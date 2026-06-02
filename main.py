@@ -83,6 +83,77 @@ def verificar_senha(senha: str, senha_hash: str) -> bool:
     except Exception:
         return False
 
+def eh_telefone_fixo(telefone: str) -> bool:
+    """Retorna True se o telefone brasileiro for um número fixo (começa com 2, 3, 4 ou 5)."""
+    if not telefone or telefone == "Não informado":
+        return False
+    nums = "".join(c for c in telefone if c.isdigit())
+    if nums.startswith("55") and len(nums) > 10:
+        nums = nums[2:]
+        
+    if len(nums) == 10:
+        return nums[2] in ['2', '3', '4', '5']
+    elif len(nums) == 8:
+        return nums[0] in ['2', '3', '4', '5']
+    return False
+
+def extrair_digitos_whatsapp(html_cleaned: str) -> list:
+    """Extrai os dígitos numéricos de todos os links do WhatsApp no HTML limpo."""
+    import re
+    numbers = []
+    matches = re.finditer(r'(?:wa\.me|api\.whatsapp\.com/send)[^\'"\s>]*', html_cleaned)
+    for m in matches:
+        url_part = m.group(0)
+        phone_match = re.search(r'(?:phone=|wa\.me/)([0-9\+\-\(\)\s]+)', url_part)
+        if phone_match:
+            raw_phone = phone_match.group(1)
+            digits = "".join(c for c in raw_phone if c.isdigit())
+            if digits:
+                numbers.append(digits)
+    return numbers
+
+def limpar_html_para_whatsapp(html_content: str) -> str:
+    """Remove footer e elementos de desenvolvedor/agência do HTML para evitar falsos positivos."""
+    if not html_content:
+        return ""
+    try:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(html_content, "html.parser")
+        
+        # Deleta todas as tags <footer>
+        for footer in soup.find_all("footer"):
+            footer.decompose()
+            
+        # Classes de desenvolvedores/agências
+        target_classes = ["developer", "agencia", "rodape", "credits"]
+        for tag in soup.find_all(True):
+            if tag.has_attr("class"):
+                classes = tag["class"]
+                if isinstance(classes, list):
+                    classes_str = " ".join(classes).lower()
+                else:
+                    classes_str = str(classes).lower()
+                if any(cls in classes_str for cls in target_classes):
+                    tag.decompose()
+        return str(soup)
+    except Exception:
+        return html_content
+
+def obter_instagram_no_site(html_content: str) -> str:
+    """Encontra link real do Instagram no HTML do site."""
+    if not html_content:
+        return ""
+    try:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(html_content, "html.parser")
+        for a_tag in soup.find_all("a", href=True):
+            href = a_tag["href"]
+            if "instagram.com/" in href:
+                return href.strip()
+    except Exception:
+        pass
+    return ""
+
 def obter_validacao_whatsapp(telefone: str, wpp_no_site: bool = False) -> str:
     """Valida se o telefone comercial é celular (WhatsApp) ou fixo."""
     if wpp_no_site:
@@ -339,15 +410,8 @@ def gerar_leads_fallback(nicho: str, cidade: str) -> List[Dict[str, Any]]:
         avaliacoes = random.randint(5, 230)
         maps = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome + ' ' + endereco)}"
         
-        instagram_link = random.choice([f"https://www.instagram.com/{nicho.lower().replace(' ', '')}_{pref.lower().replace(' ', '')}", "Não Encontrado"])
-        
-        # Simulate new WhatsApp validation statuses
-        if instagram_link != "Não Encontrado" and random.random() > 0.5:
-            wpp_status = "SIM (Confirmado)"
-        elif is_cel:
-            wpp_status = "Provável"
-        else:
-            wpp_status = "Apenas Ligação"
+        instagram_link = None
+        wpp_status = "Provável" if is_cel else "Apenas Ligação"
 
         leads.append({
             "nome": nome,
@@ -399,12 +463,33 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                         resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
                         if resp.status_code == 200:
                             html_content = resp.text
-                            import re
-                            insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
-                            if insta_match:
-                                instagram_link = insta_match.group(0)
-                            if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                            
+                            # Encontra link real do Instagram
+                            instagram_link = obter_instagram_no_site(html_content) or None
+                            
+                            # Limpa HTML para WhatsApp e extrai links
+                            html_cleaned = limpar_html_para_whatsapp(html_content)
+                            if "api.whatsapp.com" in html_cleaned or "wa.me" in html_cleaned:
                                 wpp_no_site = True
+                                
+                                # Validação Cruzada se for telefone fixo
+                                telefone = place.get("nationalPhoneNumber", "Não informado")
+                                if eh_telefone_fixo(telefone):
+                                    wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
+                                    # Normaliza números (remove DDI 55)
+                                    normalized_wpps = []
+                                    for num in wpp_numbers:
+                                        if num.startswith("55") and len(num) > 10:
+                                            normalized_wpps.append(num[2:])
+                                        else:
+                                            normalized_wpps.append(num)
+                                            
+                                    google_digits = "".join(c for c in telefone if c.isdigit())
+                                    if google_digits.startswith("55") and len(google_digits) > 10:
+                                        google_digits = google_digits[2:]
+                                        
+                                    if google_digits not in normalized_wpps:
+                                        wpp_no_site = False
                     except Exception:
                         pass
 
@@ -432,7 +517,7 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                         "avaliacoes": user_ratings,
                         "maps": maps_link,
                         "validacao_whatsapp": obter_validacao_whatsapp(telefone, wpp_no_site),
-                        "instagram_link": instagram_link or "Não Encontrado",
+                        "instagram_link": instagram_link or None,
                         "tipo_link_maps": tipo_link_maps
                     })
             return leads
@@ -480,12 +565,33 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                                 resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
                                 if resp.status_code == 200:
                                     html_content = resp.text
-                                    import re
-                                    insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
-                                    if insta_match:
-                                        instagram_link = insta_match.group(0)
-                                    if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                                    
+                                    # Encontra link real do Instagram
+                                    instagram_link = obter_instagram_no_site(html_content) or None
+                                    
+                                    # Limpa HTML para WhatsApp e extrai links
+                                    html_cleaned = limpar_html_para_whatsapp(html_content)
+                                    if "api.whatsapp.com" in html_cleaned or "wa.me" in html_cleaned:
                                         wpp_no_site = True
+                                        
+                                        # Validação Cruzada se for telefone fixo
+                                        telefone = details.get("formatted_phone_number", "Não informado")
+                                        if eh_telefone_fixo(telefone):
+                                            wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
+                                            # Normaliza números (remove DDI 55)
+                                            normalized_wpps = []
+                                            for num in wpp_numbers:
+                                                if num.startswith("55") and len(num) > 10:
+                                                    normalized_wpps.append(num[2:])
+                                                else:
+                                                    normalized_wpps.append(num)
+                                                    
+                                            google_digits = "".join(c for c in telefone if c.isdigit())
+                                            if google_digits.startswith("55") and len(google_digits) > 10:
+                                                google_digits = google_digits[2:]
+                                                
+                                            if google_digits not in normalized_wpps:
+                                                wpp_no_site = False
                             except Exception:
                                 pass
 
@@ -508,7 +614,7 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                                 "avaliacoes": details.get("user_ratings_total", 0),
                                 "maps": maps_link,
                                 "validacao_whatsapp": obter_validacao_whatsapp(details.get("formatted_phone_number", "Não informado"), wpp_no_site),
-                                "instagram_link": instagram_link or "Não Encontrado",
+                                "instagram_link": instagram_link or None,
                                 "tipo_link_maps": tipo_link_maps
                             })
                 except Exception:

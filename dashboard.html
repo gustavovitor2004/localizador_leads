@@ -940,6 +940,15 @@
             border: 1px solid var(--border-soft);
             color: var(--text-main);
             background: transparent;
+            flex-shrink: 0;
+            min-width: max-content;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            overflow: visible;
         }
 
         .btn-table-action:hover {
@@ -2083,7 +2092,7 @@
                        </span>`;
 
                 let instagramHtml = '';
-                if (lead.instagram_link && lead.instagram_link !== 'Não Encontrado') {
+                if (lead.instagram_link && lead.instagram_link !== 'Não Encontrado' && lead.instagram_link !== 'None') {
                     instagramHtml = `
                         <a href="${lead.instagram_link}" target="_blank" class="btn-table-action instagram" title="Abrir Instagram">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -2113,7 +2122,7 @@
                             <span class="rating-count">(${lead.avaliacoes})</span>
                         </div>
                     </td>
-                    <td data-label="Ações Rápidas">
+                    <td data-label="Ações Rápidas" class="actions-cell" style="display: flex; gap: 6px; align-items: center; overflow: visible;">
                         <div class="actions-cell-buttons">
                             ${wppButtonHtml}
                             <a href="${lead.maps}" target="_blank" class="btn-table-action" title="${mapsTitle}">

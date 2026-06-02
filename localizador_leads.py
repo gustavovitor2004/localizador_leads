@@ -54,6 +54,77 @@ def exibir_banner():
     """
     print(banner)
 
+def eh_telefone_fixo(telefone: str) -> bool:
+    """Retorna True se o telefone brasileiro for um número fixo (começa com 2, 3, 4 ou 5)."""
+    if not telefone or telefone == "Não informado":
+        return False
+    nums = "".join(c for c in telefone if c.isdigit())
+    if nums.startswith("55") and len(nums) > 10:
+        nums = nums[2:]
+        
+    if len(nums) == 10:
+        return nums[2] in ['2', '3', '4', '5']
+    elif len(nums) == 8:
+        return nums[0] in ['2', '3', '4', '5']
+    return False
+
+def extrair_digitos_whatsapp(html_cleaned: str) -> list:
+    """Extrai os dígitos numéricos de todos os links do WhatsApp no HTML limpo."""
+    import re
+    numbers = []
+    matches = re.finditer(r'(?:wa\.me|api\.whatsapp\.com/send)[^\'"\s>]*', html_cleaned)
+    for m in matches:
+        url_part = m.group(0)
+        phone_match = re.search(r'(?:phone=|wa\.me/)([0-9\+\-\(\)\s]+)', url_part)
+        if phone_match:
+            raw_phone = phone_match.group(1)
+            digits = "".join(c for c in raw_phone if c.isdigit())
+            if digits:
+                numbers.append(digits)
+    return numbers
+
+def limpar_html_para_whatsapp(html_content: str) -> str:
+    """Remove footer e elementos de desenvolvedor/agência do HTML para evitar falsos positivos."""
+    if not html_content:
+        return ""
+    try:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(html_content, "html.parser")
+        
+        # Deleta todas as tags <footer>
+        for footer in soup.find_all("footer"):
+            footer.decompose()
+            
+        # Classes de desenvolvedores/agências
+        target_classes = ["developer", "agencia", "rodape", "credits"]
+        for tag in soup.find_all(True):
+            if tag.has_attr("class"):
+                classes = tag["class"]
+                if isinstance(classes, list):
+                    classes_str = " ".join(classes).lower()
+                else:
+                    classes_str = str(classes).lower()
+                if any(cls in classes_str for cls in target_classes):
+                    tag.decompose()
+        return str(soup)
+    except Exception:
+        return html_content
+
+def obter_instagram_no_site(html_content: str) -> str:
+    """Encontra link real do Instagram no HTML do site."""
+    if not html_content:
+        return ""
+    try:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(html_content, "html.parser")
+        for a_tag in soup.find_all("a", href=True):
+            href = a_tag["href"]
+            if "instagram.com/" in href:
+                return href.strip()
+    except Exception:
+        pass
+    return ""
+
 def obter_validacao_whatsapp(telefone: str, wpp_no_site: bool = False) -> str:
     """Valida se o telefone comercial é celular (WhatsApp) ou fixo."""
     if wpp_no_site:
@@ -178,12 +249,33 @@ def buscar_leads_nova_api(nicho, cidade, api_key):
                 resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
                 if resp.status_code == 200:
                     html_content = resp.text
-                    import re
-                    insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
-                    if insta_match:
-                        instagram_link = insta_match.group(0)
-                    if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                    
+                    # Encontra link real do Instagram
+                    instagram_link = obter_instagram_no_site(html_content) or None
+                    
+                    # Limpa HTML para WhatsApp e extrai links
+                    html_cleaned = limpar_html_para_whatsapp(html_content)
+                    if "api.whatsapp.com" in html_cleaned or "wa.me" in html_cleaned:
                         wpp_no_site = True
+                        
+                        # Validação Cruzada se for telefone fixo
+                        telefone = place.get("nationalPhoneNumber", "Não informado")
+                        if eh_telefone_fixo(telefone):
+                            wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
+                            # Normaliza números (remove DDI 55)
+                            normalized_wpps = []
+                            for num in wpp_numbers:
+                                if num.startswith("55") and len(num) > 10:
+                                    normalized_wpps.append(num[2:])
+                                else:
+                                    normalized_wpps.append(num)
+                                    
+                            google_digits = "".join(c for c in telefone if c.isdigit())
+                            if google_digits.startswith("55") and len(google_digits) > 10:
+                                google_digits = google_digits[2:]
+                                
+                            if google_digits not in normalized_wpps:
+                                wpp_no_site = False
             except Exception:
                 pass
 
@@ -211,7 +303,7 @@ def buscar_leads_nova_api(nicho, cidade, api_key):
                 "Avaliações (Total)": user_ratings,
                 "Link do Google Maps": maps_link,
                 "validacao_whatsapp": obter_validacao_whatsapp(telefone, wpp_no_site),
-                "instagram_link": instagram_link or "Não Encontrado",
+                "instagram_link": instagram_link or None,
                 "tipo_link_maps": tipo_link_maps
             })
             
@@ -281,12 +373,33 @@ def buscar_leads_legacy_api(nicho, cidade, api_key):
                         resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
                         if resp.status_code == 200:
                             html_content = resp.text
-                            import re
-                            insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
-                            if insta_match:
-                                instagram_link = insta_match.group(0)
-                            if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                            
+                            # Encontra link real do Instagram
+                            instagram_link = obter_instagram_no_site(html_content) or None
+                            
+                            # Limpa HTML para WhatsApp e extrai links
+                            html_cleaned = limpar_html_para_whatsapp(html_content)
+                            if "api.whatsapp.com" in html_cleaned or "wa.me" in html_cleaned:
                                 wpp_no_site = True
+                                
+                                # Validação Cruzada se for telefone fixo
+                                telefone = details_data.get("formatted_phone_number", "Não informado")
+                                if eh_telefone_fixo(telefone):
+                                    wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
+                                    # Normaliza números (remove DDI 55)
+                                    normalized_wpps = []
+                                    for num in wpp_numbers:
+                                        if num.startswith("55") and len(num) > 10:
+                                            normalized_wpps.append(num[2:])
+                                        else:
+                                            normalized_wpps.append(num)
+                                            
+                                    google_digits = "".join(c for c in telefone if c.isdigit())
+                                    if google_digits.startswith("55") and len(google_digits) > 10:
+                                        google_digits = google_digits[2:]
+                                        
+                                    if google_digits not in normalized_wpps:
+                                        wpp_no_site = False
                     except Exception:
                         pass
 
@@ -310,7 +423,7 @@ def buscar_leads_legacy_api(nicho, cidade, api_key):
                         "Avaliações (Total)": details_data.get("user_ratings_total", 0),
                         "Link do Google Maps": maps_link,
                         "validacao_whatsapp": obter_validacao_whatsapp(details_data.get("formatted_phone_number", "Não informado"), wpp_no_site),
-                        "instagram_link": instagram_link or "Não Encontrado",
+                        "instagram_link": instagram_link or None,
                         "tipo_link_maps": tipo_link_maps
                     })
         except Exception as e:
@@ -407,15 +520,13 @@ def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
                         
                     # Formata coluna do link do Instagram como um link azul e sublinhado clicável no Excel
                     if col == 7:
-                        if str(cell.value).startswith("http"):
-                            url_completa = cell.value
+                        val = cell.value
+                        if val and str(val).startswith("http"):
+                            url_completa = str(val)
                             cell.value = f'=HYPERLINK("{url_completa}", "Abrir Instagram")'
                             cell.font = Font(name="Calibri", size=11, color="0563C1", underline="single")
                         else:
-                            if not cell.value or cell.value == "Não Encontrado":
-                                cell.value = "Não Encontrado"
-                                cell.font = Font(name="Calibri", size=11, color="7F7F7F")
-                                cell.alignment = align_center
+                            cell.value = None  # Deixa totalmente em branco para relatórios limpos
                         
             # Ajustando a largura das colunas dinamicamente
             for col in worksheet.columns:
