@@ -54,6 +54,38 @@ def exibir_banner():
     """
     print(banner)
 
+def obter_validacao_whatsapp(telefone: str) -> str:
+    """Valida se o telefone comercial é celular (WhatsApp) ou fixo."""
+    if not telefone or telefone == "Não informado":
+        return "Verificar"
+    # Remove tudo que não for dígito
+    nums = "".join(c for c in telefone if c.isdigit())
+    
+    # Se começar com 55 e tiver 12 ou 13 dígitos, remove o 55
+    if nums.startswith("55") and len(nums) in [12, 13]:
+        nums = nums[2:]
+        
+    # Celulares no Brasil têm 11 dígitos e o número local começa com 9: e.g. 71999998888
+    # Telefones fixos têm 10 dígitos: e.g. 7133334444
+    if len(nums) == 11 and nums[2] == '9':
+        return "Sim"
+    elif len(nums) == 10:
+        if nums[2] == '9':
+            return "Provável"
+        elif nums[2] in ['2', '3', '4', '5']:
+            return "Não"
+        return "Verificar"
+    else:
+        # Caso tenha apenas 9 dígitos e comece com 9 (celular sem DDD)
+        if len(nums) == 9 and nums[0] == '9':
+            return "Sim"
+        # Caso tenha 8 dígitos (fixo sem DDD)
+        elif len(nums) == 8:
+            if nums[0] in ['2', '3', '4', '5']:
+                return "Não"
+            return "Verificar"
+        return "Verificar"
+
 def obter_api_key():
     """Obtém a chave de API do Google Cloud de diferentes fontes possíveis."""
     # 1. Tenta carregar do ambiente (.env ou variável de sistema)
@@ -145,7 +177,14 @@ def buscar_leads_nova_api(nicho, cidade, api_key):
             endereco = place.get("formattedAddress", "Não informado")
             rating = place.get("rating", 0.0)
             user_ratings = place.get("userRatingCount", 0)
-            maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome + ' ' + endereco)}"
+            
+            place_id = place.get("id")
+            if place_id:
+                maps_link = f"https://www.google.com/maps/search/?api=1&query=Google&query_place_id={place_id}"
+                tipo_link_maps = "Link Direto"
+            else:
+                maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome + ' ' + endereco)}"
+                tipo_link_maps = "Link de Pesquisa"
             
             leads.append({
                 "Nome": nome,
@@ -153,7 +192,9 @@ def buscar_leads_nova_api(nicho, cidade, api_key):
                 "Endereço": endereco,
                 "Avaliação (Nota)": rating,
                 "Avaliações (Total)": user_ratings,
-                "Link do Google Maps": maps_link
+                "Link do Google Maps": maps_link,
+                "validacao_whatsapp": obter_validacao_whatsapp(telefone),
+                "tipo_link_maps": tipo_link_maps
             })
             
     return leads, total_analisados
@@ -218,14 +259,23 @@ def buscar_leads_legacy_api(nicho, cidade, api_key):
                 if not website:
                     nome_det = details_data.get("name", nome)
                     endereco_det = details_data.get("formatted_address", "Não informado")
-                    maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome_det + ' ' + endereco_det)}"
+                    
+                    if place_id:
+                        maps_link = f"https://www.google.com/maps/search/?api=1&query=Google&query_place_id={place_id}"
+                        tipo_link_maps = "Link Direto"
+                    else:
+                        maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome_det + ' ' + endereco_det)}"
+                        tipo_link_maps = "Link de Pesquisa"
+                        
                     leads.append({
                         "Nome": nome_det,
                         "Telefone": details_data.get("formatted_phone_number", "Não informado"),
                         "Endereço": endereco_det,
                         "Avaliação (Nota)": details_data.get("rating", 0.0),
                         "Avaliações (Total)": details_data.get("user_ratings_total", 0),
-                        "Link do Google Maps": maps_link
+                        "Link do Google Maps": maps_link,
+                        "validacao_whatsapp": obter_validacao_whatsapp(details_data.get("formatted_phone_number", "Não informado")),
+                        "tipo_link_maps": tipo_link_maps
                     })
         except Exception as e:
             # Continua verificando os outros mesmo se um falhar
@@ -236,6 +286,13 @@ def buscar_leads_legacy_api(nicho, cidade, api_key):
 
 def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
     """Salva os dados formatados em Excel com estilo profissional."""
+    # Renomeia validacao_whatsapp para WhatsApp
+    if "validacao_whatsapp" in df.columns:
+        df = df.rename(columns={"validacao_whatsapp": "WhatsApp"})
+    # Remove coluna tipo_link_maps se existir
+    if "tipo_link_maps" in df.columns:
+        df = df.drop(columns=["tipo_link_maps"])
+
     # Resolve arquivo bloqueado (ex: aberto no Excel) gerando um sufixo numérico
     actual_filename = filename
     if os.path.exists(filename):
@@ -291,16 +348,18 @@ def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
                     cell.border = border_cell
                     cell.font = Font(name="Calibri", size=11)
                     
-                    # Centralizar Notas e Quantidades
-                    if col in [4, 5]: # Colunas de Avaliação e Total de Avaliações
+                    # Centralizar Notas, Quantidades e WhatsApp
+                    if col in [4, 5, 7]: # Colunas de Avaliação, Total de Avaliações e WhatsApp
                         cell.alignment = align_center
+                    elif col == 6: # Coluna de Link do Google Maps
+                        cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=False)
                     else:
                         cell.alignment = align_left
                         
                     # Formata coluna do link do Maps como um link azul e sublinhado clicável no Excel
                     if col == 6 and str(cell.value).startswith("http"):
                         url_completa = cell.value
-                        cell.value = f'=HYPERLINK("{url_completa}", "Ver no Maps")'
+                        cell.value = f'=HYPERLINK("{url_completa}", "Abrir no Maps")'
                         cell.font = Font(name="Calibri", size=11, color="0563C1", underline="single")
                         
             # Ajustando a largura das colunas dinamicamente
@@ -311,12 +370,15 @@ def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
                     if cell.value:
                         val_str = str(cell.value)
                         if val_str.startswith("=HYPERLINK"):
-                            val_len = 11  # "Ver no Maps" length
+                            val_len = 14  # "Abrir no Maps" length
                         else:
                             val_len = len(val_str)
                         max_len = max(max_len, val_len)
                 # Define largura com uma folga
                 worksheet.column_dimensions[col_letter].width = max(max_len + 3, 12)
+                
+            # Força a largura da coluna F para 20
+            worksheet.column_dimensions['F'].width = 20
                 
             # Adiciona linhas de grade padrão
             worksheet.views.sheetView[0].showGridLines = True
@@ -388,6 +450,10 @@ def main():
             df_preview = df.copy()
             if "Link do Google Maps" in df_preview.columns:
                 df_preview = df_preview.drop(columns=["Link do Google Maps"])
+            if "tipo_link_maps" in df_preview.columns:
+                df_preview = df_preview.drop(columns=["tipo_link_maps"])
+            if "validacao_whatsapp" in df_preview.columns:
+                df_preview = df_preview.rename(columns={"validacao_whatsapp": "WhatsApp"})
             df_preview["Nome"] = df_preview["Nome"].apply(lambda x: x[:25] + "..." if len(x) > 25 else x)
             df_preview["Endereço"] = df_preview["Endereço"].apply(lambda x: x[:30] + "..." if len(x) > 30 else x)
             print(df_preview.to_string(index=False))

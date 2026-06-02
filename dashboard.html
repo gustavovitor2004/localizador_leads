@@ -954,6 +954,57 @@
             background: rgba(142, 71, 45, 0.03);
         }
 
+        /* Badges para Validação de WhatsApp */
+        .wpp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            width: fit-content;
+        }
+        .wpp-badge.sim {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: var(--success);
+        }
+        .wpp-badge.provavel {
+            background: rgba(14, 165, 233, 0.08);
+            border: 1px solid rgba(14, 165, 233, 0.25);
+            color: var(--primary);
+        }
+        .wpp-badge.nao {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: var(--danger);
+        }
+        .wpp-badge.verificar {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: var(--warning);
+        }
+
+        /* Indicador de precisão do Maps */
+        .maps-indicator-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 4px;
+        }
+        .maps-indicator-dot.direto {
+            background-color: var(--success);
+            box-shadow: 0 0 6px var(--success-glow);
+        }
+        .maps-indicator-dot.pesquisa {
+            background-color: var(--warning);
+            box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+        }
+
         /* Notificações Toaster */
         .toast-container {
             position: fixed;
@@ -1412,6 +1463,7 @@
                             <tr>
                                 <th>Nome do Estabelecimento</th>
                                 <th>Telefone Comercial</th>
+                                <th>WhatsApp</th>
                                 <th>Endereço do Local</th>
                                 <th>Avaliação Google Places</th>
                                 <th>Ações Rápidas</th>
@@ -1963,7 +2015,7 @@
             tbody.innerHTML = '';
             
             if (leads.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!</td></tr>`;
                 return;
             }
             
@@ -1976,12 +2028,46 @@
                     starsSvg += (i <= starsCount) ? '★' : '☆';
                 }
                 
-                const cleanPhone = lead.telefone.replace(/\D/g, '');
-                const wppLink = `https://wa.me/55${cleanPhone}?text=Olá,%20vi%20sua%20empresa%20${encodeURIComponent(lead.nome)}%20no%20Google%20e%20gostaria%20de%20apresentar%20uma%20proposta...`;
+                // Sanitização robusta do telefone e geração de link do WhatsApp
+                let wppLink = '#';
+                let hasPhone = false;
+                if (lead.telefone && lead.telefone !== "Não informado") {
+                    let cleanPhone = lead.telefone.replace(/\D/g, '');
+                    if (cleanPhone.length > 0) {
+                        hasPhone = true;
+                        if (cleanPhone.startsWith('55') && (cleanPhone.length === 12 || cleanPhone.length === 13)) {
+                            // Já inclui o código do país (+55)
+                        } else {
+                            cleanPhone = '55' + cleanPhone;
+                        }
+                        wppLink = `https://wa.me/${cleanPhone}?text=Olá,%20vi%20sua%20empresa%20${encodeURIComponent(lead.nome)}%20no%20Google%20e%20gostaria%20de%20apresentar%20uma%20proposta...`;
+                    }
+                }
                 
+                const wppStatus = lead.validacao_whatsapp || "Verificar";
+                const wppStatusClass = wppStatus.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // "sim", "provavel", "nao", "verificar"
+                
+                const isLinkDireto = lead.tipo_link_maps === "Link Direto";
+                const mapsTitle = isLinkDireto ? "Link Direto (100% Garantido)" : "Link de Pesquisa (Busca por Texto)";
+                const mapsDotClass = isLinkDireto ? "direto" : "pesquisa";
+
+                const wppButtonHtml = hasPhone
+                    ? `<a href="${wppLink}" target="_blank" class="btn-table-action whatsapp" title="Iniciar Conversa comercial">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.324 5.328 0 11.99 0c3.23.001 6.262 1.258 8.537 3.535C22.8 5.813 24.053 8.847 24.05 12.077c-.003 6.66-5.328 11.98-11.99 11.98-2.003-.001-3.975-.497-5.733-1.442L0 24zm6.59-4.846c1.62.963 3.377 1.47 5.4 1.472 5.564 0 10.093-4.522 10.096-10.086.002-2.695-1.043-5.228-2.946-7.133C17.234 1.503 14.707.458 12.002.458c-5.568 0-10.097 4.522-10.1 10.086-.001 1.936.5 3.818 1.448 5.432L2.348 21.65l5.965-1.562z"/>
+                            </svg>
+                            WhatsApp
+                       </a>`
+                    : `<span class="btn-table-action whatsapp disabled" style="opacity: 0.4; cursor: not-allowed;" title="Sem telefone cadastrado">
+                            WhatsApp
+                       </span>`;
+
                 tr.innerHTML = `
                     <td data-label="Nome do Estabelecimento" class="lead-name-cell">${lead.nome}</td>
                     <td data-label="Telefone Comercial" class="lead-phone">${lead.telefone}</td>
+                    <td data-label="WhatsApp">
+                        <span class="wpp-badge ${wppStatusClass}">${wppStatus}</span>
+                    </td>
                     <td data-label="Endereço do Local">${lead.endereco}</td>
                     <td data-label="Avaliação Google Places">
                         <div class="rating-badge">
@@ -1992,14 +2078,10 @@
                     </td>
                     <td data-label="Ações Rápidas">
                         <div class="actions-cell-buttons">
-                            <a href="${wppLink}" target="_blank" class="btn-table-action whatsapp" title="Iniciar Conversa comercial">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.324 5.328 0 11.99 0c3.23.001 6.262 1.258 8.537 3.535C22.8 5.813 24.053 8.847 24.05 12.077c-.003 6.66-5.328 11.98-11.99 11.98-2.003-.001-3.975-.497-5.733-1.442L0 24zm6.59-4.846c1.62.963 3.377 1.47 5.4 1.472 5.564 0 10.093-4.522 10.096-10.086.002-2.695-1.043-5.228-2.946-7.133C17.234 1.503 14.707.458 12.002.458c-5.568 0-10.097 4.522-10.1 10.086-.001 1.936.5 3.818 1.448 5.432L2.348 21.65l5.965-1.562z"/>
-                                </svg>
-                                WhatsApp
-                            </a>
-                            <a href="${lead.maps}" target="_blank" class="btn-table-action" title="Visualizar no Google Maps">
+                            ${wppButtonHtml}
+                            <a href="${lead.maps}" target="_blank" class="btn-table-action" title="${mapsTitle}">
                                 Maps
+                                <span class="maps-indicator-dot ${mapsDotClass}"></span>
                             </a>
                         </div>
                     </td>
@@ -2116,7 +2198,7 @@
    <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11"/>
   </Style>
   <Style ss:ID="Hyperlink">
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="0"/>
    <Borders>
     <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
     <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
@@ -2128,31 +2210,34 @@
  </Styles>
  <Worksheet ss:Name="Leads">
   <Table x:FullColumns="1" x:FullRows="1" ss:DefaultRowHeight="20">
-   <Column ss:Width="200"/>
-   <Column ss:Width="110"/>
-   <Column ss:Width="260"/>
-   <Column ss:Width="110"/>
-   <Column ss:Width="110"/>
-   <Column ss:Width="110"/>
-   <Row ss:Height="26">
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Nome</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Telefone</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Endereço</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliação (Nota)</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliações (Total)</Data></Cell>
-    <Cell ss:StyleID="Header"><Data ss:Type="String">Link do Google Maps</Data></Cell>
-   </Row>`;
+    <Column ss:Width="200"/>
+    <Column ss:Width="110"/>
+    <Column ss:Width="260"/>
+    <Column ss:Width="110"/>
+    <Column ss:Width="110"/>
+    <Column ss:Width="110"/>
+    <Column ss:Width="100"/>
+    <Row ss:Height="26">
+     <Cell ss:StyleID="Header"><Data ss:Type="String">Nome</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">Telefone</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">Endereço</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliação (Nota)</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliações (Total)</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">Link do Google Maps</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">WhatsApp</Data></Cell>
+    </Row>`;
 
             leads.forEach(lead => {
                 xml += `
-   <Row ss:Height="22">
-    <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.nome)}</Data></Cell>
-    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(lead.telefone)}</Data></Cell>
-    <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.endereco)}</Data></Cell>
-    <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.nota}</Data></Cell>
-    <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.avaliacoes}</Data></Cell>
-    <Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.maps)}"><Data ss:Type="String">Ver no Maps</Data></Cell>
-   </Row>`;
+    <Row ss:Height="22">
+     <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.nome)}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(lead.telefone)}</Data></Cell>
+     <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.endereco)}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.nota}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.avaliacoes}</Data></Cell>
+     <Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.maps)}"><Data ss:Type="String">Abrir no Maps</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(lead.validacao_whatsapp || 'Verificar')}</Data></Cell>
+    </Row>`;
             });
 
             xml += `

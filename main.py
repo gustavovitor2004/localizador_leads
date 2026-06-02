@@ -83,6 +83,38 @@ def verificar_senha(senha: str, senha_hash: str) -> bool:
     except Exception:
         return False
 
+def obter_validacao_whatsapp(telefone: str) -> str:
+    """Valida se o telefone comercial é celular (WhatsApp) ou fixo."""
+    if not telefone or telefone == "Não informado":
+        return "Verificar"
+    # Remove tudo que não for dígito
+    nums = "".join(c for c in telefone if c.isdigit())
+    
+    # Se começar com 55 e tiver 12 ou 13 dígitos, remove o 55
+    if nums.startswith("55") and len(nums) in [12, 13]:
+        nums = nums[2:]
+        
+    # Celulares no Brasil têm 11 dígitos e o número local começa com 9: e.g. 71999998888
+    # Telefones fixos têm 10 dígitos: e.g. 7133334444
+    if len(nums) == 11 and nums[2] == '9':
+        return "Sim"
+    elif len(nums) == 10:
+        if nums[2] == '9':
+            return "Provável"
+        elif nums[2] in ['2', '3', '4', '5']:
+            return "Não"
+        return "Verificar"
+    else:
+        # Caso tenha apenas 9 dígitos e comece com 9 (celular sem DDD)
+        if len(nums) == 9 and nums[0] == '9':
+            return "Sim"
+        # Caso tenha 8 dígitos (fixo sem DDD)
+        elif len(nums) == 8:
+            if nums[0] in ['2', '3', '4', '5']:
+                return "Não"
+            return "Verificar"
+        return "Verificar"
+
 # ==========================================================================
 # SIMULAÇÃO DE BANCO DE DADOS EM MEMÓRIA (SUPABASE / POSTGRES PLACEHOLDER)
 # ==========================================================================
@@ -313,7 +345,9 @@ def gerar_leads_fallback(nicho: str, cidade: str) -> List[Dict[str, Any]]:
             "endereco": endereco,
             "nota": nota,
             "avaliacoes": avaliacoes,
-            "maps": maps
+            "maps": maps,
+            "validacao_whatsapp": obter_validacao_whatsapp(telefone),
+            "tipo_link_maps": "Link de Pesquisa"
         })
         
     # Ordena por nota descrecente
@@ -331,7 +365,7 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": api_key,
-            "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.nationalPhoneNumber,places.websiteUri,places.googleMapsUri"
+            "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.nationalPhoneNumber,places.websiteUri,places.googleMapsUri"
         }
         body = {
             "textQuery": f"{nicho} em {cidade}",
@@ -352,7 +386,14 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                     endereco = place.get("formattedAddress", "Não informado")
                     rating = place.get("rating", 0.0)
                     user_ratings = place.get("userRatingCount", 0)
-                    maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome + ' ' + endereco)}"
+                    
+                    place_id = place.get("id")
+                    if place_id:
+                        maps_link = f"https://www.google.com/maps/search/?api=1&query=Google&query_place_id={place_id}"
+                        tipo_link_maps = "Link Direto"
+                    else:
+                        maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome + ' ' + endereco)}"
+                        tipo_link_maps = "Link de Pesquisa"
                     
                     leads.append({
                         "nome": nome,
@@ -360,7 +401,9 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                         "endereco": endereco,
                         "nota": rating,
                         "avaliacoes": user_ratings,
-                        "maps": maps_link
+                        "maps": maps_link,
+                        "validacao_whatsapp": obter_validacao_whatsapp(telefone),
+                        "tipo_link_maps": tipo_link_maps
                     })
             return leads
     except Exception as e:
@@ -400,14 +443,23 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                         if not details.get("website"):
                             nome_det = details.get("name", place.get("name"))
                             endereco_det = details.get("formatted_address", "Não informado")
-                            maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome_det + ' ' + endereco_det)}"
+                            
+                            if place_id:
+                                maps_link = f"https://www.google.com/maps/search/?api=1&query=Google&query_place_id={place_id}"
+                                tipo_link_maps = "Link Direto"
+                            else:
+                                maps_link = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome_det + ' ' + endereco_det)}"
+                                tipo_link_maps = "Link de Pesquisa"
+                                
                             leads.append({
                                 "nome": nome_det,
                                 "telefone": details.get("formatted_phone_number", "Não informado"),
                                 "endereco": endereco_det,
                                 "nota": details.get("rating", 0.0),
                                 "avaliacoes": details.get("user_ratings_total", 0),
-                                "maps": maps_link
+                                "maps": maps_link,
+                                "validacao_whatsapp": obter_validacao_whatsapp(details.get("formatted_phone_number", "Não informado")),
+                                "tipo_link_maps": tipo_link_maps
                             })
                 except Exception:
                     pass
