@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadFinder Pro - Painel de Varredura Comercial</title>
+    
+    <!-- Google Fonts: Outfit (Heading) & Inter (UI Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Supabase Official JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* ==========================================================================
+           1. DESIGN SYSTEM - VARIÁVEIS :ROOT & RESET
+           ========================================================================== */
+        :root {
+            /* Palette Cores (Harmonioso, vibrante e moderno - Dark Mode) */
+            --bg-deep: hsl(222, 47%, 6%);
+            --bg-base: hsl(222, 47%, 10%);
+            --bg-card: hsla(222, 47%, 14%, 0.7);
+            --bg-input: hsl(222, 47%, 16%);
+            --border-glow: hsla(180, 100%, 50%, 0.2);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            
+            --primary: hsl(180, 100%, 50%);         /* Ciano Neon */
+            --primary-glow: hsla(180, 100%, 50%, 0.4);
+            --secondary: hsl(217, 91%, 60%);       /* Azul Elétrico */
+            --secondary-glow: hsla(217, 91%, 60%, 0.3);
+            
+            --text-main: hsl(210, 40%, 98%);       /* Texto Branco/Claro */
+            --text-muted: hsl(215, 20%, 65%);      /* Texto Cinza Médio */
+            --text-dark: hsl(222, 47%, 11%);       /* Texto Escuro de Destaque */
+            
+            --success: hsl(142, 71%, 45%);         /* Verde Esmeralda */
+            --success-glow: hsla(142, 71%, 45%, 0.4);
+            --warning: hsl(48, 96%, 53%);          /* Amarelo/Laranja Google */
+            --danger: hsl(346, 84%, 61%);          /* Vermelho Cuidado */
+            
+            /* Efeitos de Layout */
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+            --glass-blur: blur(16px);
+        }
+
+        /* Reset Global */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(222, 47%, 12%, 0.5) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(217, 91%, 15%, 0.4) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, hsla(180, 100%, 10%, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Estilizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-deep);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-input);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Container Principal */
+        .app-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* ==========================================================================
+           2. TELA DE AUTENTICAÇÃO SUPABASE (LOGIN / CADASTRO)
+           ========================================================================== */
+        .auth-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+            padding: 2rem 1.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: var(--shadow-premium);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%);
+        }
+
+        .auth-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .auth-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.4;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-soft);
+            margin-bottom: 2rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border-bottom: 2px solid transparent;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .auth-form-footer {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 1.5rem;
+            line-height: 1.4;
+        }
+
+        /* ==========================================================================
+           3. CABEÇALHO (HEADER)
+           ========================================================================== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-premium);
+            transition: var(--transition-smooth);
+        }
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand-title span.badge {
+            font-size: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            -webkit-text-fill-color: var(--text-dark);
+            color: var(--text-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .brand-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .user-status-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-soft);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .user-credits-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(180, 255, 255, 0.02);
+            border: 1px solid var(--primary-glow);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success-glow);
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--border-soft);
+            color: var(--text-main);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(255, 100, 100, 0.05);
+            transform: scale(1.05);
+        }
+
+        /* ==========================================================================
+           4. CONTAINER DO FORMULÁRIO CENTRALIZADO
+           ========================================================================== */
+        .form-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            transition: var(--transition-smooth);
+        }
+
+        .card-panel {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: var(--shadow-premium);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .card-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%);
+        }
+
+        .card-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1.25rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1.1rem 1.25rem 1.1rem 3.25rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--border-glow);
+            background: hsl(222, 47%, 18%);
+        }
+
+        .form-input:focus + .input-icon {
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* Personalização do datalist */
+        .form-input::-webkit-calendar-picker-indicator {
+            opacity: 0.3;
+            cursor: pointer;
+            filter: invert(1);
+            transition: var(--transition-smooth);
+        }
+        .form-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+            filter: invert(1) drop-shadow(0 0 2px var(--primary));
+        }
+
+        /* Ajuste do input-wrapper para conter o dropdown absoluto e o ícone de seta customizado */
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .form-input {
+            padding-right: 3rem; /* Espaço para o ícone de seta na direita */
+        }
+
+        /* Estilização Premium do Dropdown Customizado (Dark/Cyber) */
+        .custom-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+            margin-top: 8px;
+            background: hsl(222, 47%, 12%);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .custom-dropdown.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .custom-dropdown ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .custom-dropdown li {
+            padding: 12px 16px;
+            text-align: left;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition-smooth);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .custom-dropdown li:last-child {
+            border-bottom: none;
+        }
+
+        .custom-dropdown li:hover {
+            background: rgba(180, 255, 255, 0.08);
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* Estilização da scrollbar interna do dropdown */
+        .custom-dropdown::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-dropdown::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0 12px 12px 0;
+        }
+        .custom-dropdown::-webkit-scrollbar-thumb {
+            background: var(--bg-input);
+            border-radius: 3px;
+        }
+        .custom-dropdown::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            border: none;
+            border-radius: var(--radius-md);
+            color: var(--text-dark);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 20px var(--secondary-glow);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.6s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px var(--primary-glow);
+        }
+
+        .btn-submit:hover::after {
+            left: 100%;
+        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        .btn-submit svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-dark);
+            transition: var(--transition-smooth);
+        }
+
+        .btn-submit:hover svg {
+            transform: rotate(90deg);
+        }
+
+        /* ==========================================================================
+           5. SEÇÃO DE AGUARDE / SCANNING SIMULADO
+           ========================================================================== */
+        .scanning-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: var(--transition-smooth);
+        }
+
+        .scanner-loader {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 2rem;
+        }
+
+        .loader-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid var(--bg-input);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .loader-ring-inner {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border: 3px solid var(--bg-input);
+            border-bottom: 3px solid var(--secondary);
+            border-radius: 50%;
+            animation: spinReverse 1s linear infinite;
+        }
+
+        .scanner-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            box-shadow: 0 0 10px var(--primary-glow);
+            transition: width 0.1s linear;
+        }
+
+        .scanning-status {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Console Terminal no Frontend */
+        .terminal-console {
+            width: 100%;
+            height: 120px;
+            background: hsl(222, 47%, 4%);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            color: hsl(120, 100%, 75%); /* Verde fosforescente clássico */
+            overflow-y: auto;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            scroll-behavior: smooth;
+        }
+
+        .terminal-line {
+            line-height: 1.3;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .terminal-line.info { color: hsl(180, 100%, 75%); }
+        .terminal-line.success { color: hsl(120, 100%, 75%); }
+        .terminal-line.warn { color: var(--warning); }
+
+        /* ==========================================================================
+           6. SEÇÃO DE RESULTADOS COMERCIAL (TABELAS E METRICAS)
+           ========================================================================== */
+        .results-section {
+            display: none;
+            flex-direction: column;
+            gap: 1.75rem;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Painel de Métricas Rápidas */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            box-shadow: var(--shadow-premium);
+            transition: var(--transition-smooth);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .metric-icon-wrapper {
+            width: 54px;
+            height: 54px;
+            border-radius: var(--radius-sm);
+            background: rgba(180, 255, 255, 0.04);
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            transition: var(--transition-smooth);
+        }
+
+        .metric-card:hover .metric-icon-wrapper {
+            background: var(--primary);
+            color: var(--text-dark);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .metric-card:nth-child(2):hover .metric-icon-wrapper {
+            background: var(--secondary);
+            color: var(--text-main);
+            box-shadow: 0 0 15px var(--secondary-glow);
+        }
+
+        .metric-card:nth-child(2) .metric-icon-wrapper {
+            color: var(--secondary);
+        }
+
+        .metric-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .metric-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Container da Tabela e Ações */
+        .results-panel {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-premium);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .results-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-soft);
+            padding-bottom: 1.25rem;
+        }
+
+        .results-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .results-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .results-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .results-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-action {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition-smooth);
+            border: 1px solid transparent;
+        }
+
+        .btn-excel {
+            background: var(--success);
+            color: #ffffff;
+            box-shadow: 0 4px 12px var(--success-glow);
+        }
+
+        .btn-excel:hover {
+            background: hsl(142, 71%, 38%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--success-glow);
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--border-soft);
+            color: var(--text-main);
+        }
+
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(180, 255, 255, 0.02);
+            transform: translateY(-1px);
+        }
+
+        /* Tabela Estilizada */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table.leads-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        table.leads-table th {
+            padding: 1rem 1.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        table.leads-table td {
+            padding: 1.1rem 1.25rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border-soft);
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+
+        table.leads-table tr {
+            transition: var(--transition-smooth);
+        }
+
+        table.leads-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .lead-name-cell {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .lead-phone {
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .rating-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(248, 192, 48, 0.08);
+            border: 1px solid rgba(248, 192, 48, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        .rating-val {
+            color: var(--warning);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .rating-stars {
+            color: var(--warning);
+            font-size: 0.75rem;
+        }
+
+        .rating-count {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .actions-cell-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-table-action {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            border: 1px solid var(--border-soft);
+            color: var(--text-main);
+            background: transparent;
+        }
+
+        .btn-table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(180, 255, 255, 0.03);
+        }
+
+        .btn-table-action.whatsapp:hover {
+            border-color: var(--success);
+            color: var(--success);
+            background: rgba(142, 71, 45, 0.03);
+        }
+
+        /* Notificações Toaster */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 380px;
+            width: 100%;
+        }
+
+        .toast-message {
+            background: var(--bg-card);
+            border-left: 4px solid var(--primary);
+            border-top: 1px solid var(--border-soft);
+            border-right: 1px solid var(--border-soft);
+            border-bottom: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            box-shadow: var(--shadow-premium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            animation: slideLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .toast-message.success {
+            border-left-color: var(--success);
+        }
+
+        .toast-content {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* Rodapé Fixo */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-soft);
+            margin-top: auto;
+        }
+
+        /* ==========================================================================
+           7. ANIMAÇÕES KEYFRAMES E RESPONSIVIDADE
+           ========================================================================== */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes spinReverse {
+            to { transform: rotate(-360deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+                box-shadow: 0 0 8px var(--success-glow);
+            }
+            50% {
+                transform: scale(1.15);
+                opacity: 1;
+                box-shadow: 0 0 16px var(--success);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideLeft {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+                text-align: center;
+            }
+            .brand-title {
+                justify-content: center;
+            }
+            .user-status-wrapper {
+                justify-content: center;
+            }
+            .card-panel, .scanning-section, .auth-card {
+                padding: 1.5rem;
+            }
+            .results-header-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .results-buttons {
+                flex-direction: column;
+            }
+            .btn-action {
+                justify-content: center;
+            }
+            table.leads-table th {
+                display: none;
+            }
+            table.leads-table td {
+                display: block;
+                text-align: right;
+                border-bottom: none;
+                padding: 0.6rem 0.5rem;
+            }
+            table.leads-table tr {
+                display: block;
+                padding: 1rem 0.5rem;
+                border-bottom: 2px solid var(--border-soft);
+            }
+            table.leads-table td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: 600;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                font-size: 0.75rem;
+            }
+            .rating-badge {
+                float: right;
+            }
+            .actions-cell-buttons {
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================================================
+         A. TELA DE AUTENTICAÇÃO (SUPABASE AUTH VIEW)
+         ========================================================================== -->
+    <div class="auth-wrapper" id="auth-view">
+        <div class="auth-card">
+            <div class="auth-logo">🔍 LEADFINDER PRO</div>
+            <div class="auth-subtitle">Painel de Prospecção SaaS para Agências e Designers</div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Acessar Conta</button>
+                <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Criar Conta</button>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div class="form-group" style="text-align: left;">
+                    <label for="auth-email" class="form-label">Endereço de E-mail</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </span>
+                        <input type="email" id="auth-email" class="form-input" placeholder="seuemail@provedor.com" required autocomplete="email">
+                    </div>
+                </div>
+                
+                <div class="form-group" style="text-align: left;">
+                    <label for="auth-password" class="form-label">Senha de Acesso</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </span>
+                        <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit" id="btn-auth-submit" style="margin-top: 1rem;">
+                    Entrar na Plataforma
+                </button>
+            </form>
+            
+            <p id="auth-footer-text" class="auth-form-footer">
+                Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.
+            </p>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         B. PAINEL DE CONTROLE LOGADO (APP VIEW)
+         ========================================================================== -->
+    <div class="app-container" id="app-view" style="display: none;">
+        
+        <!-- CABEÇALHO (HEADER) -->
+        <header>
+            <div class="brand-container">
+                <h1 class="brand-title">
+                    🔍 LEADFINDER PRO <span class="badge">SaaS</span>
+                </h1>
+                <span class="brand-subtitle">Prospecção de Leads de Alto Impacto</span>
+            </div>
+            
+            <div class="user-status-wrapper" id="user-status-area">
+                <!-- Badge de Usuário -->
+                <div class="user-badge" id="user-profile-badge">
+                    <span class="status-dot"></span>
+                    <span id="user-email-display">contato@agenciapremier.com.br</span>
+                </div>
+                
+                <!-- Badge de Créditos Dinâmicos -->
+                <div class="user-credits-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary); margin-right: 0.15rem;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span id="user-credits-display" style="color: var(--primary);">25</span>&nbsp;créditos
+                </div>
+
+                <!-- Botão de Sair -->
+                <button class="btn-logout" id="btn-logout" title="Desconectar do SaaS" onclick="handleLogout()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- FORMULÁRIO CENTRALIZADO (ESTADO INICIAL) -->
+        <section class="form-section" id="form-container">
+            <div class="card-panel">
+                <div class="card-header">
+                    <h2 class="card-title">Configurar Nova Varredura</h2>
+                    <p class="card-description">Selecione o nicho de mercado e a cidade da Bahia para buscar estabelecimentos comerciais que faturam bem, mas não possuem site oficial cadastrado no Google.</p>
+                </div>
+
+                <form id="leads-search-form" onsubmit="handleFormSubmit(event)">
+                    <!-- Nicho / Comércio (Autocomplete customizado) -->
+                    <div class="form-group">
+                        <label for="nicho-input" class="form-label">Comércio / Nicho de Atuação</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </span>
+                            <input 
+                                type="text" 
+                                id="nicho-input" 
+                                class="form-input" 
+                                placeholder="Selecione ou digite um nicho..." 
+                                autocomplete="off"
+                                required
+                            >
+                            <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span>
+                            <div class="custom-dropdown" id="nicho-dropdown">
+                                <ul>
+                                    <li data-value="Academia">Academia</li>
+                                    <li data-value="Advocacia">Advocacia</li>
+                                    <li data-value="Barbearia">Barbearia</li>
+                                    <li data-value="Boutique">Boutique</li>
+                                    <li data-value="Buffet">Buffet</li>
+                                    <li data-value="Clínica Médica">Clínica Médica</li>
+                                    <li data-value="Clínica Odontológica">Clínica Odontológica</li>
+                                    <li data-value="Contabilidade">Contabilidade</li>
+                                    <li data-value="Drogaria">Drogaria</li>
+                                    <li data-value="Espaço de Eventos">Espaço de Eventos</li>
+                                    <li data-value="Farmácia">Farmácia</li>
+                                    <li data-value="Lanchonete">Lanchonete</li>
+                                    <li data-value="Loja de Roupas">Loja de Roupas</li>
+                                    <li data-value="Pastelaria">Pastelaria</li>
+                                    <li data-value="Pet Shop">Pet Shop</li>
+                                    <li data-value="Restaurante">Restaurante</li>
+                                    <li data-value="Salão de Beleza">Salão de Beleza</li>
+                                    <li data-value="Studio Fitness">Studio Fitness</li>
+                                    <li data-value="Veterinária">Veterinária</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cidade / Bahia (Autocomplete customizado) -->
+                    <div class="form-group">
+                        <label for="cidade-input" class="form-label">Cidade e Estado (Foco Bahia)</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </span>
+                            <input 
+                                type="text" 
+                                id="cidade-input" 
+                                class="form-input" 
+                                placeholder="Selecione ou digite uma cidade da Bahia..." 
+                                autocomplete="off"
+                                required
+                            >
+                            <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span>
+                            <div class="custom-dropdown" id="cidade-dropdown">
+                                <ul>
+                                    <li data-value="Alagoinhas - BA">Alagoinhas - BA</li>
+                                    <li data-value="Camaçari - BA">Camaçari - BA</li>
+                                    <li data-value="Conceição do Jacuípe - BA">Conceição do Jacuípe - BA</li>
+                                    <li data-value="Feira de Santana - BA">Feira de Santana - BA</li>
+                                    <li data-value="Ilhéus - BA">Ilhéus - BA</li>
+                                    <li data-value="Itabuna - BA">Itabuna - BA</li>
+                                    <li data-value="Juazeiro - BA">Juazeiro - BA</li>
+                                    <li data-value="Lauro de Freitas - BA">Lauro de Freitas - BA</li>
+                                    <li data-value="Porto Seguro - BA">Porto Seguro - BA</li>
+                                    <li data-value="Salvador - BA">Salvador - BA</li>
+                                    <li data-value="Santo Antônio de Jesus - BA">Santo Antônio de Jesus - BA</li>
+                                    <li data-value="Serrinha - BA">Serrinha - BA</li>
+                                    <li data-value="Vitória da Conquista - BA">Vitória da Conquista - BA</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Botão de Ação -->
+                    <button type="submit" class="btn-submit">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                        </svg>
+                        Iniciar Varredura de Leads (-1 crédito)
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DE VARREDURA / SCANNING DE LEADS -->
+        <section class="scanning-section" id="scanning-container">
+            <div class="scanner-loader">
+                <div class="loader-ring"></div>
+                <div class="loader-ring-inner"></div>
+                <div class="scanner-percentage" id="scanning-percentage-text">0%</div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="scanning-progress-bar"></div>
+            </div>
+
+            <div class="scanning-status" id="scanning-status-title">Conectando ao gateway de busca...</div>
+            
+            <!-- Terminal de Logs interativo -->
+            <div class="terminal-console" id="terminal-log">
+                <p class="terminal-line">[SYSTEM] Terminal de varredura pronto.</p>
+            </div>
+        </section>
+
+        <!-- SEÇÃO DE RESULTADOS COMERCIAIS -->
+        <section class="results-section" id="results-container">
+            
+            <!-- Grid de Métricas Comerciais -->
+            <div class="metrics-grid">
+                <!-- Locais Analisados -->
+                <div class="metric-card">
+                    <div class="metric-icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <div class="metric-info">
+                        <span class="metric-value" id="metric-analyzed">0</span>
+                        <span class="metric-label">Locais Analisados</span>
+                    </div>
+                </div>
+
+                <!-- Leads Sem Site -->
+                <div class="metric-card">
+                    <div class="metric-icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                        </svg>
+                    </div>
+                    <div class="metric-info">
+                        <span class="metric-value" id="metric-leads" style="color: var(--primary);">0</span>
+                        <span class="metric-label">Leads Sem Site Oficial</span>
+                    </div>
+                </div>
+
+                <!-- Oportunidade Comercial -->
+                <div class="metric-card">
+                    <div class="metric-icon-wrapper" style="color: var(--success);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="metric-info">
+                        <span class="metric-value" id="metric-conversion" style="color: var(--success);">0%</span>
+                        <span class="metric-label">Presença Digital Local</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela Geral de Prospecção -->
+            <div class="results-panel">
+                <div class="results-header-actions">
+                    <div class="results-meta">
+                        <h3 class="results-title" id="results-badge-title">Leads Qualificados</h3>
+                        <span class="results-subtitle" id="results-badge-subtitle">Busca de comércios locais sem site</span>
+                    </div>
+                    
+                    <div class="results-buttons">
+                        <button class="btn-action btn-excel" onclick="triggerExcelExport()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Exportar para Excel (.xlsx)
+                        </button>
+                        <button class="btn-action btn-reset" onclick="resetSearchForm()">
+                            Nova Varredura
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabela de Dados Reais -->
+                <div class="table-responsive">
+                    <table class="leads-table">
+                        <thead>
+                            <tr>
+                                <th>Nome do Estabelecimento</th>
+                                <th>Telefone Comercial</th>
+                                <th>Endereço do Local</th>
+                                <th>Avaliação Google Places</th>
+                                <th>Ações Rápidas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-rows">
+                            <!-- Inserido dinamicamente via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <!-- Container de Toasters / Alertas Flutuantes -->
+    <div class="toast-container" id="toast-wrapper"></div>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; 2026 LeadFinder Pro - Plataforma SaaS. Buscas e acessos protegidos de forma segura no backend.</p>
+    </footer>
+
+    <!-- ==========================================================================
+         8. LÓGICA JAVASCRIPT VANILLA - SUPABASE AUTH & BACKEND INTEGRATION
+         ========================================================================== -->
+    <script>
+        // ==========================================================================
+        // CONFIGURAÇÕES SUPABASE E BACKEND URL (PRODUÇÃO / LOCAL)
+        // ==========================================================================
+        const SUPABASE_URL = 'https://sua-url-do-supabase.supabase.co'; // Placeholders prontos para produção
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.sua-chave-anon-placeholder';
+        const BACKEND_URL = 'http://127.0.0.1:8000'; // Vincula-se ao IP correto do backend FastAPI local
+
+        let supabaseClient = null;
+        let isSupabaseSimulated = true;
+
+        // Tenta inicializar o cliente Supabase de produção (caso a URL e CDN estejam configuradas)
+        if (typeof supabase !== 'undefined' && SUPABASE_URL && !SUPABASE_URL.includes("sua-url-do-supabase")) {
+            try {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                isSupabaseSimulated = false;
+                console.log("[SaaS] Supabase inicializado com sucesso.");
+            } catch (err) {
+                console.warn("[SaaS] Supabase real falhou. Utilizando simulador cliente-side.");
+            }
+        }
+
+        // Estado Global da Aplicação no Frontend
+        let appState = {
+            currentAuthTab: 'login',
+            nichoAtual: '',
+            cidadeAtual: '',
+            leadsEncontrados: [],
+            user: null // Armazena dados do usuário autenticado { id, email, credits }
+        };
+
+        // Inicialização do App
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSession();
+            // Inicializa dropdowns customizados para nicho e cidade
+            setupCustomDropdown('nicho-input', 'nicho-dropdown');
+            setupCustomDropdown('cidade-input', 'cidade-dropdown');
+        });
+
+        // Helper para gerenciar Dropdowns Customizados com transição de opacidade/transform e filtro em tempo real
+        function setupCustomDropdown(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            const items = dropdown.querySelectorAll('li');
+            let isSelecting = false;
+
+            function showDropdown() {
+                // Fechar todos os outros dropdowns no DOM para evitar sobreposição
+                document.querySelectorAll('.custom-dropdown').forEach(otherDropdown => {
+                    if (otherDropdown !== dropdown) {
+                        otherDropdown.classList.remove('show');
+                        otherDropdown.style.display = 'none';
+                    }
+                });
+
+                dropdown.style.display = 'block';
+                requestAnimationFrame(() => {
+                    dropdown.classList.add('show');
+                });
+            }
+
+            function hideDropdown() {
+                dropdown.classList.remove('show');
+                setTimeout(() => {
+                    if (!dropdown.classList.contains('show')) {
+                        dropdown.style.display = 'none';
+                    }
+                }, 200);
+            }
+
+            // Exibir dropdown ao focar ou clicar
+            input.addEventListener('focus', showDropdown);
+            input.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showDropdown();
+            });
+
+            // Fechar ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    hideDropdown();
+                }
+            });
+
+            // Filtro dinâmico em tempo real ignorando caixa alta/baixa e acentuação
+            input.addEventListener('input', () => {
+                if (isSelecting) return;
+
+                const query = input.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                
+                items.forEach(item => {
+                    const value = (item.getAttribute('data-value') || item.textContent).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    if (value.includes(query)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                showDropdown();
+            });
+
+            // Seleção de opção ao clicar em um item da lista
+            items.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    input.value = item.getAttribute('data-value') || item.textContent;
+                    
+                    // Esconde imediatamente o contêiner correspondente do dropdown
+                    dropdown.classList.remove('show');
+                    dropdown.style.display = 'none';
+                    
+                    isSelecting = true;
+                    // Dispara eventos padrão para propagação
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    isSelecting = false;
+                });
+            });
+        }
+
+        // Helper para gerar um ID determinístico a partir do email (essencial para persistência no Mock)
+        function hashEmailToId(email) {
+            let hash = 0;
+            for (let i = 0; i < email.length; i++) {
+                hash = (hash << 5) - hash + email.charCodeAt(i);
+                hash |= 0; // Converte para um inteiro de 32 bits
+            }
+            return 'usr_' + Math.abs(hash).toString(36);
+        }
+
+        // ==========================================================================
+        // GESTÃO DE SESSION E AUTENTICAÇÃO (MOCK E REAL)
+        // ==========================================================================
+        function checkSession() {
+            // Tenta obter sessão do sessionStorage
+            const sessionData = sessionStorage.getItem('leadfinder_session');
+            if (sessionData) {
+                try {
+                    appState.user = JSON.parse(sessionData);
+                    showAuthenticatedApp();
+                    return;
+                } catch (e) {
+                    sessionStorage.removeItem('leadfinder_session');
+                }
+            }
+            
+            showAuthScreen();
+        }
+
+        function showAuthScreen() {
+            document.getElementById('app-view').style.display = 'none';
+            document.getElementById('auth-view').style.display = 'flex';
+            
+            // LIMPA ESTADO ANTERIOR DE DADOS E INTERFACE NO LOGOUT
+            appState.leadsEncontrados = [];
+            appState.nichoAtual = '';
+            appState.cidadeAtual = '';
+            
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('scanning-container').style.display = 'none';
+            document.getElementById('form-container').style.display = 'flex';
+            
+            document.getElementById('nicho-input').value = '';
+            document.getElementById('cidade-input').value = '';
+            
+            // Reseta a visibilidade de todos os itens nos dropdowns customizados para 'block'
+            document.querySelectorAll('.custom-dropdown li').forEach(item => {
+                item.style.display = 'block';
+            });
+
+            switchAuthTab(appState.currentAuthTab);
+        }
+
+        function showAuthenticatedApp() {
+            document.getElementById('auth-view').style.display = 'none';
+            document.getElementById('app-view').style.display = 'flex';
+            
+            // RESET VISUAL DO PAINEL PARA CONFIGURAR NOVA VARREDURA AO LOGAR
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('scanning-container').style.display = 'none';
+            document.getElementById('form-container').style.display = 'flex';
+            
+            // LIMPA OS CAMPOS DE BUSCA ANTERIORES DO OUTRO USUÁRIO
+            document.getElementById('nicho-input').value = '';
+            document.getElementById('cidade-input').value = '';
+            
+            // Reseta a visibilidade de todos os itens nos dropdowns customizados para 'block'
+            document.querySelectorAll('.custom-dropdown li').forEach(item => {
+                item.style.display = 'block';
+            });
+
+            updateUserPanel();
+            sincronizarCreditos(); // Sincroniza créditos com o backend de forma assíncrona ao logar/carregar sessão
+        }
+
+        function updateUserPanel() {
+            if (appState.user) {
+                document.getElementById('user-email-display').textContent = appState.user.email;
+                document.getElementById('user-credits-display').textContent = appState.user.credits;
+            }
+        }
+
+        async function sincronizarCreditos() {
+            if (!appState.user) return;
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/perfil/${appState.user.id}`);
+                if (response.ok) {
+                    const profile = await response.json();
+                    appState.user.credits = profile.credits;
+                    sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
+                    updateUserPanel();
+                } else if (response.status === 404) {
+                    // Se o perfil sumiu do banco, força deslogar
+                    handleLogout();
+                }
+            } catch (err) {
+                console.warn("[SaaS] Falha ao sincronizar créditos com o servidor:", err);
+            }
+        }
+
+        function switchAuthTab(tab) {
+            appState.currentAuthTab = tab;
+            const btnLogin = document.getElementById('tab-login');
+            const btnSignup = document.getElementById('tab-signup');
+            const btnSubmit = document.getElementById('btn-auth-submit');
+            const footerText = document.getElementById('auth-footer-text');
+
+            if (tab === 'login') {
+                btnLogin.classList.add('active');
+                btnSignup.classList.remove('active');
+                btnSubmit.textContent = 'Acessar Plataforma';
+                footerText.innerHTML = 'Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.';
+            } else {
+                btnSignup.classList.add('active');
+                btnLogin.classList.remove('active');
+                btnSubmit.textContent = 'Criar Minha Conta Grátis';
+                footerText.innerHTML = 'Já possui cadastro? Altere a aba acima para "Acessar Conta" e insira suas credenciais.';
+            }
+        }
+
+        // Helper para obter ID de usuário consistente em simulação
+        function obterMockUserId(email) {
+            if (email === 'contato@agenciapremier.com.br') return 'usr_demo_123';
+            if (email.includes('designer') || email.includes('freela')) return 'usr_starter_456';
+            return hashEmailToId(email);
+        }
+
+        async function handleAuthSubmit(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const btnSubmit = document.getElementById('btn-auth-submit');
+            
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Processando...';
+
+            try {
+                let userId = null;
+                let userEmail = email;
+
+                if (!isSupabaseSimulated && supabaseClient) {
+                    // FLUXO DE PRODUÇÃO REAL COM SUPABASE AUTH CDN
+                    if (appState.currentAuthTab === 'login') {
+                        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                        if (error) throw error;
+                        userId = data.user.id;
+                        userEmail = data.user.email;
+
+                        // Valida se o perfil existe no backend E se as credenciais batem
+                        const resProfile = await fetch(`${BACKEND_URL}/api/perfil/login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail, password: password })
+                        });
+                        if (!resProfile.ok) {
+                            await supabaseClient.auth.signOut();
+                            if (resProfile.status === 401) {
+                                throw new Error("Senha incorreta.");
+                            } else if (resProfile.status === 404) {
+                                throw new Error("Conta não encontrada. Por favor, cadastre-se.");
+                            }
+                            throw new Error("Erro de comunicação com o servidor ao consultar perfil.");
+                        }
+                        const profile = await resProfile.json();
+                        appState.user = {
+                            id: userId,
+                            email: userEmail,
+                            credits: profile.credits
+                        };
+                        createToast('Conectado com sucesso!', 'success');
+                    } else {
+                        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                        if (error) throw error;
+                        userId = data.user.id;
+                        userEmail = data.user.email;
+
+                        // Cria o perfil no backend (inclui 5 créditos, senha criptografada e e-mail de boas-vindas)
+                        const resRegister = await fetch(`${BACKEND_URL}/api/perfil`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId, email: userEmail, password: password })
+                        });
+                        if (!resRegister.ok) {
+                            const errData = await resRegister.json();
+                            throw new Error(errData.detail || "Erro ao registrar perfil de usuário.");
+                        }
+                        const profile = await resRegister.json();
+                        appState.user = {
+                            id: userId,
+                            email: userEmail,
+                            credits: profile.credits
+                        };
+                        createToast('Conta criada com sucesso! Verifique seu e-mail.', 'success');
+                    }
+                } else {
+                    // FLUXO DE TESTES / DESENVOLVEDOR LOCAL SIMULADO
+                    userId = obterMockUserId(email);
+
+                    if (appState.currentAuthTab === 'login') {
+                        // Consulta perfil mockado no backend e valida a senha
+                        const resProfile = await fetch(`${BACKEND_URL}/api/perfil/login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: userEmail, password: password })
+                        });
+                        if (!resProfile.ok) {
+                            if (resProfile.status === 401) {
+                                throw new Error("Senha incorreta.");
+                            } else if (resProfile.status === 404) {
+                                throw new Error("Conta não encontrada. Por favor, cadastre-se.");
+                            }
+                            throw new Error("Erro de comunicação com o backend simulado.");
+                        }
+                        const profile = await resProfile.json();
+                        appState.user = {
+                            id: profile.id, // Usa o ID retornado pelo servidor
+                            email: userEmail,
+                            credits: profile.credits
+                        };
+                        createToast('Acesso de testes concedido!', 'success');
+                    } else {
+                        // Cria perfil mockado no backend com senha
+                        const resRegister = await fetch(`${BACKEND_URL}/api/perfil`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId, email: userEmail, password: password })
+                        });
+                        if (!resRegister.ok) {
+                            const errData = await resRegister.json();
+                            throw new Error(errData.detail || "Erro ao registrar conta simulada.");
+                        }
+                        const profile = await resRegister.json();
+                        appState.user = {
+                            id: userId,
+                            email: userEmail,
+                            credits: profile.credits
+                        };
+                        createToast('Conta demonstrativa criada no simulador! Você ganhou 5 créditos grátis.', 'success');
+                    }
+                }
+                
+                sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
+                showAuthenticatedApp();
+            } catch (err) {
+                createToast('Erro de Autenticação: ' + err.message, 'danger');
+            } finally {
+                btnSubmit.disabled = false;
+                switchAuthTab(appState.currentAuthTab);
+            }
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('leadfinder_session');
+            appState.user = null;
+            createToast('Você desconectou da plataforma.', 'warn');
+            showAuthScreen();
+        }
+
+        // ==========================================================================
+        // SUBMIT DE BUSCA E INTEGRAÇÃO FETCH BACKEND
+        // ==========================================================================
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const nichoVal = document.getElementById('nicho-input').value.trim();
+            const cidadeVal = document.getElementById('cidade-input').value.trim();
+            
+            if (!nichoVal || !cidadeVal) {
+                createToast('Preencha os campos obrigatórios!', 'warn');
+                return;
+            }
+            
+            if (appState.user.credits <= 0) {
+                createToast('Créditos insuficientes! Faça uma recarga para continuar buscando.', 'danger');
+                return;
+            }
+
+            appState.nichoAtual = nichoVal;
+            appState.cidadeAtual = cidadeVal;
+            
+            // Oculta formulário e inicia painel de varredura
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('scanning-container').style.display = 'flex';
+            
+            executeRealScan(nichoVal, cidadeVal);
+        }
+
+        async function executeRealScan(nicho, cidade) {
+            const progressFill = document.getElementById('scanning-progress-bar');
+            const percentText = document.getElementById('scanning-percentage-text');
+            const statusText = document.getElementById('scanning-status-title');
+            const consoleBox = document.getElementById('terminal-log');
+            
+            // Reset do terminal
+            consoleBox.innerHTML = '';
+            appendTerminalLine('[SYSTEM] Inicializando módulo de varredura SaaS...', 'info');
+            appendTerminalLine('[CONEXÃO] Estabelecendo conexão segura HTTP com o Backend...', 'info');
+            
+            // Animação de progresso rica visual (carrega até 90% enquanto aguarda a API do backend responder)
+            let progress = 0;
+            let progressInterval = setInterval(() => {
+                if (progress < 92) {
+                    progress += Math.floor(Math.random() * 5) + 1;
+                    progressFill.style.width = `${progress}%`;
+                    percentText.textContent = `${progress}%`;
+                    
+                    if (progress > 15 && progress <= 35) {
+                        statusText.textContent = '[CONEXÃO] Validando credenciais e créditos de busca...';
+                    } else if (progress > 35 && progress <= 60) {
+                        statusText.textContent = `[PLACES] Consultando Google Places no nicho '${nicho}'...`;
+                    } else if (progress > 60 && progress <= 85) {
+                        statusText.textContent = '[ANÁLISE] Filtrando estabelecimentos que não têm site oficial...';
+                    } else if (progress > 85) {
+                        statusText.textContent = '[QUALIFICAÇÃO] Preparando planilha de abordagem comercial...';
+                    }
+                }
+            }, 120);
+
+            try {
+                // Realiza a requisição fetch apontando para o nosso servidor FastAPI
+                const response = await fetch(`${BACKEND_URL}/api/buscar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nicho: nicho,
+                        cidade: cidade,
+                        user_id: appState.user.id,
+                        email: appState.user.email
+                    })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || 'Falha crítica na API do Servidor.');
+                }
+
+                const data = await response.json();
+                
+                // Conclui a animação de progresso rapidamente a 100% após a resposta chegar
+                clearInterval(progressInterval);
+                
+                appendTerminalLine(`[API SUCCESS] Busca finalizada através do motor: ${data.api_utilizada}`, 'success');
+                appendTerminalLine(`[CRÉDITOS] Débito efetuado. Saldo restante: ${data.creditos_restantes} buscas`, 'warn');
+                
+                let finalProgress = progress;
+                let finalInterval = setInterval(() => {
+                    if (finalProgress < 100) {
+                        finalProgress += 4;
+                        progressFill.style.width = `${Math.min(100, finalProgress)}%`;
+                        percentText.textContent = `${Math.min(100, finalProgress)}%`;
+                    } else {
+                        clearInterval(finalInterval);
+                        setTimeout(() => {
+                            // Salva dados no estado e atualiza créditos do cliente
+                            appState.leadsEncontrados = data.leads;
+                            appState.user.credits = data.creditos_restantes;
+                            sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
+                            
+                            // Atualiza saldo na tela
+                            updateUserPanel();
+                            
+                            // Exibe os resultados
+                            document.getElementById('scanning-container').style.display = 'none';
+                            document.getElementById('results-container').style.display = 'flex';
+                            
+                            document.getElementById('results-badge-title').textContent = `Leads: ${appState.nichoAtual} em ${appState.cidadeAtual}`;
+                            document.getElementById('results-badge-subtitle').textContent = `Dados gerados através do backend (${data.api_utilizada})`;
+                            
+                            renderLeadsTable(data.leads);
+                            animateMetricCounters(data.leads.length);
+                        }, 500);
+                    }
+                }, 20);
+
+            } catch (err) {
+                clearInterval(progressInterval);
+                document.getElementById('scanning-container').style.display = 'none';
+                document.getElementById('form-container').style.display = 'flex';
+                
+                let friendlyMessage = err.message;
+                if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+                    friendlyMessage = "Não foi possível conectar ao servidor. Certifique-se de que a API está rodando no terminal.";
+                }
+                createToast('Erro na Varredura: ' + friendlyMessage, 'danger');
+            }
+        }
+
+        function appendTerminalLine(text, style = '') {
+            const consoleBox = document.getElementById('terminal-log');
+            const p = document.createElement('p');
+            p.className = `terminal-line ${style}`;
+            p.textContent = text;
+            consoleBox.appendChild(p);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function renderLeadsTable(leads) {
+            const tbody = document.getElementById('leads-table-rows');
+            tbody.innerHTML = '';
+            
+            if (leads.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!</td></tr>`;
+                return;
+            }
+            
+            leads.forEach(lead => {
+                const tr = document.createElement('tr');
+                
+                const starsCount = Math.round(parseFloat(lead.nota));
+                let starsSvg = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsSvg += (i <= starsCount) ? '★' : '☆';
+                }
+                
+                const cleanPhone = lead.telefone.replace(/\D/g, '');
+                const wppLink = `https://wa.me/55${cleanPhone}?text=Olá,%20vi%20sua%20empresa%20${encodeURIComponent(lead.nome)}%20no%20Google%20e%20gostaria%20de%20apresentar%20uma%20proposta...`;
+                
+                tr.innerHTML = `
+                    <td data-label="Nome do Estabelecimento" class="lead-name-cell">${lead.nome}</td>
+                    <td data-label="Telefone Comercial" class="lead-phone">${lead.telefone}</td>
+                    <td data-label="Endereço do Local">${lead.endereco}</td>
+                    <td data-label="Avaliação Google Places">
+                        <div class="rating-badge">
+                            <span class="rating-val">${lead.nota}</span>
+                            <span class="rating-stars">${starsSvg}</span>
+                            <span class="rating-count">(${lead.avaliacoes})</span>
+                        </div>
+                    </td>
+                    <td data-label="Ações Rápidas">
+                        <div class="actions-cell-buttons">
+                            <a href="${wppLink}" target="_blank" class="btn-table-action whatsapp" title="Iniciar Conversa comercial">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.324 5.328 0 11.99 0c3.23.001 6.262 1.258 8.537 3.535C22.8 5.813 24.053 8.847 24.05 12.077c-.003 6.66-5.328 11.98-11.99 11.98-2.003-.001-3.975-.497-5.733-1.442L0 24zm6.59-4.846c1.62.963 3.377 1.47 5.4 1.472 5.564 0 10.093-4.522 10.096-10.086.002-2.695-1.043-5.228-2.946-7.133C17.234 1.503 14.707.458 12.002.458c-5.568 0-10.097 4.522-10.1 10.086-.001 1.936.5 3.818 1.448 5.432L2.348 21.65l5.965-1.562z"/>
+                                </svg>
+                                WhatsApp
+                            </a>
+                            <a href="${lead.maps}" target="_blank" class="btn-table-action" title="Visualizar no Google Maps">
+                                Maps
+                            </a>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function animateMetricCounters(leadsCount) {
+            const totalAnalyzed = Math.round(leadsCount * (1.5 + Math.random()));
+            const presenceRate = Math.round((1 - (leadsCount / totalAnalyzed)) * 100);
+            
+            animateNumber('metric-analyzed', 0, totalAnalyzed, 800);
+            animateNumber('metric-leads', 0, leadsCount, 800);
+            animateNumber('metric-conversion', 0, presenceRate, 800, '%');
+        }
+
+        function animateNumber(id, start, end, duration, suffix = '') {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.textContent = Math.floor(progress * (end - start) + start) + suffix;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function resetSearchForm() {
+            document.getElementById('nicho-input').value = '';
+            document.getElementById('cidade-input').value = '';
+            
+            // Reseta a visibilidade de todos os itens nos dropdowns customizados para 'block'
+            document.querySelectorAll('.custom-dropdown li').forEach(item => {
+                item.style.display = 'block';
+            });
+            
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('form-container').style.display = 'flex';
+        }
+
+        // ==========================================================================
+        // EXPORTADOR EXCEL (.xls XML SPREADSHEET 2003 COMPATÍVEL)
+        // ==========================================================================
+        function triggerExcelExport() {
+            if (appState.leadsEncontrados.length === 0) {
+                createToast('Nenhum dado para exportar!', 'warn');
+                return;
+            }
+            
+            try {
+                exportToExcel(appState.leadsEncontrados, appState.nichoAtual, appState.cidadeAtual);
+                createToast('Exportação para Excel (.xlsx) iniciada!', 'success');
+            } catch (err) {
+                createToast('Erro ao exportar: ' + err.message, 'danger');
+            }
+        }
+
+        function exportToExcel(leads, nicho, cidade) {
+            const dateStr = new Date().toISOString();
+            
+            let xml = `<?xml version="1.0" encoding="utf-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>LeadFinder Pro</Author>
+  <LastAuthor>LeadFinder Pro</LastAuthor>
+  <Created>${dateStr}</Created>
+  <Company>LeadFinder Inc</Company>
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="Header">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1F4E78" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="Cell">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="CellCenter">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="Hyperlink">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D3D3D3"/>
+   </Borders>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#0563C1" ss:Underline="Single"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Leads">
+  <Table x:FullColumns="1" x:FullRows="1" ss:DefaultRowHeight="20">
+   <Column ss:Width="200"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="260"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="110"/>
+   <Row ss:Height="26">
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Nome</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Telefone</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Endereço</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliação (Nota)</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliações (Total)</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Link do Google Maps</Data></Cell>
+   </Row>`;
+
+            leads.forEach(lead => {
+                xml += `
+   <Row ss:Height="22">
+    <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.nome)}</Data></Cell>
+    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(lead.telefone)}</Data></Cell>
+    <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.endereco)}</Data></Cell>
+    <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.nota}</Data></Cell>
+    <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.avaliacoes}</Data></Cell>
+    <Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.maps)}"><Data ss:Type="String">Ver no Maps</Data></Cell>
+   </Row>`;
+            });
+
+            xml += `
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageLayoutZoom>0</PageLayoutZoom>
+   <Selected/>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+   <ShowGridLines/>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>`;
+
+            const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            const fileNicho = nicho.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
+            const fileCidade = cidade.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
+            
+            a.href = url;
+            a.download = `leads_sem_site_${fileNicho}_${fileCidade}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function escapeXml(unsafe) {
+            if (!unsafe) return "";
+            return unsafe.replace(/[<>&'"]/g, function (c) {
+                switch (c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case '\'': return '&apos;';
+                    case '"': return '&quot;';
+                    default: return c;
+                }
+            });
+        }
+
+        // ==========================================================================
+        // NOTIFICAÇÕES TOASTS FLUTUANTES
+        // ==========================================================================
+        function createToast(message, type = 'success') {
+            const container = document.getElementById('toast-wrapper');
+            const toast = document.createElement('div');
+            toast.className = `toast-message ${type}`;
+            
+            toast.innerHTML = `
+                <div class="toast-content">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeIn 0.3s ease-out reverse forwards';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
