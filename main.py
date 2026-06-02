@@ -83,10 +83,13 @@ def verificar_senha(senha: str, senha_hash: str) -> bool:
     except Exception:
         return False
 
-def obter_validacao_whatsapp(telefone: str) -> str:
+def obter_validacao_whatsapp(telefone: str, wpp_no_site: bool = False) -> str:
     """Valida se o telefone comercial é celular (WhatsApp) ou fixo."""
+    if wpp_no_site:
+        return "SIM (Confirmado)"
+        
     if not telefone or telefone == "Não informado":
-        return "Verificar"
+        return "Apenas Ligação"
     # Remove tudo que não for dígito
     nums = "".join(c for c in telefone if c.isdigit())
     
@@ -97,23 +100,20 @@ def obter_validacao_whatsapp(telefone: str) -> str:
     # Celulares no Brasil têm 11 dígitos e o número local começa com 9: e.g. 71999998888
     # Telefones fixos têm 10 dígitos: e.g. 7133334444
     if len(nums) == 11 and nums[2] == '9':
-        return "Sim"
+        return "Provável"
     elif len(nums) == 10:
         if nums[2] == '9':
             return "Provável"
-        elif nums[2] in ['2', '3', '4', '5']:
-            return "Não"
-        return "Verificar"
+        else:
+            return "Apenas Ligação"
     else:
         # Caso tenha apenas 9 dígitos e comece com 9 (celular sem DDD)
         if len(nums) == 9 and nums[0] == '9':
-            return "Sim"
+            return "Provável"
         # Caso tenha 8 dígitos (fixo sem DDD)
         elif len(nums) == 8:
-            if nums[0] in ['2', '3', '4', '5']:
-                return "Não"
-            return "Verificar"
-        return "Verificar"
+            return "Apenas Ligação"
+        return "Apenas Ligação"
 
 # ==========================================================================
 # SIMULAÇÃO DE BANCO DE DADOS EM MEMÓRIA (SUPABASE / POSTGRES PLACEHOLDER)
@@ -339,6 +339,16 @@ def gerar_leads_fallback(nicho: str, cidade: str) -> List[Dict[str, Any]]:
         avaliacoes = random.randint(5, 230)
         maps = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome + ' ' + endereco)}"
         
+        instagram_link = random.choice([f"https://www.instagram.com/{nicho.lower().replace(' ', '')}_{pref.lower().replace(' ', '')}", "Não Encontrado"])
+        
+        # Simulate new WhatsApp validation statuses
+        if instagram_link != "Não Encontrado" and random.random() > 0.5:
+            wpp_status = "SIM (Confirmado)"
+        elif is_cel:
+            wpp_status = "Provável"
+        else:
+            wpp_status = "Apenas Ligação"
+
         leads.append({
             "nome": nome,
             "telefone": telefone,
@@ -346,7 +356,8 @@ def gerar_leads_fallback(nicho: str, cidade: str) -> List[Dict[str, Any]]:
             "nota": nota,
             "avaliacoes": avaliacoes,
             "maps": maps,
-            "validacao_whatsapp": obter_validacao_whatsapp(telefone),
+            "validacao_whatsapp": wpp_status,
+            "instagram_link": instagram_link,
             "tipo_link_maps": "Link de Pesquisa"
         })
         
@@ -379,6 +390,24 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
             leads = []
             for place in places:
                 website = place.get("websiteUri")
+                
+                # Inspeciona o website se cadastrado
+                instagram_link = None
+                wpp_no_site = False
+                if website:
+                    try:
+                        resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+                        if resp.status_code == 200:
+                            html_content = resp.text
+                            import re
+                            insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
+                            if insta_match:
+                                instagram_link = insta_match.group(0)
+                            if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                                wpp_no_site = True
+                    except Exception:
+                        pass
+
                 # Filtra comércios que NÃO possuem website cadastrado
                 if not website:
                     nome = place.get("displayName", {}).get("text", "Sem nome")
@@ -402,7 +431,8 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                         "nota": rating,
                         "avaliacoes": user_ratings,
                         "maps": maps_link,
-                        "validacao_whatsapp": obter_validacao_whatsapp(telefone),
+                        "validacao_whatsapp": obter_validacao_whatsapp(telefone, wpp_no_site),
+                        "instagram_link": instagram_link or "Não Encontrado",
                         "tipo_link_maps": tipo_link_maps
                     })
             return leads
@@ -440,7 +470,26 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                     d_resp = requests.get(details_url, params=d_params, timeout=5)
                     if d_resp.status_code == 200:
                         details = d_resp.json().get("result", {})
-                        if not details.get("website"):
+                        website = details.get("website")
+                        
+                        # Inspeciona o website se cadastrado
+                        instagram_link = None
+                        wpp_no_site = False
+                        if website:
+                            try:
+                                resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+                                if resp.status_code == 200:
+                                    html_content = resp.text
+                                    import re
+                                    insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
+                                    if insta_match:
+                                        instagram_link = insta_match.group(0)
+                                    if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                                        wpp_no_site = True
+                            except Exception:
+                                pass
+
+                        if not website:
                             nome_det = details.get("name", place.get("name"))
                             endereco_det = details.get("formatted_address", "Não informado")
                             
@@ -458,7 +507,8 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                                 "nota": details.get("rating", 0.0),
                                 "avaliacoes": details.get("user_ratings_total", 0),
                                 "maps": maps_link,
-                                "validacao_whatsapp": obter_validacao_whatsapp(details.get("formatted_phone_number", "Não informado")),
+                                "validacao_whatsapp": obter_validacao_whatsapp(details.get("formatted_phone_number", "Não informado"), wpp_no_site),
+                                "instagram_link": instagram_link or "Não Encontrado",
                                 "tipo_link_maps": tipo_link_maps
                             })
                 except Exception:

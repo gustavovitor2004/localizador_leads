@@ -54,10 +54,13 @@ def exibir_banner():
     """
     print(banner)
 
-def obter_validacao_whatsapp(telefone: str) -> str:
+def obter_validacao_whatsapp(telefone: str, wpp_no_site: bool = False) -> str:
     """Valida se o telefone comercial é celular (WhatsApp) ou fixo."""
+    if wpp_no_site:
+        return "SIM (Confirmado)"
+        
     if not telefone or telefone == "Não informado":
-        return "Verificar"
+        return "Apenas Ligação"
     # Remove tudo que não for dígito
     nums = "".join(c for c in telefone if c.isdigit())
     
@@ -68,23 +71,20 @@ def obter_validacao_whatsapp(telefone: str) -> str:
     # Celulares no Brasil têm 11 dígitos e o número local começa com 9: e.g. 71999998888
     # Telefones fixos têm 10 dígitos: e.g. 7133334444
     if len(nums) == 11 and nums[2] == '9':
-        return "Sim"
+        return "Provável"
     elif len(nums) == 10:
         if nums[2] == '9':
             return "Provável"
-        elif nums[2] in ['2', '3', '4', '5']:
-            return "Não"
-        return "Verificar"
+        else:
+            return "Apenas Ligação"
     else:
         # Caso tenha apenas 9 dígitos e comece com 9 (celular sem DDD)
         if len(nums) == 9 and nums[0] == '9':
-            return "Sim"
+            return "Provável"
         # Caso tenha 8 dígitos (fixo sem DDD)
         elif len(nums) == 8:
-            if nums[0] in ['2', '3', '4', '5']:
-                return "Não"
-            return "Verificar"
-        return "Verificar"
+            return "Apenas Ligação"
+        return "Apenas Ligação"
 
 def obter_api_key():
     """Obtém a chave de API do Google Cloud de diferentes fontes possíveis."""
@@ -170,6 +170,23 @@ def buscar_leads_nova_api(nicho, cidade, api_key):
         # Verifica se o site existe
         website = place.get("websiteUri")
         
+        # Inspeciona site se cadastrado
+        instagram_link = None
+        wpp_no_site = False
+        if website:
+            try:
+                resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+                if resp.status_code == 200:
+                    html_content = resp.text
+                    import re
+                    insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
+                    if insta_match:
+                        instagram_link = insta_match.group(0)
+                    if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                        wpp_no_site = True
+            except Exception:
+                pass
+
         # Filtragem: capturar apenas comércios sem site cadastrado
         if not website:
             nome = place.get("displayName", {}).get("text", "Nome não informado")
@@ -193,7 +210,8 @@ def buscar_leads_nova_api(nicho, cidade, api_key):
                 "Avaliação (Nota)": rating,
                 "Avaliações (Total)": user_ratings,
                 "Link do Google Maps": maps_link,
-                "validacao_whatsapp": obter_validacao_whatsapp(telefone),
+                "validacao_whatsapp": obter_validacao_whatsapp(telefone, wpp_no_site),
+                "instagram_link": instagram_link or "Não Encontrado",
                 "tipo_link_maps": tipo_link_maps
             })
             
@@ -255,6 +273,23 @@ def buscar_leads_legacy_api(nicho, cidade, api_key):
                 details_data = details_resp.json().get("result", {})
                 
                 website = details_data.get("website")
+                # Inspeciona site se cadastrado
+                instagram_link = None
+                wpp_no_site = False
+                if website:
+                    try:
+                        resp = requests.get(website, timeout=2, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+                        if resp.status_code == 200:
+                            html_content = resp.text
+                            import re
+                            insta_match = re.search(r'https?://(?:www\.)?instagram\.com/[a-zA-Z0-9_\.\-]+/?', html_content)
+                            if insta_match:
+                                instagram_link = insta_match.group(0)
+                            if "api.whatsapp.com" in html_content or "wa.me" in html_content:
+                                wpp_no_site = True
+                    except Exception:
+                        pass
+
                 # Filtra estabelecimentos sem site
                 if not website:
                     nome_det = details_data.get("name", nome)
@@ -274,7 +309,8 @@ def buscar_leads_legacy_api(nicho, cidade, api_key):
                         "Avaliação (Nota)": details_data.get("rating", 0.0),
                         "Avaliações (Total)": details_data.get("user_ratings_total", 0),
                         "Link do Google Maps": maps_link,
-                        "validacao_whatsapp": obter_validacao_whatsapp(details_data.get("formatted_phone_number", "Não informado")),
+                        "validacao_whatsapp": obter_validacao_whatsapp(details_data.get("formatted_phone_number", "Não informado"), wpp_no_site),
+                        "instagram_link": instagram_link or "Não Encontrado",
                         "tipo_link_maps": tipo_link_maps
                     })
         except Exception as e:
@@ -286,12 +322,19 @@ def buscar_leads_legacy_api(nicho, cidade, api_key):
 
 def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
     """Salva os dados formatados em Excel com estilo profissional."""
-    # Renomeia validacao_whatsapp para WhatsApp
+    # Renomeia colunas
     if "validacao_whatsapp" in df.columns:
         df = df.rename(columns={"validacao_whatsapp": "WhatsApp"})
+    if "instagram_link" in df.columns:
+        df = df.rename(columns={"instagram_link": "Link do Instagram"})
+        
     # Remove coluna tipo_link_maps se existir
     if "tipo_link_maps" in df.columns:
         df = df.drop(columns=["tipo_link_maps"])
+
+    # Ordena as colunas explicitamente
+    cols_order = ["Nome", "Telefone", "Endereço", "Avaliação (Nota)", "Avaliações (Total)", "Link do Google Maps", "Link do Instagram", "WhatsApp"]
+    df = df.reindex(columns=[c for c in cols_order if c in df.columns] + [c for c in df.columns if c not in cols_order])
 
     # Resolve arquivo bloqueado (ex: aberto no Excel) gerando um sufixo numérico
     actual_filename = filename
@@ -349,9 +392,9 @@ def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
                     cell.font = Font(name="Calibri", size=11)
                     
                     # Centralizar Notas, Quantidades e WhatsApp
-                    if col in [4, 5, 7]: # Colunas de Avaliação, Total de Avaliações e WhatsApp
+                    if col in [4, 5, 8]: # Colunas de Avaliação, Total de Avaliações e WhatsApp
                         cell.alignment = align_center
-                    elif col == 6: # Coluna de Link do Google Maps
+                    elif col in [6, 7]: # Colunas de Links (Maps e Instagram)
                         cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=False)
                     else:
                         cell.alignment = align_left
@@ -362,6 +405,18 @@ def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
                         cell.value = f'=HYPERLINK("{url_completa}", "Abrir no Maps")'
                         cell.font = Font(name="Calibri", size=11, color="0563C1", underline="single")
                         
+                    # Formata coluna do link do Instagram como um link azul e sublinhado clicável no Excel
+                    if col == 7:
+                        if str(cell.value).startswith("http"):
+                            url_completa = cell.value
+                            cell.value = f'=HYPERLINK("{url_completa}", "Abrir Instagram")'
+                            cell.font = Font(name="Calibri", size=11, color="0563C1", underline="single")
+                        else:
+                            if not cell.value or cell.value == "Não Encontrado":
+                                cell.value = "Não Encontrado"
+                                cell.font = Font(name="Calibri", size=11, color="7F7F7F")
+                                cell.alignment = align_center
+                        
             # Ajustando a largura das colunas dinamicamente
             for col in worksheet.columns:
                 max_len = 0
@@ -370,15 +425,19 @@ def formatar_e_salvar_excel(df, filename="leads_sem_site.xlsx"):
                     if cell.value:
                         val_str = str(cell.value)
                         if val_str.startswith("=HYPERLINK"):
-                            val_len = 14  # "Abrir no Maps" length
+                            if "Abrir Instagram" in val_str:
+                                val_len = 15  # "Abrir Instagram" length
+                            else:
+                                val_len = 14  # "Abrir no Maps" length
                         else:
                             val_len = len(val_str)
                         max_len = max(max_len, val_len)
                 # Define largura com uma folga
                 worksheet.column_dimensions[col_letter].width = max(max_len + 3, 12)
                 
-            # Força a largura da coluna F para 20
+            # Força a largura das colunas F e G para 20
             worksheet.column_dimensions['F'].width = 20
+            worksheet.column_dimensions['G'].width = 20
                 
             # Adiciona linhas de grade padrão
             worksheet.views.sheetView[0].showGridLines = True
@@ -454,6 +513,12 @@ def main():
                 df_preview = df_preview.drop(columns=["tipo_link_maps"])
             if "validacao_whatsapp" in df_preview.columns:
                 df_preview = df_preview.rename(columns={"validacao_whatsapp": "WhatsApp"})
+            if "instagram_link" in df_preview.columns:
+                df_preview = df_preview.rename(columns={"instagram_link": "Instagram"})
+                
+            cols_preview = ["Nome", "Telefone", "WhatsApp", "Instagram", "Endereço", "Avaliação (Nota)", "Avaliações (Total)"]
+            df_preview = df_preview.reindex(columns=[c for c in cols_preview if c in df_preview.columns])
+            
             df_preview["Nome"] = df_preview["Nome"].apply(lambda x: x[:25] + "..." if len(x) > 25 else x)
             df_preview["Endereço"] = df_preview["Endereço"].apply(lambda x: x[:30] + "..." if len(x) > 30 else x)
             print(df_preview.to_string(index=False))

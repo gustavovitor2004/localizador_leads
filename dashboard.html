@@ -954,6 +954,18 @@
             background: rgba(142, 71, 45, 0.03);
         }
 
+        .btn-table-action.instagram {
+            border-color: rgba(168, 85, 247, 0.3);
+            color: hsl(282, 84%, 60%);
+        }
+
+        .btn-table-action.instagram:hover {
+            border-color: hsl(282, 84%, 54%);
+            color: #ffffff;
+            background: linear-gradient(135deg, hsl(282, 84%, 54%) 0%, hsl(260, 84%, 54%) 100%);
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+        }
+
         /* Badges para Validação de WhatsApp */
         .wpp-badge {
             display: inline-flex;
@@ -1464,6 +1476,7 @@
                                 <th>Nome do Estabelecimento</th>
                                 <th>Telefone Comercial</th>
                                 <th>WhatsApp</th>
+                                <th>Instagram</th>
                                 <th>Endereço do Local</th>
                                 <th>Avaliação Google Places</th>
                                 <th>Ações Rápidas</th>
@@ -2015,7 +2028,7 @@
             tbody.innerHTML = '';
             
             if (leads.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!</td></tr>`;
                 return;
             }
             
@@ -2044,8 +2057,15 @@
                     }
                 }
                 
-                const wppStatus = lead.validacao_whatsapp || "Verificar";
-                const wppStatusClass = wppStatus.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // "sim", "provavel", "nao", "verificar"
+                const wppStatus = lead.validacao_whatsapp || "Apenas Ligação";
+                let wppStatusClass = "";
+                if (wppStatus.includes("SIM")) {
+                    wppStatusClass = "sim";
+                } else if (wppStatus.includes("Provável")) {
+                    wppStatusClass = "provavel";
+                } else {
+                    wppStatusClass = "nao";
+                }
                 
                 const isLinkDireto = lead.tipo_link_maps === "Link Direto";
                 const mapsTitle = isLinkDireto ? "Link Direto (100% Garantido)" : "Link de Pesquisa (Busca por Texto)";
@@ -2062,11 +2082,28 @@
                             WhatsApp
                        </span>`;
 
+                let instagramHtml = '';
+                if (lead.instagram_link && lead.instagram_link !== 'Não Encontrado') {
+                    instagramHtml = `
+                        <a href="${lead.instagram_link}" target="_blank" class="btn-table-action instagram" title="Abrir Instagram">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                            </svg>
+                            Instagram
+                        </a>
+                    `;
+                } else {
+                    instagramHtml = `<span style="color: var(--text-muted); font-size: 0.85rem;">Não Encontrado</span>`;
+                }
+
                 tr.innerHTML = `
                     <td data-label="Nome do Estabelecimento" class="lead-name-cell">${lead.nome}</td>
                     <td data-label="Telefone Comercial" class="lead-phone">${lead.telefone}</td>
                     <td data-label="WhatsApp">
                         <span class="wpp-badge ${wppStatusClass}">${wppStatus}</span>
+                    </td>
+                    <td data-label="Instagram">
+                        ${instagramHtml}
                     </td>
                     <td data-label="Endereço do Local">${lead.endereco}</td>
                     <td data-label="Avaliação Google Places">
@@ -2215,7 +2252,8 @@
     <Column ss:Width="260"/>
     <Column ss:Width="110"/>
     <Column ss:Width="110"/>
-    <Column ss:Width="110"/>
+    <Column ss:Width="150"/>
+    <Column ss:Width="150"/>
     <Column ss:Width="100"/>
     <Row ss:Height="26">
      <Cell ss:StyleID="Header"><Data ss:Type="String">Nome</Data></Cell>
@@ -2224,10 +2262,18 @@
      <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliação (Nota)</Data></Cell>
      <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliações (Total)</Data></Cell>
      <Cell ss:StyleID="Header"><Data ss:Type="String">Link do Google Maps</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">Link do Instagram</Data></Cell>
      <Cell ss:StyleID="Header"><Data ss:Type="String">WhatsApp</Data></Cell>
     </Row>`;
 
             leads.forEach(lead => {
+                let instagramCellXml = '';
+                if (lead.instagram_link && lead.instagram_link !== 'Não Encontrado') {
+                    instagramCellXml = `<Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.instagram_link)}"><Data ss:Type="String">Abrir Instagram</Data></Cell>`;
+                } else {
+                    instagramCellXml = `<Cell ss:StyleID="CellCenter"><Data ss:Type="String">Não Encontrado</Data></Cell>`;
+                }
+
                 xml += `
     <Row ss:Height="22">
      <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.nome)}</Data></Cell>
@@ -2236,6 +2282,7 @@
      <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.nota}</Data></Cell>
      <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.avaliacoes}</Data></Cell>
      <Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.maps)}"><Data ss:Type="String">Abrir no Maps</Data></Cell>
+     ${instagramCellXml}
      <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(lead.validacao_whatsapp || 'Verificar')}</Data></Cell>
     </Row>`;
             });
