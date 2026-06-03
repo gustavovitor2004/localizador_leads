@@ -2708,14 +2708,19 @@
             user: null // Armazena dados do usuário autenticado { id, email, credits }
         };
 
-        // Validação simples de senha no Frontend (apenas comprimento mínimo para testes)
+        // Validação de complexidade de senha no Frontend (Regex)
         function validatePassword(password) {
-            return password && password.length >= 3;
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*()_+\-=\[\]\{\};':"\\|,.<>\/?~`]).{8,}$/;
+            return regex.test(password);
         }
 
         // Obtém o token de sessão ativa do Supabase de forma robusta e dinâmica
         function getSupabaseToken() {
-            // 1. Procura por chaves no localStorage/sessionStorage que sigam o padrão sb-*-auth-token do SDK do Supabase
+            // 1. Check if token is in appState
+            if (appState.user && appState.user.token) {
+                return appState.user.token;
+            }
+            // 2. Procura por chaves no localStorage/sessionStorage que sigam o padrão sb-*-auth-token do SDK do Supabase
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
@@ -2727,7 +2732,7 @@
                     } catch (e) {}
                 }
             }
-            // 2. Procura por chaves alternativas comuns
+            // 3. Procura por chaves alternativas comuns
             const altKeys = ['sb-access-token', 'access_token', 'supabase.auth.token'];
             for (const key of altKeys) {
                 const val = localStorage.getItem(key) || sessionStorage.getItem(key);
@@ -2741,7 +2746,7 @@
                     }
                 }
             }
-            // 3. Obtém dinamicamente do objeto do cliente Supabase se disponível
+            // 4. Obtém dinamicamente do objeto do cliente Supabase se disponível
             if (supabaseClient) {
                 try {
                     const session = supabaseClient.auth.session ? supabaseClient.auth.session() : null;
@@ -3022,8 +3027,8 @@
                 if (!validatePassword(password)) {
                     createToast(
                         appState.currentLang === 'en'
-                        ? 'Password must be at least 3 characters long.'
-                        : 'A senha deve conter no mínimo 3 caracteres.',
+                        ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
+                        : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
                         'danger'
                     );
                     btnSubmit.disabled = false;
@@ -3043,6 +3048,7 @@
                         if (error) throw error;
                         userId = data.user.id;
                         userEmail = data.user.email;
+                        const sessionToken = data.session ? data.session.access_token : null;
 
                         // Valida se o perfil existe no backend E se as credenciais batem
                         const resProfile = await fetch(`${API_BASE_URL}/api/perfil/login`, {
@@ -3063,7 +3069,8 @@
                         appState.user = {
                             id: userId,
                             email: userEmail,
-                            credits: profile.credits
+                            credits: profile.credits,
+                            token: sessionToken
                         };
                         createToast('Conectado com sucesso!', 'success');
                     } else {
@@ -3071,6 +3078,7 @@
                         if (error) throw error;
                         userId = data.user.id;
                         userEmail = data.user.email;
+                        const sessionToken = data.session ? data.session.access_token : null;
 
                         // Cria o perfil no backend (inclui 5 créditos, senha criptografada e e-mail de boas-vindas)
                         const resRegister = await fetch(`${API_BASE_URL}/api/perfil`, {
@@ -3086,7 +3094,8 @@
                         appState.user = {
                             id: userId,
                             email: userEmail,
-                            credits: profile.credits
+                            credits: profile.credits,
+                            token: sessionToken
                         };
                         createToast('Conta criada com sucesso! Verifique seu e-mail.', 'success');
                     }
@@ -3110,10 +3119,13 @@
                             throw new Error("Erro de comunicação com o backend simulado.");
                         }
                         const profile = await resProfile.json();
+                        const mockPayload = btoa(JSON.stringify({ sub: profile.id })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                        const mockToken = `mockheader.${mockPayload}.mocksignature`;
                         appState.user = {
                             id: profile.id, // Usa o ID retornado pelo servidor
                             email: userEmail,
-                            credits: profile.credits
+                            credits: profile.credits,
+                            token: mockToken
                         };
                         createToast('Acesso de testes concedido!', 'success');
                     } else {
@@ -3128,10 +3140,13 @@
                             throw new Error(errData.detail || "Erro ao registrar conta simulada.");
                         }
                         const profile = await resRegister.json();
+                        const mockPayload = btoa(JSON.stringify({ sub: userId })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                        const mockToken = `mockheader.${mockPayload}.mocksignature`;
                         appState.user = {
                             id: userId,
                             email: userEmail,
-                            credits: profile.credits
+                            credits: profile.credits,
+                            token: mockToken
                         };
                         createToast('Conta demonstrativa criada no simulador! Você ganhou 5 créditos grátis.', 'success');
                     }
@@ -4158,8 +4173,8 @@
             if (!validatePassword(newPassword)) {
                 createToast(
                     appState.currentLang === 'en'
-                    ? 'New password must be at least 3 characters long.'
-                    : 'A nova senha deve conter no mínimo 3 caracteres.',
+                    ? 'New password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
+                    : 'A nova senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
                     'danger'
                 );
                 return;
@@ -4262,8 +4277,8 @@
             if (!validatePassword(newPassword)) {
                 createToast(
                     appState.currentLang === 'en'
-                    ? 'Password must be at least 3 characters long.'
-                    : 'A senha deve conter no mínimo 3 caracteres.',
+                    ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
+                    : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
                     'danger'
                 );
                 return;

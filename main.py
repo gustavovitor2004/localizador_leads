@@ -8,6 +8,7 @@ Descrição: Servidor backend robusto para controle de buscas, autenticação se
 """
 
 import os
+import re
 import random
 import requests
 import uuid
@@ -101,9 +102,13 @@ def verificar_senha(senha: str, senha_hash: str) -> bool:
 
 def validar_complexidade_senha(senha: str) -> bool:
     """
-    Valida se a senha tem pelo menos 3 caracteres (sanidade básica para testes).
+    Valida a complexidade da senha usando Expressão Regular.
+    Deve ter no mínimo 8 caracteres, pelo menos 1 maiúscula, 1 minúscula e 1 caractere especial.
     """
-    return len(senha) >= 3
+    if not senha:
+        return False
+    pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*()_+\-=\[\]\{\};':\"\\|,.<>\/?~`]).{8,}$"
+    return bool(re.match(pattern, senha))
 
 def extrair_uuid_do_token(authorization: Optional[str]) -> Optional[str]:
     """
@@ -122,10 +127,12 @@ def extrair_uuid_do_token(authorization: Optional[str]) -> Optional[str]:
         if len(parts) != 3:
             return None
         payload_b64 = parts[1]
+        # Substitui caracteres base64url para base64 padrão
+        payload_b64 = payload_b64.replace("-", "+").replace("_", "/")
         rem = len(payload_b64) % 4
         if rem > 0:
             payload_b64 += "=" * (4 - rem)
-        payload_bytes = base64.urlsafe_b64decode(payload_b64)
+        payload_bytes = base64.b64decode(payload_b64)
         payload_data = json.loads(payload_bytes.decode("utf-8"))
         return payload_data.get("sub")
     except Exception as e:
@@ -745,7 +752,7 @@ async def criar_perfil(req: ProfileCreateRequest):
     if not validar_complexidade_senha(req.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 3 caracteres."
+            detail="A senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e 1 caractere especial."
         )
     user_id = req.user_id
     email = req.email
@@ -899,12 +906,10 @@ def enviar_email_recuperacao(email: str, token: str):
     smtp_user = os.getenv("SMTP_USER")
     smtp_password = os.getenv("SMTP_PASSWORD")
 
-    # Caso as credenciais SMTP não estejam configuradas, loga o link de recuperação de teste
+    # Caso as credenciais SMTP não estejam configuradas, levanta erro para não fingir sucesso
     if (not smtp_server or not smtp_user or not smtp_password or
         "seu-email@gmail.com" in smtp_user or "sua-senha-de-app" in smtp_password):
-        print(f"[SMTP WARNING] Configurações de SMTP vazias ou com placeholders.")
-        print(f"[RECOVERY LINK SIMULATED] https://gridhunter.vercel.app/?reset_token={token}")
-        return
+        raise ValueError("Servidor SMTP não configurado ou com placeholders no arquivo .env. Não foi possível enviar o e-mail de recuperação.")
 
     try:
         msg = MIMEMultipart("alternative")
@@ -980,6 +985,7 @@ def enviar_email_recuperacao(email: str, token: str):
         print(f"[SMTP ERROR] Falha ao enviar e-mail de recuperação para {email}: {email_err}")
         raise email_err
 
+
 @app.post("/api/alterar-senha")
 async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str] = Header(None)):
     """Altera a senha de um usuário autenticado validando a senha atual."""
@@ -987,7 +993,7 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
     if not validar_complexidade_senha(req.new_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 3 caracteres."
+            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e 1 caractere especial."
         )
 
     # 2. Decodifica o token JWT para identificar o ID do usuário ativo
@@ -1097,7 +1103,7 @@ async def redefinir_senha(req: ResetPasswordRequest):
     if not validar_complexidade_senha(nova_senha):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 3 caracteres."
+            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e 1 caractere especial."
         )
 
     if token not in RESET_TOKENS:
