@@ -1053,9 +1053,9 @@ async def esqueci_senha(req: ForgotPasswordRequest):
     """Gera um token temporário e envia o link de redefinição de senha."""
     SERVER = str(os.getenv("SMTP_SERVER", "smtp.gmail.com")).strip()
     try:
-        PORT = int(os.getenv("SMTP_PORT", 587))
+        PORT = int(os.getenv("SMTP_PORT", 465))
     except (ValueError, TypeError):
-        PORT = 587
+        PORT = 465
     USER = str(os.getenv("SMTP_USER", "")).strip()
     PASSWORD = str(os.getenv("SMTP_PASSWORD", "")).strip()
 
@@ -1095,8 +1095,7 @@ async def esqueci_senha(req: ForgotPasswordRequest):
 
     # Dispara e-mail de recuperação com blindagem contra falhas SMTP
     try:
-        server = smtplib.SMTP(SERVER, PORT, timeout=10)
-        server.starttls()
+        server = smtplib.SMTP_SSL(SERVER, PORT, timeout=10)
         server.login(USER, PASSWORD)
         
         msg = MIMEMultipart("alternative")
