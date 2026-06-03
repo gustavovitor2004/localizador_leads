@@ -102,13 +102,10 @@ def verificar_senha(senha: str, senha_hash: str) -> bool:
 
 def validar_complexidade_senha(senha: str) -> bool:
     """
-    Valida a complexidade da senha usando Expressão Regular.
-    Deve ter no mínimo 8 caracteres, pelo menos 1 maiúscula, 1 minúscula e 1 caractere especial.
+    Valida se a senha tem o comprimento mínimo de 3 caracteres.
     """
-    if not senha:
-        return False
-    pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*()_+\-=\[\]\{\};':\"\\|,.<>\/?~`]).{8,}$"
-    return bool(re.match(pattern, senha))
+    return bool(senha and len(senha) >= 3)
+
 
 def extrair_uuid_do_token(authorization: Optional[str]) -> Optional[str]:
     """
@@ -438,7 +435,7 @@ def enviar_email_boas_vindas(email: str):
 
         # Envia usando SMTP/TLS
         port = int(smtp_port) if smtp_port else 587
-        server = smtplib.SMTP(smtp_server, port)
+        server = smtplib.SMTP(smtp_server, port, timeout=8)
         server.starttls()
         server.login(smtp_user, smtp_password)
         server.sendmail(smtp_user, email, msg.as_string())
@@ -752,7 +749,7 @@ async def criar_perfil(req: ProfileCreateRequest):
     if not validar_complexidade_senha(req.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e 1 caractere especial."
+            detail="A senha deve conter no mínimo 3 caracteres."
         )
     user_id = req.user_id
     email = req.email
@@ -975,7 +972,7 @@ def enviar_email_recuperacao(email: str, token: str):
         msg.attach(part2)
 
         port = int(smtp_port) if smtp_port else 587
-        server = smtplib.SMTP(smtp_server, port)
+        server = smtplib.SMTP(smtp_server, port, timeout=8)
         server.starttls()
         server.login(smtp_user, smtp_password)
         server.sendmail(smtp_user, email, msg.as_string())
@@ -993,7 +990,7 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
     if not validar_complexidade_senha(req.new_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e 1 caractere especial."
+            detail="A nova senha deve conter no mínimo 3 caracteres."
         )
 
     # 2. Decodifica o token JWT para identificar o ID do usuário ativo
@@ -1057,6 +1054,18 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
 @app.post("/api/esqueci-senha")
 async def esqueci_senha(req: ForgotPasswordRequest):
     """Gera um token temporário e envia o link de redefinição de senha."""
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    placeholders = ["seu-email@gmail.com", "seu_email@gmail.com", "sua-senha-de-app", "sua_senha_de_app"]
+    if (not smtp_user or not smtp_password or
+        any(p in smtp_user.lower() for p in placeholders) or
+        any(p in smtp_password.lower() for p in placeholders)):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Servidor de e-mail não configurado no painel do Render"}
+        )
+
     email_addr = req.email.strip().lower()
     
     user_exists = False
@@ -1130,7 +1139,7 @@ async def redefinir_senha(req: ResetPasswordRequest):
     if not validar_complexidade_senha(nova_senha):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e 1 caractere especial."
+            detail="A nova senha deve conter no mínimo 3 caracteres."
         )
 
     if token not in RESET_TOKENS:

@@ -2708,10 +2708,9 @@
             user: null // Armazena dados do usuário autenticado { id, email, credits }
         };
 
-        // Validação de complexidade de senha no Frontend (Regex)
+        // Validação simples de senha no Frontend (apenas comprimento mínimo para testes)
         function validatePassword(password) {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*()_+\-=\[\]\{\};':"\\|,.<>\/?~`]).{8,}$/;
-            return regex.test(password);
+            return password && password.length >= 3;
         }
 
         // Obtém o token de sessão ativa do Supabase de forma robusta e dinâmica
@@ -3027,8 +3026,8 @@
                 if (!validatePassword(password)) {
                     createToast(
                         appState.currentLang === 'en'
-                        ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
-                        : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                        ? 'Password must be at least 3 characters long.'
+                        : 'A senha deve conter no mínimo 3 caracteres.',
                         'danger'
                     );
                     btnSubmit.disabled = false;
@@ -4173,8 +4172,8 @@
             if (!validatePassword(newPassword)) {
                 createToast(
                     appState.currentLang === 'en'
-                    ? 'New password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
-                    : 'A nova senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                    ? 'New password must be at least 3 characters long.'
+                    : 'A nova senha deve conter no mínimo 3 caracteres.',
                     'danger'
                 );
                 return;
@@ -4212,7 +4211,8 @@
                 createToast('Erro de rede: ' + e.message, 'danger');
             } finally {
                 btn.disabled = false;
-                btn.textContent = translations[appState.currentLang || 'pt']['save_password_btn'];
+                const lang = appState.currentLang || 'pt';
+                btn.textContent = (translations[lang] && translations[lang]['save_password_btn']) || "Atualizar Senha";
             }
         }
 
@@ -4253,13 +4253,14 @@
                     showLoginPane();
                 } else {
                     const err = await res.json();
-                    createToast(err.detail || 'Erro ao solicitar recuperação', 'danger');
+                    createToast(err.detail || err.error || 'Erro ao solicitar recuperação', 'danger');
                 }
             } catch (e) {
                 createToast('Erro de rede: ' + e.message, 'danger');
             } finally {
                 btn.disabled = false;
-                btn.textContent = translations[appState.currentLang || 'pt']['send_recovery_link_btn'];
+                const lang = appState.currentLang || 'pt';
+                btn.textContent = (translations[lang] && translations[lang]['send_recovery_link_btn']) || "Enviar Link de Recuperação";
             }
         }
 
@@ -4277,8 +4278,8 @@
             if (!validatePassword(newPassword)) {
                 createToast(
                     appState.currentLang === 'en'
-                    ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
-                    : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                    ? 'Password must be at least 3 characters long.'
+                    : 'A senha deve conter no mínimo 3 caracteres.',
                     'danger'
                 );
                 return;
@@ -4312,7 +4313,8 @@
                 createToast('Erro de rede: ' + e.message, 'danger');
             } finally {
                 btn.disabled = false;
-                btn.textContent = translations[appState.currentLang || 'pt']['reset_pwd_btn'];
+                const lang = appState.currentLang || 'pt';
+                btn.textContent = (translations[lang] && translations[lang]['reset_pwd_btn']) || "Salvar Nova Senha";
             }
         }
 
