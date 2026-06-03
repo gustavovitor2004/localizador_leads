@@ -31,7 +31,7 @@ from dotenv import load_dotenv
 from supabase import create_client, Client
 
 # Carrega variáveis de ambiente
-load_dotenv()
+load_dotenv(override=False)
 
 # Inicialização do Cliente Supabase com fallback seguro para mock
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -362,12 +362,10 @@ def enviar_email_boas_vindas(email: str):
     smtp_user = os.getenv("SMTP_USER")
     smtp_password = os.getenv("SMTP_PASSWORD")
 
-    # Verifica se os parâmetros SMTP são placeholders ou estão vazios
-    if (not smtp_server or not smtp_user or not smtp_password or
-        "seu-email@gmail.com" in smtp_user or "sua-senha-de-app" in smtp_password):
-        print(f"[SMTP WARNING] Configurações de SMTP vazias ou com placeholders. "
+    # Verifica se os parâmetros SMTP estão vazios
+    if not all([smtp_server, smtp_port, smtp_user, smtp_password]):
+        print(f"[SMTP WARNING] Configurações de SMTP incompletas. "
               f"Pulando disparo real de e-mail de boas-vindas para {email}.")
-        print("[SMTP NOTE] Para habilitar o envio, insira credenciais válidas de SMTP no seu arquivo '.env'.")
         return
 
     try:
@@ -904,9 +902,8 @@ def enviar_email_recuperacao(email: str, token: str):
     smtp_password = os.getenv("SMTP_PASSWORD")
 
     # Caso as credenciais SMTP não estejam configuradas, levanta erro para não fingir sucesso
-    if (not smtp_server or not smtp_user or not smtp_password or
-        "seu-email@gmail.com" in smtp_user or "sua-senha-de-app" in smtp_password):
-        raise ValueError("Servidor SMTP não configurado ou com placeholders no arquivo .env. Não foi possível enviar o e-mail de recuperação.")
+    if not all([smtp_server, smtp_port, smtp_user, smtp_password]):
+        raise ValueError("Servidor SMTP não configurado. Não foi possível enviar o e-mail de recuperação.")
 
     try:
         msg = MIMEMultipart("alternative")
@@ -1054,12 +1051,8 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
 @app.post("/api/esqueci-senha")
 async def esqueci_senha(req: ForgotPasswordRequest):
     """Gera um token temporário e envia o link de redefinição de senha."""
-    smtp_user = os.getenv("SMTP_USER")
-    smtp_password = os.getenv("SMTP_PASSWORD")
-    placeholders = ["seu-email@gmail.com", "seu_email@gmail.com", "sua-senha-de-app", "sua_senha_de_app"]
-    if (not smtp_user or not smtp_password or
-        any(p in smtp_user.lower() for p in placeholders) or
-        any(p in smtp_password.lower() for p in placeholders)):
+    print(f"[SMTP DIAGNOSTIC] Server: {os.getenv('SMTP_SERVER')}, User: {os.getenv('SMTP_USER')}, Has Pass: {bool(os.getenv('SMTP_PASSWORD'))}")
+    if not all([os.getenv("SMTP_SERVER"), os.getenv("SMTP_PORT"), os.getenv("SMTP_USER"), os.getenv("SMTP_PASSWORD")]):
         from fastapi.responses import JSONResponse
         return JSONResponse(
             status_code=400,
@@ -1090,24 +1083,7 @@ async def esqueci_senha(req: ForgotPasswordRequest):
             detail="Conta não encontrada com este e-mail. Por favor, verifique ou crie uma conta."
         )
 
-    # 1. Tratamento seguro de strings SMTP e validação de placeholders
-    smtp_server = (os.getenv("SMTP_SERVER") or "").strip()
-    smtp_port = (os.getenv("SMTP_PORT") or "").strip()
-    smtp_user = (os.getenv("SMTP_USER") or "").strip()
-    smtp_password = (os.getenv("SMTP_PASSWORD") or "").strip()
-    
-    placeholders = ["seu-email@gmail.com", "seu_email@gmail.com", "sua-senha-de-app", "sua_senha_de_app", ""]
-    is_smtp_config_invalid = (
-        not smtp_server or not smtp_user or not smtp_password or
-        any(p in smtp_user.lower() for p in placeholders) or
-        any(p in smtp_password.lower() for p in placeholders)
-    )
-    
-    if is_smtp_config_invalid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="O serviço de e-mail (SMTP) não está configurado. Se você é o administrador do sistema, configure as variáveis de ambiente SMTP_SERVER, SMTP_PORT, SMTP_USER e SMTP_PASSWORD no painel de controle do Render."
-        )
+    # As variáveis já foram verificadas no início do endpoint
 
     # Gera token de 32 bytes seguro
     token = secrets.token_urlsafe(32)
