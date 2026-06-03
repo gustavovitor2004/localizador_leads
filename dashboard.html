@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeadFinder Pro - Painel de Varredura Comercial</title>
-    
+
     <!-- Google Fonts: Outfit (Heading) & Inter (UI Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <!-- Supabase Official JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -25,21 +28,29 @@
             --bg-input: hsl(222, 47%, 16%);
             --border-glow: hsla(180, 100%, 50%, 0.2);
             --border-soft: rgba(255, 255, 255, 0.08);
-            
-            --primary: hsl(180, 100%, 50%);         /* Ciano Neon */
+
+            --primary: hsl(180, 100%, 50%);
+            /* Ciano Neon */
             --primary-glow: hsla(180, 100%, 50%, 0.4);
-            --secondary: hsl(217, 91%, 60%);       /* Azul Elétrico */
+            --secondary: hsl(217, 91%, 60%);
+            /* Azul Elétrico */
             --secondary-glow: hsla(217, 91%, 60%, 0.3);
-            
-            --text-main: hsl(210, 40%, 98%);       /* Texto Branco/Claro */
-            --text-muted: hsl(215, 20%, 65%);      /* Texto Cinza Médio */
-            --text-dark: hsl(222, 47%, 11%);       /* Texto Escuro de Destaque */
-            
-            --success: hsl(142, 71%, 45%);         /* Verde Esmeralda */
+
+            --text-main: hsl(210, 40%, 98%);
+            /* Texto Branco/Claro */
+            --text-muted: hsl(215, 20%, 65%);
+            /* Texto Cinza Médio */
+            --text-dark: hsl(222, 47%, 11%);
+            /* Texto Escuro de Destaque */
+
+            --success: hsl(142, 71%, 45%);
+            /* Verde Esmeralda */
             --success-glow: hsla(142, 71%, 45%, 0.4);
-            --warning: hsl(48, 96%, 53%);          /* Amarelo/Laranja Google */
-            --danger: hsl(346, 84%, 61%);          /* Vermelho Cuidado */
-            
+            --warning: hsl(48, 96%, 53%);
+            /* Amarelo/Laranja Google */
+            --danger: hsl(346, 84%, 61%);
+            /* Vermelho Cuidado */
+
             /* Efeitos de Layout */
             --radius-sm: 8px;
             --radius-md: 16px;
@@ -61,7 +72,7 @@
 
         body {
             background-color: var(--bg-deep);
-            background-image: 
+            background-image:
                 radial-gradient(at 0% 0%, hsla(222, 47%, 12%, 0.5) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, hsla(217, 91%, 15%, 0.4) 0px, transparent 50%),
                 radial-gradient(at 50% 100%, hsla(180, 100%, 10%, 0.15) 0px, transparent 50%);
@@ -77,13 +88,16 @@
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: var(--bg-deep);
         }
+
         ::-webkit-scrollbar-thumb {
             background: var(--bg-input);
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: var(--secondary);
         }
@@ -411,7 +425,7 @@
             background: hsl(222, 47%, 18%);
         }
 
-        .form-input:focus + .input-icon {
+        .form-input:focus+.input-icon {
             color: var(--primary);
             transform: scale(1.05);
         }
@@ -423,6 +437,7 @@
             filter: invert(1);
             transition: var(--transition-smooth);
         }
+
         .form-input::-webkit-calendar-picker-indicator:hover {
             opacity: 1;
             filter: invert(1) drop-shadow(0 0 2px var(--primary));
@@ -434,7 +449,8 @@
         }
 
         .input-wrapper .form-input {
-            padding-right: 3rem; /* Espaço para o ícone de seta na direita */
+            padding-right: 3rem;
+            /* Espaço para o ícone de seta na direita */
         }
 
         /* Estilização Premium do Dropdown Customizado (Dark/Cyber) */
@@ -448,7 +464,7 @@
             background: hsl(222, 47%, 12%);
             border: 1px solid var(--border-soft);
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             max-height: 250px;
             overflow-y: auto;
             display: none;
@@ -493,14 +509,17 @@
         .custom-dropdown::-webkit-scrollbar {
             width: 6px;
         }
+
         .custom-dropdown::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 0 12px 12px 0;
         }
+
         .custom-dropdown::-webkit-scrollbar-thumb {
             background: var(--bg-input);
             border-radius: 3px;
         }
+
         .custom-dropdown::-webkit-scrollbar-thumb:hover {
             background: var(--primary);
         }
@@ -657,7 +676,8 @@
             padding: 0.75rem 1rem;
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.8rem;
-            color: hsl(120, 100%, 75%); /* Verde fosforescente clássico */
+            color: hsl(120, 100%, 75%);
+            /* Verde fosforescente clássico */
             overflow-y: auto;
             text-align: left;
             display: flex;
@@ -672,9 +692,17 @@
             white-space: pre-wrap;
         }
 
-        .terminal-line.info { color: hsl(180, 100%, 75%); }
-        .terminal-line.success { color: hsl(120, 100%, 75%); }
-        .terminal-line.warn { color: var(--warning); }
+        .terminal-line.info {
+            color: hsl(180, 100%, 75%);
+        }
+
+        .terminal-line.success {
+            color: hsl(120, 100%, 75%);
+        }
+
+        .terminal-line.warn {
+            color: var(--warning);
+        }
 
         /* ==========================================================================
            6. SEÇÃO DE RESULTADOS COMERCIAL (TABELAS E METRICAS)
@@ -988,21 +1016,25 @@
             letter-spacing: 0.03em;
             width: fit-content;
         }
+
         .wpp-badge.sim {
             background: rgba(16, 185, 129, 0.08);
             border: 1px solid rgba(16, 185, 129, 0.25);
             color: var(--success);
         }
+
         .wpp-badge.provavel {
             background: rgba(14, 165, 233, 0.08);
             border: 1px solid rgba(14, 165, 233, 0.25);
             color: var(--primary);
         }
+
         .wpp-badge.nao {
             background: rgba(239, 68, 68, 0.08);
             border: 1px solid rgba(239, 68, 68, 0.25);
             color: var(--danger);
         }
+
         .wpp-badge.verificar {
             background: rgba(245, 158, 11, 0.08);
             border: 1px solid rgba(245, 158, 11, 0.25);
@@ -1017,10 +1049,12 @@
             display: inline-block;
             margin-left: 4px;
         }
+
         .maps-indicator-dot.direto {
             background-color: var(--success);
             box-shadow: 0 0 6px var(--success-glow);
         }
+
         .maps-indicator-dot.pesquisa {
             background-color: var(--warning);
             box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
@@ -1086,34 +1120,65 @@
            7. ANIMAÇÕES KEYFRAMES E RESPONSIVIDADE
            ========================================================================== */
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
+
         @keyframes spinReverse {
-            to { transform: rotate(-360deg); }
+            to {
+                transform: rotate(-360deg);
+            }
         }
+
         @keyframes pulseGlow {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 opacity: 0.8;
                 box-shadow: 0 0 8px var(--success-glow);
             }
+
             50% {
                 transform: scale(1.15);
                 opacity: 1;
                 box-shadow: 0 0 16px var(--success);
             }
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
+
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
+
         @keyframes slideLeft {
-            from { transform: translateX(50px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         /* Responsividade */
@@ -1124,39 +1189,51 @@
                 align-items: stretch;
                 text-align: center;
             }
+
             .brand-title {
                 justify-content: center;
             }
+
             .user-status-wrapper {
                 justify-content: center;
             }
-            .card-panel, .scanning-section, .auth-card {
+
+            .card-panel,
+            .scanning-section,
+            .auth-card {
                 padding: 1.5rem;
             }
+
             .results-header-actions {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .results-buttons {
                 flex-direction: column;
             }
+
             .btn-action {
                 justify-content: center;
             }
+
             table.leads-table th {
                 display: none;
             }
+
             table.leads-table td {
                 display: block;
                 text-align: right;
                 border-bottom: none;
                 padding: 0.6rem 0.5rem;
             }
+
             table.leads-table tr {
                 display: block;
                 padding: 1rem 0.5rem;
                 border-bottom: 2px solid var(--border-soft);
             }
+
             table.leads-table td::before {
                 content: attr(data-label);
                 float: left;
@@ -1165,15 +1242,18 @@
                 text-transform: uppercase;
                 font-size: 0.75rem;
             }
+
             .rating-badge {
                 float: right;
             }
+
             .actions-cell-buttons {
                 justify-content: flex-end;
             }
         }
     </style>
 </head>
+
 <body>
 
     <!-- ==========================================================================
@@ -1183,7 +1263,7 @@
         <div class="auth-card">
             <div class="auth-logo">🔍 LEADFINDER PRO</div>
             <div class="auth-subtitle">Painel de Prospecção SaaS para Agências e Designers</div>
-            
+
             <div class="auth-tabs">
                 <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Acessar Conta</button>
                 <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Criar Conta</button>
@@ -1194,33 +1274,38 @@
                     <label for="auth-email" class="form-label">Endereço de E-mail</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                </path>
                                 <polyline points="22,6 12,13 2,6"></polyline>
                             </svg>
                         </span>
-                        <input type="email" id="auth-email" class="form-input" placeholder="seuemail@provedor.com" required autocomplete="email">
+                        <input type="email" id="auth-email" class="form-input" placeholder="seuemail@provedor.com"
+                            required autocomplete="email">
                     </div>
                 </div>
-                
+
                 <div class="form-group" style="text-align: left;">
                     <label for="auth-password" class="form-label">Senha de Acesso</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
                         </span>
-                        <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+                        <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required
+                            autocomplete="current-password">
                     </div>
                 </div>
-                
+
                 <button type="submit" class="btn-submit" id="btn-auth-submit" style="margin-top: 1rem;">
                     Entrar na Plataforma
                 </button>
             </form>
-            
+
             <p id="auth-footer-text" class="auth-form-footer">
                 Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.
             </p>
@@ -1231,7 +1316,7 @@
          B. PAINEL DE CONTROLE LOGADO (APP VIEW)
          ========================================================================== -->
     <div class="app-container" id="app-view" style="display: none;">
-        
+
         <!-- CABEÇALHO (HEADER) -->
         <header>
             <div class="brand-container">
@@ -1240,17 +1325,18 @@
                 </h1>
                 <span class="brand-subtitle">Prospecção de Leads de Alto Impacto</span>
             </div>
-            
+
             <div class="user-status-wrapper" id="user-status-area">
                 <!-- Badge de Usuário -->
                 <div class="user-badge" id="user-profile-badge">
                     <span class="status-dot"></span>
                     <span id="user-email-display">contato@agenciapremier.com.br</span>
                 </div>
-                
+
                 <!-- Badge de Créditos Dinâmicos -->
                 <div class="user-credits-badge">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary); margin-right: 0.15rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="color: var(--primary); margin-right: 0.15rem;">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -1260,7 +1346,8 @@
 
                 <!-- Botão de Sair -->
                 <button class="btn-logout" id="btn-logout" title="Desconectar do SaaS" onclick="handleLogout()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                         <polyline points="16 17 21 12 16 7"></polyline>
                         <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -1274,7 +1361,9 @@
             <div class="card-panel">
                 <div class="card-header">
                     <h2 class="card-title">Configurar Nova Varredura</h2>
-                    <p class="card-description">Selecione o nicho de mercado e a cidade da Bahia para buscar estabelecimentos comerciais que faturam bem, mas não possuem site oficial cadastrado no Google.</p>
+                    <p class="card-description">Selecione o nicho de mercado e a cidade da Bahia para buscar
+                        estabelecimentos comerciais que faturam bem, mas não possuem site oficial cadastrado no Google.
+                    </p>
                 </div>
 
                 <form id="leads-search-form" onsubmit="handleFormSubmit(event)">
@@ -1283,21 +1372,18 @@
                         <label for="nicho-input" class="form-label">Comércio / Nicho de Atuação</label>
                         <div class="input-wrapper">
                             <span class="input-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                 </svg>
                             </span>
-                            <input 
-                                type="text" 
-                                id="nicho-input" 
-                                class="form-input" 
-                                placeholder="Selecione ou digite um nicho..." 
-                                autocomplete="off"
-                                required
-                            >
+                            <input type="text" id="nicho-input" class="form-input"
+                                placeholder="Selecione ou digite um nicho..." autocomplete="off" required>
                             <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    style="opacity: 0.5;">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </span>
@@ -1332,21 +1418,18 @@
                         <label for="cidade-input" class="form-label">Cidade e Estado (Foco Bahia)</label>
                         <div class="input-wrapper">
                             <span class="input-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
                             </span>
-                            <input 
-                                type="text" 
-                                id="cidade-input" 
-                                class="form-input" 
-                                placeholder="Selecione ou digite uma cidade da Bahia..." 
-                                autocomplete="off"
-                                required
-                            >
+                            <input type="text" id="cidade-input" class="form-input"
+                                placeholder="Selecione ou digite uma cidade da Bahia..." autocomplete="off" required>
                             <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    style="opacity: 0.5;">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </span>
@@ -1374,7 +1457,8 @@
                     <!-- Botão de Ação -->
                     <button type="submit" class="btn-submit">
                         <svg viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                         </svg>
                         Iniciar Varredura de Leads (-1 crédito)
                     </button>
@@ -1389,13 +1473,13 @@
                 <div class="loader-ring-inner"></div>
                 <div class="scanner-percentage" id="scanning-percentage-text">0%</div>
             </div>
-            
+
             <div class="progress-bar-container">
                 <div class="progress-bar-fill" id="scanning-progress-bar"></div>
             </div>
 
             <div class="scanning-status" id="scanning-status-title">Conectando ao gateway de busca...</div>
-            
+
             <!-- Terminal de Logs interativo -->
             <div class="terminal-console" id="terminal-log">
                 <p class="terminal-line">[SYSTEM] Terminal de varredura pronto.</p>
@@ -1404,13 +1488,14 @@
 
         <!-- SEÇÃO DE RESULTADOS COMERCIAIS -->
         <section class="results-section" id="results-container">
-            
+
             <!-- Grid de Métricas Comerciais -->
             <div class="metrics-grid">
                 <!-- Locais Analisados -->
                 <div class="metric-card">
                     <div class="metric-icon-wrapper">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
@@ -1424,7 +1509,8 @@
                 <!-- Leads Sem Site -->
                 <div class="metric-card">
                     <div class="metric-icon-wrapper">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
                             <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
                             <line x1="6" y1="6" x2="6.01" y2="6"></line>
@@ -1440,7 +1526,8 @@
                 <!-- Oportunidade Comercial -->
                 <div class="metric-card">
                     <div class="metric-icon-wrapper" style="color: var(--success);">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="1" x2="12" y2="23"></line>
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                         </svg>
@@ -1457,12 +1544,14 @@
                 <div class="results-header-actions">
                     <div class="results-meta">
                         <h3 class="results-title" id="results-badge-title">Leads Qualificados</h3>
-                        <span class="results-subtitle" id="results-badge-subtitle">Busca de comércios locais sem site</span>
+                        <span class="results-subtitle" id="results-badge-subtitle">Busca de comércios locais sem
+                            site</span>
                     </div>
-                    
+
                     <div class="results-buttons">
                         <button class="btn-action btn-excel" onclick="triggerExcelExport()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
                                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -1498,7 +1587,7 @@
                 </div>
             </div>
         </section>
-        
+
     </div>
 
     <!-- Container de Toasters / Alertas Flutuantes -->
@@ -1518,7 +1607,7 @@
         // ==========================================================================
         const SUPABASE_URL = 'https://sua-url-do-supabase.supabase.co'; // Placeholders prontos para produção
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.sua-chave-anon-placeholder';
-        const API_BASE_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" ? "http://127.0.0.1:8000" : "https://seu-backend-no-render.onrender.com";
+        const API_BASE_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" ? "http://127.0.0.1:8000" : "https://localizador-leads.onrender.com";
 
         let supabaseClient = null;
         let isSupabaseSimulated = true;
@@ -1601,7 +1690,7 @@
                 if (isSelecting) return;
 
                 const query = input.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                
+
                 items.forEach(item => {
                     const value = (item.getAttribute('data-value') || item.textContent).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                     if (value.includes(query)) {
@@ -1610,7 +1699,7 @@
                         item.style.display = 'none';
                     }
                 });
-                
+
                 showDropdown();
             });
 
@@ -1619,11 +1708,11 @@
                 item.addEventListener('click', (e) => {
                     e.stopPropagation();
                     input.value = item.getAttribute('data-value') || item.textContent;
-                    
+
                     // Esconde imediatamente o contêiner correspondente do dropdown
                     dropdown.classList.remove('show');
                     dropdown.style.display = 'none';
-                    
+
                     isSelecting = true;
                     // Dispara eventos padrão para propagação
                     input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1658,26 +1747,26 @@
                     sessionStorage.removeItem('leadfinder_session');
                 }
             }
-            
+
             showAuthScreen();
         }
 
         function showAuthScreen() {
             document.getElementById('app-view').style.display = 'none';
             document.getElementById('auth-view').style.display = 'flex';
-            
+
             // LIMPA ESTADO ANTERIOR DE DADOS E INTERFACE NO LOGOUT
             appState.leadsEncontrados = [];
             appState.nichoAtual = '';
             appState.cidadeAtual = '';
-            
+
             document.getElementById('results-container').style.display = 'none';
             document.getElementById('scanning-container').style.display = 'none';
             document.getElementById('form-container').style.display = 'flex';
-            
+
             document.getElementById('nicho-input').value = '';
             document.getElementById('cidade-input').value = '';
-            
+
             // Reseta a visibilidade de todos os itens nos dropdowns customizados para 'block'
             document.querySelectorAll('.custom-dropdown li').forEach(item => {
                 item.style.display = 'block';
@@ -1689,16 +1778,16 @@
         function showAuthenticatedApp() {
             document.getElementById('auth-view').style.display = 'none';
             document.getElementById('app-view').style.display = 'flex';
-            
+
             // RESET VISUAL DO PAINEL PARA CONFIGURAR NOVA VARREDURA AO LOGAR
             document.getElementById('results-container').style.display = 'none';
             document.getElementById('scanning-container').style.display = 'none';
             document.getElementById('form-container').style.display = 'flex';
-            
+
             // LIMPA OS CAMPOS DE BUSCA ANTERIORES DO OUTRO USUÁRIO
             document.getElementById('nicho-input').value = '';
             document.getElementById('cidade-input').value = '';
-            
+
             // Reseta a visibilidade de todos os itens nos dropdowns customizados para 'block'
             document.querySelectorAll('.custom-dropdown li').forEach(item => {
                 item.style.display = 'block';
@@ -1762,11 +1851,11 @@
 
         async function handleAuthSubmit(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
             const btnSubmit = document.getElementById('btn-auth-submit');
-            
+
             btnSubmit.disabled = true;
             btnSubmit.textContent = 'Processando...';
 
@@ -1874,7 +1963,7 @@
                         createToast('Conta demonstrativa criada no simulador! Você ganhou 5 créditos grátis.', 'success');
                     }
                 }
-                
+
                 sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
                 showAuthenticatedApp();
             } catch (err) {
@@ -1897,15 +1986,15 @@
         // ==========================================================================
         function handleFormSubmit(event) {
             event.preventDefault();
-            
+
             const nichoVal = document.getElementById('nicho-input').value.trim();
             const cidadeVal = document.getElementById('cidade-input').value.trim();
-            
+
             if (!nichoVal || !cidadeVal) {
                 createToast('Preencha os campos obrigatórios!', 'warn');
                 return;
             }
-            
+
             if (appState.user.credits <= 0) {
                 createToast('Créditos insuficientes! Faça uma recarga para continuar buscando.', 'danger');
                 return;
@@ -1913,11 +2002,11 @@
 
             appState.nichoAtual = nichoVal;
             appState.cidadeAtual = cidadeVal;
-            
+
             // Oculta formulário e inicia painel de varredura
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('scanning-container').style.display = 'flex';
-            
+
             executeRealScan(nichoVal, cidadeVal);
         }
 
@@ -1926,12 +2015,12 @@
             const percentText = document.getElementById('scanning-percentage-text');
             const statusText = document.getElementById('scanning-status-title');
             const consoleBox = document.getElementById('terminal-log');
-            
+
             // Reset do terminal
             consoleBox.innerHTML = '';
             appendTerminalLine('[SYSTEM] Inicializando módulo de varredura SaaS...', 'info');
             appendTerminalLine('[CONEXÃO] Estabelecendo conexão segura HTTP com o Backend...', 'info');
-            
+
             // Animação de progresso rica visual (carrega até 90% enquanto aguarda a API do backend responder)
             let progress = 0;
             let progressInterval = setInterval(() => {
@@ -1939,7 +2028,7 @@
                     progress += Math.floor(Math.random() * 5) + 1;
                     progressFill.style.width = `${progress}%`;
                     percentText.textContent = `${progress}%`;
-                    
+
                     if (progress > 15 && progress <= 35) {
                         statusText.textContent = '[CONEXÃO] Validando credenciais e créditos de busca...';
                     } else if (progress > 35 && progress <= 60) {
@@ -1973,13 +2062,13 @@
                 }
 
                 const data = await response.json();
-                
+
                 // Conclui a animação de progresso rapidamente a 100% após a resposta chegar
                 clearInterval(progressInterval);
-                
+
                 appendTerminalLine(`[API SUCCESS] Busca finalizada através do motor: ${data.api_utilizada}`, 'success');
                 appendTerminalLine(`[CRÉDITOS] Débito efetuado. Saldo restante: ${data.creditos_restantes} buscas`, 'warn');
-                
+
                 let finalProgress = progress;
                 let finalInterval = setInterval(() => {
                     if (finalProgress < 100) {
@@ -1993,17 +2082,17 @@
                             appState.leadsEncontrados = data.leads;
                             appState.user.credits = data.creditos_restantes;
                             sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
-                            
+
                             // Atualiza saldo na tela
                             updateUserPanel();
-                            
+
                             // Exibe os resultados
                             document.getElementById('scanning-container').style.display = 'none';
                             document.getElementById('results-container').style.display = 'flex';
-                            
+
                             document.getElementById('results-badge-title').textContent = `Leads: ${appState.nichoAtual} em ${appState.cidadeAtual}`;
                             document.getElementById('results-badge-subtitle').textContent = `Dados gerados através do backend (${data.api_utilizada})`;
-                            
+
                             renderLeadsTable(data.leads);
                             animateMetricCounters(data.leads.length);
                         }, 500);
@@ -2014,7 +2103,7 @@
                 clearInterval(progressInterval);
                 document.getElementById('scanning-container').style.display = 'none';
                 document.getElementById('form-container').style.display = 'flex';
-                
+
                 let friendlyMessage = err.message;
                 if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
                     friendlyMessage = "Não foi possível conectar ao servidor. Certifique-se de que a API está rodando no terminal.";
@@ -2035,21 +2124,21 @@
         function renderLeadsTable(leads) {
             const tbody = document.getElementById('leads-table-rows');
             tbody.innerHTML = '';
-            
+
             if (leads.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!</td></tr>`;
                 return;
             }
-            
+
             leads.forEach(lead => {
                 const tr = document.createElement('tr');
-                
+
                 const starsCount = Math.round(parseFloat(lead.nota));
                 let starsSvg = '';
                 for (let i = 1; i <= 5; i++) {
                     starsSvg += (i <= starsCount) ? '★' : '☆';
                 }
-                
+
                 // Sanitização robusta do telefone e geração de link do WhatsApp
                 let wppLink = '#';
                 let hasPhone = false;
@@ -2065,7 +2154,7 @@
                         wppLink = `https://wa.me/${cleanPhone}?text=Olá,%20vi%20sua%20empresa%20${encodeURIComponent(lead.nome)}%20no%20Google%20e%20gostaria%20de%20apresentar%20uma%20proposta...`;
                     }
                 }
-                
+
                 const wppStatus = lead.validacao_whatsapp || "Apenas Ligação";
                 let wppStatusClass = "";
                 if (wppStatus.includes("SIM")) {
@@ -2075,7 +2164,7 @@
                 } else {
                     wppStatusClass = "nao";
                 }
-                
+
                 const isLinkDireto = lead.tipo_link_maps === "Link Direto";
                 const mapsTitle = isLinkDireto ? "Link Direto (100% Garantido)" : "Link de Pesquisa (Busca por Texto)";
                 const mapsDotClass = isLinkDireto ? "direto" : "pesquisa";
@@ -2139,7 +2228,7 @@
         function animateMetricCounters(leadsCount) {
             const totalAnalyzed = Math.round(leadsCount * (1.5 + Math.random()));
             const presenceRate = Math.round((1 - (leadsCount / totalAnalyzed)) * 100);
-            
+
             animateNumber('metric-analyzed', 0, totalAnalyzed, 800);
             animateNumber('metric-leads', 0, leadsCount, 800);
             animateNumber('metric-conversion', 0, presenceRate, 800, '%');
@@ -2162,12 +2251,12 @@
         function resetSearchForm() {
             document.getElementById('nicho-input').value = '';
             document.getElementById('cidade-input').value = '';
-            
+
             // Reseta a visibilidade de todos os itens nos dropdowns customizados para 'block'
             document.querySelectorAll('.custom-dropdown li').forEach(item => {
                 item.style.display = 'block';
             });
-            
+
             document.getElementById('results-container').style.display = 'none';
             document.getElementById('form-container').style.display = 'flex';
         }
@@ -2180,7 +2269,7 @@
                 createToast('Nenhum dado para exportar!', 'warn');
                 return;
             }
-            
+
             try {
                 exportToExcel(appState.leadsEncontrados, appState.nichoAtual, appState.cidadeAtual);
                 createToast('Exportação para Excel (.xlsx) iniciada!', 'success');
@@ -2191,7 +2280,7 @@
 
         function exportToExcel(leads, nicho, cidade) {
             const dateStr = new Date().toISOString();
-            
+
             let xml = `<?xml version="1.0" encoding="utf-8"?>
 <?mso-application progid="Excel.Sheet"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
@@ -2311,10 +2400,10 @@
             const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            
+
             const fileNicho = nicho.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
             const fileCidade = cidade.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
-            
+
             a.href = url;
             a.download = `leads_sem_site_${fileNicho}_${fileCidade}.xls`;
             document.body.appendChild(a);
@@ -2344,7 +2433,7 @@
             const container = document.getElementById('toast-wrapper');
             const toast = document.createElement('div');
             toast.className = `toast-message ${type}`;
-            
+
             toast.innerHTML = `
                 <div class="toast-content">${message}</div>
                 <button class="toast-close" onclick="this.parentElement.remove()">
@@ -2354,9 +2443,9 @@
                     </svg>
                 </button>
             `;
-            
+
             container.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.style.animation = 'fadeIn 0.3s ease-out reverse forwards';
                 setTimeout(() => {
@@ -2366,4 +2455,5 @@
         }
     </script>
 </body>
+
 </html>
