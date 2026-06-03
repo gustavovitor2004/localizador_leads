@@ -2113,6 +2113,11 @@
             <p id="auth-footer-text" class="auth-form-footer" data-i18n="auth_footer_login_text">
                 Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.
             </p>
+
+            <!-- Copyright minimalista para tela de recuperação -->
+            <div id="minimal-copyright" style="display: none; font-size: 0.75rem; color: var(--text-muted); margin-top: 2rem; opacity: 0.6;">
+                &copy; 2026 GridHunter. Todos os direitos reservados.
+            </div>
         </div>
 
         <!-- SEÇÕES INSTITUCIONAIS LANDING PAGE -->
@@ -2703,25 +2708,64 @@
             user: null // Armazena dados do usuário autenticado { id, email, credits }
         };
 
-        // Validação de complexidade de senha no Frontend
+        // Validação simples de senha no Frontend (apenas comprimento mínimo para testes)
         function validatePassword(password) {
-            if (password.length < 8) return false;
-            if (!/[a-z]/.test(password)) return false;
-            if (!/[A-Z]/.test(password)) return false;
-            const specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/;
-            if (!specialChars.test(password)) return false;
-            return true;
+            return password && password.length >= 3;
+        }
+
+        // Obtém o token de sessão ativa do Supabase de forma robusta e dinâmica
+        function getSupabaseToken() {
+            // 1. Procura por chaves no localStorage/sessionStorage que sigam o padrão sb-*-auth-token do SDK do Supabase
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+                    try {
+                        const sessionObj = JSON.parse(localStorage.getItem(key));
+                        if (sessionObj && sessionObj.access_token) {
+                            return sessionObj.access_token;
+                        }
+                    } catch (e) {}
+                }
+            }
+            // 2. Procura por chaves alternativas comuns
+            const altKeys = ['sb-access-token', 'access_token', 'supabase.auth.token'];
+            for (const key of altKeys) {
+                const val = localStorage.getItem(key) || sessionStorage.getItem(key);
+                if (val) {
+                    try {
+                        const parsed = JSON.parse(val);
+                        if (parsed && parsed.access_token) return parsed.access_token;
+                        return val;
+                    } catch(e) {
+                        return val;
+                    }
+                }
+            }
+            // 3. Obtém dinamicamente do objeto do cliente Supabase se disponível
+            if (supabaseClient) {
+                try {
+                    const session = supabaseClient.auth.session ? supabaseClient.auth.session() : null;
+                    if (session && session.access_token) return session.access_token;
+                } catch (e) {}
+            }
+            return null;
         }
 
         // Gerencia visibilidade das seções da página baseada no estado atual
         function manageMarketingSectionsVisibility(viewState) {
-            const landingContainer = document.querySelector('.landing-container');
-            if (landingContainer) {
-                if (viewState === 'forgot' || viewState === 'reset') {
-                    landingContainer.style.display = 'none';
+            const isRecovery = (viewState === 'forgot' || viewState === 'reset');
+            
+            document.querySelectorAll('section, footer').forEach(el => {
+                if (isRecovery) {
+                    el.style.display = 'none';
                 } else {
-                    landingContainer.style.display = 'block';
+                    el.style.display = '';
                 }
+            });
+
+            const minCopyright = document.getElementById('minimal-copyright');
+            if (minCopyright) {
+                minCopyright.style.display = isRecovery ? 'block' : 'none';
             }
         }
 
@@ -2978,8 +3022,8 @@
                 if (!validatePassword(password)) {
                     createToast(
                         appState.currentLang === 'en'
-                        ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
-                        : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                        ? 'Password must be at least 3 characters long.'
+                        : 'A senha deve conter no mínimo 3 caracteres.',
                         'danger'
                     );
                     btnSubmit.disabled = false;
@@ -4114,8 +4158,8 @@
             if (!validatePassword(newPassword)) {
                 createToast(
                     appState.currentLang === 'en'
-                    ? 'New password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
-                    : 'A nova senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                    ? 'New password must be at least 3 characters long.'
+                    : 'A nova senha deve conter no mínimo 3 caracteres.',
                     'danger'
                 );
                 return;
@@ -4125,19 +4169,8 @@
             btn.disabled = true;
             btn.textContent = '...';
 
-            let token = 'mock-token-for-development';
-            if (!isSupabaseSimulated && supabaseClient) {
-                try {
-                    const sessionResp = await supabaseClient.auth.getSession();
-                    if (sessionResp && sessionResp.data && sessionResp.data.session) {
-                        token = sessionResp.data.session.access_token;
-                    }
-                } catch (err) {
-                    console.warn("Erro ao obter sessão do Supabase:", err);
-                }
-            } else if (appState.user && appState.user.token) {
-                token = appState.user.token;
-            }
+            const tokenObj = getSupabaseToken();
+            const token = tokenObj || (appState.user && appState.user.token) || 'mock-token-for-development';
 
             try {
                 const res = await fetch(`${API_BASE_URL}/api/alterar-senha`, {
@@ -4229,8 +4262,8 @@
             if (!validatePassword(newPassword)) {
                 createToast(
                     appState.currentLang === 'en'
-                    ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
-                    : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                    ? 'Password must be at least 3 characters long.'
+                    : 'A senha deve conter no mínimo 3 caracteres.',
                     'danger'
                 );
                 return;
