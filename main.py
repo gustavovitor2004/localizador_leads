@@ -114,9 +114,9 @@ def extrair_uuid_do_token(authorization: Optional[str]) -> Optional[str]:
     """
     import base64
     import json
-    if not authorization or not authorization.startswith("Bearer "):
+    if not authorization or not authorization.lower().startswith("bearer "):
         return None
-    token = authorization.split(" ")[1]
+    token = authorization.split(" ", 1)[1].strip().strip('"')
     if token == "mock-token-for-development" or "." not in token:
         return None
     try:
@@ -351,6 +351,15 @@ def obter_uuid_usuario(user_id: Optional[str]) -> Optional[str]:
     except ValueError:
         # Gera UUID determinístico usando namespace DNS e a string recebida
         return str(uuid.uuid5(uuid.NAMESPACE_DNS, str(user_id)))
+
+def eh_uuid_valido(val: str) -> bool:
+    if not val:
+        return False
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
 
 def enviar_email_boas_vindas(email: str):
     """
@@ -1004,7 +1013,7 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
     senha_hash = None
     email_addr = None
     
-    if not is_supabase_mock and supabase is not None:
+    if not is_supabase_mock and supabase is not None and eh_uuid_valido(user_uuid):
         try:
             db_profile_resp = supabase.table("perfis_usuarios").select("senha_hash, email").eq("id", user_uuid).execute()
             if not db_profile_resp.data:
@@ -1027,7 +1036,7 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
 
     nova_senha_cripto = hash_senha(req.new_password)
 
-    if not is_supabase_mock and supabase is not None:
+    if not is_supabase_mock and supabase is not None and eh_uuid_valido(user_uuid):
         try:
             # Tenta atualizar a senha no Supabase Auth se for administrador
             try:
@@ -1085,60 +1094,17 @@ async def esqueci_senha(req: ForgotPasswordRequest):
         "expira_em": expira_em
     }
 
-    API_KEY = os.getenv("RESEND_API_KEY", "")
-    resend_from = os.getenv("RESEND_FROM") or "GridHunter <onboarding@resend.dev>"
-    reset_link = f"https://gridhunter.vercel.app/?reset_token={token}"
-
-    html_content = f"""
-    <html>
-    <body style="background-color: #0b0f19; color: #f8fafc; font-family: 'Inter', sans-serif; padding: 20px; margin: 0;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #0ea5e9; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.025em;">Grid<span style="color: #f8fafc;">Hunter</span></h1>
-                <p style="color: #64748b; font-size: 14px; margin-top: 5px;">Recuperação de Acesso</p>
-            </div>
-            
-            <hr style="border: 0; border-top: 1px solid #1e293b; margin-bottom: 30px;" />
-            
-            <h2 style="font-size: 20px; font-weight: 600; color: #f8fafc; margin-top: 0;">Redefinição de Senha</h2>
-            
-            <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                Recebemos uma solicitação para redefinir a senha da sua conta no <strong>GridHunter</strong>. 
-                Clique no botão abaixo para criar uma nova senha:
-            </p>
-            
-            <div style="text-align: center; margin-bottom: 30px; margin-top: 30px;">
-                <a href="{reset_link}" style="background-color: #0ea5e9; color: #ffffff; text-decoration: none; padding: 12px 30px; font-weight: 600; border-radius: 8px; display: inline-block; font-size: 15px; box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.4);">
-                    Redefinir Minha Senha
-                </a>
-            </div>
-            
-            <div style="background-color: #0b0f19; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px; margin-bottom: 30px;">
-                <p style="margin: 0; color: #e2e8f0; font-size: 14px;">
-                    <strong>Importante:</strong> Este link é válido por apenas 30 minutos. Se você não solicitou essa redefinição, por favor ignore este e-mail.
-                </p>
-            </div>
-            
-            <hr style="border: 0; border-top: 1px solid #1e293b; margin-bottom: 30px;" />
-            
-            <div style="text-align: center; color: #64748b; font-size: 12px; line-height: 1.5;">
-                <p style="margin: 0;">Você está recebendo este e-mail porque solicitou a redefinição de senha.</p>
-                <p style="margin: 5px 0 0 0;">&copy; 2026 GridHunter. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
+    RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
     headers = {
-        "Authorization": f"Bearer {API_KEY}",
+        "Authorization": f"Bearer {RESEND_API_KEY}",
         "Content-Type": "application/json"
     }
     payload = {
-        "from": resend_from,
-        "to": [email],
+        "from": "onboarding@resend.dev",
+        "to": email,
         "subject": "Recuperação de Senha - GridHunter",
-        "html": html_content
+        "html": f"<p>Você solicitou a redefinição de senha para o GridHunter.</p><p>Use o link a seguir para definir uma nova credencial: https://gridhunter.vercel.app/?reset_token={token}</p>"
     }
 
     try:
