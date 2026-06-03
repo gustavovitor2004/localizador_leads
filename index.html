@@ -2703,6 +2703,28 @@
             user: null // Armazena dados do usuário autenticado { id, email, credits }
         };
 
+        // Validação de complexidade de senha no Frontend
+        function validatePassword(password) {
+            if (password.length < 8) return false;
+            if (!/[a-z]/.test(password)) return false;
+            if (!/[A-Z]/.test(password)) return false;
+            const specialChars = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/;
+            if (!specialChars.test(password)) return false;
+            return true;
+        }
+
+        // Gerencia visibilidade das seções da página baseada no estado atual
+        function manageMarketingSectionsVisibility(viewState) {
+            const landingContainer = document.querySelector('.landing-container');
+            if (landingContainer) {
+                if (viewState === 'forgot' || viewState === 'reset') {
+                    landingContainer.style.display = 'none';
+                } else {
+                    landingContainer.style.display = 'block';
+                }
+            }
+        }
+
         // Inicialização do App
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
@@ -2721,6 +2743,7 @@
                 
                 document.getElementById('auth-view').style.display = 'flex';
                 document.getElementById('app-view').style.display = 'none';
+                manageMarketingSectionsVisibility('reset');
             } else {
                 checkSession();
             }
@@ -2863,6 +2886,7 @@
                 item.style.display = 'block';
             });
 
+            manageMarketingSectionsVisibility('login');
             switchAuthTab(appState.currentAuthTab);
         }
 
@@ -2949,6 +2973,20 @@
 
             btnSubmit.disabled = true;
             btnSubmit.textContent = 'Processando...';
+
+            if (appState.currentAuthTab === 'signup') {
+                if (!validatePassword(password)) {
+                    createToast(
+                        appState.currentLang === 'en'
+                        ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
+                        : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                        'danger'
+                    );
+                    btnSubmit.disabled = false;
+                    switchAuthTab(appState.currentAuthTab);
+                    return;
+                }
+            }
 
             try {
                 let userId = null;
@@ -4073,14 +4111,41 @@
                 return;
             }
 
+            if (!validatePassword(newPassword)) {
+                createToast(
+                    appState.currentLang === 'en'
+                    ? 'New password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
+                    : 'A nova senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                    'danger'
+                );
+                return;
+            }
+
             const btn = document.getElementById('btn-change-password');
             btn.disabled = true;
             btn.textContent = '...';
 
+            let token = 'mock-token-for-development';
+            if (!isSupabaseSimulated && supabaseClient) {
+                try {
+                    const sessionResp = await supabaseClient.auth.getSession();
+                    if (sessionResp && sessionResp.data && sessionResp.data.session) {
+                        token = sessionResp.data.session.access_token;
+                    }
+                } catch (err) {
+                    console.warn("Erro ao obter sessão do Supabase:", err);
+                }
+            } else if (appState.user && appState.user.token) {
+                token = appState.user.token;
+            }
+
             try {
                 const res = await fetch(`${API_BASE_URL}/api/alterar-senha`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({
                         user_id: appState.user.id,
                         current_password: currentPassword,
@@ -4109,6 +4174,7 @@
             document.getElementById('forgot-form').style.display = 'block';
             document.querySelector('.auth-tabs').style.display = 'none';
             document.getElementById('auth-footer-text').style.display = 'none';
+            manageMarketingSectionsVisibility('forgot');
         }
 
         function showLoginPane() {
@@ -4117,11 +4183,12 @@
             document.querySelector('.auth-tabs').style.display = 'flex';
             document.getElementById('auth-footer-text').style.display = 'block';
             document.getElementById('forgot-form').reset();
+            manageMarketingSectionsVisibility('login');
         }
 
         async function handleForgotSubmit(event) {
             event.preventDefault();
-            const email = document.getElementById('forgot-email').value.trim();
+            const email = document.getElementById('forgot-email').value.trim().toLowerCase();
             const btn = document.getElementById('btn-forgot-submit');
             btn.disabled = true;
             btn.textContent = '...';
@@ -4156,6 +4223,16 @@
 
             if (newPassword !== confirmPassword) {
                 createToast(appState.currentLang === 'en' ? 'Passwords do not match!' : 'As senhas não coincidem!', 'danger');
+                return;
+            }
+
+            if (!validatePassword(newPassword)) {
+                createToast(
+                    appState.currentLang === 'en'
+                    ? 'Password must be at least 8 characters long, contain 1 uppercase letter, 1 lowercase letter, and 1 special character.'
+                    : 'A senha deve conter no mínimo 8 caracteres, pelo menos 1 letra maiúscula, 1 letra minúscula e um caractere especial.',
+                    'danger'
+                );
                 return;
             }
 

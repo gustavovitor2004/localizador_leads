@@ -19,14 +19,12 @@ import time
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, HTTPException, status, Body, Response
+from fastapi import FastAPI, HTTPException, status, Body, Response, Header
 from fastapi.responses import FileResponse, RedirectResponse
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 from dotenv import load_dotenv
 # pyrefly: ignore [missing-import]
 from supabase import create_client, Client
@@ -87,14 +85,66 @@ async def add_security_headers(request, call_next):
 
 def hash_senha(senha: str) -> str:
     """Gera um hash bcrypt seguro para a senha."""
-    return pwd_context.hash(senha)
+    senha_bytes = senha.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hash_bytes = bcrypt.hashpw(senha_bytes, salt)
+    return hash_bytes.decode('utf-8')
 
 def verificar_senha(senha: str, senha_hash: str) -> bool:
     """Verifica se a senha coincide com o hash bcrypt."""
     try:
-        return pwd_context.verify(senha, senha_hash)
+        senha_bytes = senha.encode('utf-8')
+        hash_bytes = senha_hash.encode('utf-8')
+        return bcrypt.checkpw(senha_bytes, hash_bytes)
     except Exception:
         return False
+
+def validar_complexidade_senha(senha: str) -> bool:
+    """
+    Valida se a senha atende aos requisitos de complexidade:
+    - Mínimo 8 caracteres.
+    - Pelo menos 1 caractere especial (!, @, #, $, %, etc.).
+    - Pelo menos 1 letra maiúscula.
+    - Pelo menos 1 letra minúscula.
+    """
+    if len(senha) < 8:
+        return False
+    if not any(c.isupper() for c in senha):
+        return False
+    if not any(c.islower() for c in senha):
+        return False
+    # Pelo menos 1 caractere especial
+    caracteres_especiais = "!@#$%^&*()_+-=[]{}|;:\',./<>?`~\"\\"
+    if not any(c in caracteres_especiais for c in senha):
+        return False
+    return True
+
+def extrair_uuid_do_token(authorization: Optional[str]) -> Optional[str]:
+    """
+    Decodifica o token JWT (Bearer token) enviado no cabeçalho Authorization
+    para extrair o UUID do usuário (campo 'sub').
+    """
+    import base64
+    import json
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    token = authorization.split(" ")[1]
+    if token == "mock-token-for-development" or "." not in token:
+        return None
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            return None
+        payload_b64 = parts[1]
+        rem = len(payload_b64) % 4
+        if rem > 0:
+            payload_b64 += "=" * (4 - rem)
+        payload_bytes = base64.urlsafe_b64decode(payload_b64)
+        payload_data = json.loads(payload_bytes.decode("utf-8"))
+        return payload_data.get("sub")
+    except Exception as e:
+        print(f"[JWT DECODE ERROR] Erro ao decodificar token: {e}")
+        return None
 
 def eh_telefone_fixo(telefone: str) -> bool:
     """Retorna True se o telefone brasileiro for um número fixo (começa com 2, 3, 4 ou 5)."""
@@ -706,6 +756,11 @@ async def criar_perfil(req: ProfileCreateRequest):
     Cria um novo perfil de usuário com 5 créditos iniciais e envia e-mail de boas-vindas.
     Se já existir, retorna HTTP 400.
     """
+    if not validar_complexidade_senha(req.password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial."
+        )
     user_id = req.user_id
     email = req.email
     password = req.password
@@ -939,9 +994,25 @@ def enviar_email_recuperacao(email: str, token: str):
         print(f"[SMTP ERROR] Falha ao enviar e-mail de recuperação para {email}: {email_err}")
 
 @app.post("/api/alterar-senha")
-async def alterar_senha(req: ChangePasswordRequest):
+async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str] = Header(None)):
     """Altera a senha de um usuário autenticado validando a senha atual."""
-    user_uuid = obter_uuid_usuario(req.user_id)
+    # 1. Valida complexidade da nova senha
+    if not validar_complexidade_senha(req.new_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial."
+        )
+
+    # 2. Decodifica o token JWT para identificar o ID do usuário ativo
+    token_user_id = extrair_uuid_do_token(authorization)
+    
+    if not is_supabase_mock and not token_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de autenticação ausente, inválido ou expirado."
+        )
+        
+    user_uuid = token_user_id or obter_uuid_usuario(req.user_id)
     
     senha_hash = None
     email_addr = None
@@ -991,7 +1062,7 @@ async def esqueci_senha(req: ForgotPasswordRequest):
     
     if not is_supabase_mock and supabase is not None:
         try:
-            db_res = supabase.table("perfis_usuarios").select("id").eq("email", email_addr).execute()
+            db_res = supabase.table("perfis_usuarios").select("id").ilike("email", email_addr).execute()
             if db_res.data:
                 user_exists = True
         except Exception as db_err:
@@ -1004,8 +1075,10 @@ async def esqueci_senha(req: ForgotPasswordRequest):
                 break
 
     if not user_exists:
-        # Retorna mensagem genérica para evitar enumeração de usuários
-        return {"status": "success", "message": "Se o e-mail estiver cadastrado, o link de recuperação será enviado."}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conta não encontrada com este e-mail. Por favor, verifique ou crie uma conta."
+        )
 
     # Gera token de 32 bytes seguro
     token = secrets.token_urlsafe(32)
@@ -1027,6 +1100,12 @@ async def redefinir_senha(req: ResetPasswordRequest):
     """Valida o token temporário e atualiza a credencial do usuário."""
     token = req.token
     nova_senha = req.password
+
+    if not validar_complexidade_senha(nova_senha):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A nova senha não atende aos requisitos de complexidade exigidos. Deve ter no mínimo 8 caracteres, uma letra maiúscula, uma letra minúscula e um caractere especial."
+        )
 
     if token not in RESET_TOKENS:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token inválido ou expirado.")
