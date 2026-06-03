@@ -786,6 +786,95 @@
             font-size: 0.85rem;
             color: var(--text-muted);
             font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Tooltip de Informação */
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            cursor: help;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            transition: var(--transition-smooth);
+        }
+
+        .tooltip-icon:hover {
+            color: var(--primary);
+            background: rgba(180, 255, 255, 0.1);
+        }
+
+        .tooltip-icon::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            width: 280px;
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            background-color: hsl(222, 47%, 10%);
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 10px rgba(180, 255, 255, 0.1);
+            color: var(--text-main);
+            font-size: 0.75rem;
+            line-height: 1.4;
+            text-align: left;
+            white-space: normal;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+            font-weight: normal;
+        }
+
+        .tooltip-icon::before {
+            content: "";
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--border-soft) transparent transparent transparent;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+
+        .tooltip-icon:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .tooltip-icon:hover::before {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsividade para Tooltip */
+        @media (max-width: 480px) {
+            .tooltip-icon::before {
+                display: none;
+            }
+            .tooltip-icon::after {
+                width: 220px;
+                left: auto;
+                right: -20px;
+                transform: translateY(5px);
+            }
+            .tooltip-icon:hover::after {
+                transform: translateY(0);
+            }
         }
 
         /* Container da Tabela e Ações */
@@ -1534,7 +1623,10 @@
                     </div>
                     <div class="metric-info">
                         <span class="metric-value" id="metric-conversion" style="color: var(--success);">0%</span>
-                        <span class="metric-label">Presença Digital Local</span>
+                        <span class="metric-label">
+                            Presença Digital Local
+                            <span class="tooltip-icon" data-tooltip="Esta métrica calcula a porcentagem de empresas analisadas que possuem um site oficial ou canal digital ativo. Quanto menor a porcentagem, maior é a oportunidade para agências de marketing e tecnologia oferecerem serviços de digitalização nessa região.">ⓘ</span>
+                        </span>
                     </div>
                 </div>
             </div>
