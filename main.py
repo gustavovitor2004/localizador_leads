@@ -1035,11 +1035,19 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
 
     if not is_supabase_mock and supabase is not None:
         try:
+            # Tenta atualizar a senha no Supabase Auth se for administrador
+            try:
+                supabase.auth.admin.update_user_by_id(user_uuid, {"password": req.new_password})
+                print(f"[SUPABASE AUTH] Senha atualizada no Auth do Supabase para {email_addr}.")
+            except Exception as auth_err:
+                print(f"[SUPABASE AUTH WARNING] Não foi possível atualizar a senha no Auth do Supabase: {auth_err}")
+
+            # Atualiza a senha na tabela customizada 'perfis_usuarios'
             supabase.table("perfis_usuarios").update({"senha_hash": nova_senha_cripto}).eq("id", user_uuid).execute()
             print(f"[SUPABASE DB] Senha atualizada com sucesso para {email_addr}.")
-        except Exception as db_err:
-            print(f"[SUPABASE DB ERROR] Erro ao atualizar senha: {db_err}")
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Erro ao atualizar senha no banco.")
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro ao atualizar senha no banco: {str(e)}")
     else:
         MOCK_SUPABASE_PROFILES[user_uuid]["senha_hash"] = nova_senha_cripto
         print(f"[MOCK DATABASE] Senha atualizada com sucesso para {email_addr}.")
@@ -1071,6 +1079,25 @@ async def esqueci_senha(req: ForgotPasswordRequest):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Conta não encontrada com este e-mail. Por favor, verifique ou crie uma conta."
+        )
+
+    # 1. Tratamento seguro de strings SMTP e validação de placeholders
+    smtp_server = (os.getenv("SMTP_SERVER") or "").strip()
+    smtp_port = (os.getenv("SMTP_PORT") or "").strip()
+    smtp_user = (os.getenv("SMTP_USER") or "").strip()
+    smtp_password = (os.getenv("SMTP_PASSWORD") or "").strip()
+    
+    placeholders = ["seu-email@gmail.com", "seu_email@gmail.com", "sua-senha-de-app", "sua_senha_de_app", ""]
+    is_smtp_config_invalid = (
+        not smtp_server or not smtp_user or not smtp_password or
+        any(p in smtp_user.lower() for p in placeholders) or
+        any(p in smtp_password.lower() for p in placeholders)
+    )
+    
+    if is_smtp_config_invalid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="O serviço de e-mail (SMTP) não está configurado. Se você é o administrador do sistema, configure as variáveis de ambiente SMTP_SERVER, SMTP_PORT, SMTP_USER e SMTP_PASSWORD no painel de controle do Render."
         )
 
     # Gera token de 32 bytes seguro
@@ -1125,14 +1152,21 @@ async def redefinir_senha(req: ResetPasswordRequest):
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado.")
             user_uuid = db_profile_resp.data[0]["id"]
             
+            # Tenta atualizar a senha no Supabase Auth se for administrador
+            try:
+                supabase.auth.admin.update_user_by_id(user_uuid, {"password": nova_senha})
+                print(f"[SUPABASE AUTH] Senha redefinida no Auth do Supabase para {email_addr}.")
+            except Exception as auth_err:
+                print(f"[SUPABASE AUTH WARNING] Não foi possível redefinir a senha no Auth do Supabase: {auth_err}")
+
             # Atualiza
             supabase.table("perfis_usuarios").update({"senha_hash": nova_senha_cripto}).eq("id", user_uuid).execute()
             print(f"[SUPABASE DB] Senha redefinida com sucesso para {email_addr}.")
         except HTTPException as http_ex:
             raise http_ex
-        except Exception as db_err:
-            print(f"[SUPABASE DB ERROR] Erro ao redefinir senha: {db_err}")
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Erro ao redefinir senha no banco.")
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro ao redefinir senha no banco: {str(e)}")
     else:
         found_uuid = None
         for uid, prof in MOCK_SUPABASE_PROFILES.items():
