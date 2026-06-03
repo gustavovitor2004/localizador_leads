@@ -60,6 +60,8 @@
             --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
             --glass-blur: blur(16px);
+            --tooltip-bg: hsl(222, 47%, 10%);
+            --tooltip-text: hsl(210, 40%, 98%);
         }
 
         /* Temas Alternativos */
@@ -77,6 +79,8 @@
             --text-main: hsl(0, 0%, 95%);
             --text-muted: hsl(0, 0%, 70%);
             --text-dark: hsl(0, 0%, 10%);
+            --tooltip-bg: hsl(0, 0%, 10%);
+            --tooltip-text: hsl(0, 0%, 95%);
             background-image: none;
         }
 
@@ -95,6 +99,8 @@
             --text-muted: hsl(220, 20%, 40%);
             --text-dark: hsl(0, 0%, 100%);
             --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+            --tooltip-bg: hsl(0, 0%, 100%);
+            --tooltip-text: hsl(220, 40%, 15%);
             background-image: none;
         }
         
@@ -899,10 +905,10 @@
             width: 280px;
             padding: 0.75rem;
             border-radius: var(--radius-sm);
-            background-color: hsl(222, 47%, 10%);
+            background-color: var(--tooltip-bg, hsl(222, 47%, 10%));
             border: 1px solid var(--border-soft);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 10px rgba(180, 255, 255, 0.1);
-            color: var(--text-main);
+            color: var(--tooltip-text, hsl(210, 40%, 98%));
             font-size: 0.75rem;
             line-height: 1.4;
             text-align: left;
@@ -922,7 +928,7 @@
             transform: translateX(-50%) translateY(5px);
             border-width: 6px;
             border-style: solid;
-            border-color: var(--border-soft) transparent transparent transparent;
+            border-color: var(--tooltip-bg, hsl(222, 47%, 10%)) transparent transparent transparent;
             z-index: 10000;
             opacity: 0;
             pointer-events: none;
@@ -2056,12 +2062,55 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit" id="btn-auth-submit" style="margin-top: 1rem;">
+                <div style="text-align: right; margin-top: 0.5rem; margin-bottom: 1rem;" id="forgot-password-link-container">
+                    <a href="javascript:void(0)" onclick="showForgotPane()" class="forgot-link" style="font-size: 0.8rem; color: var(--primary); text-decoration: none;" data-i18n="forgot_password_link">Esqueci minha senha</a>
+                </div>
+ 
+                <button type="submit" class="btn-submit" id="btn-auth-submit" style="margin-top: 1rem;" data-i18n="access_platform_btn">
                     Entrar na Plataforma
                 </button>
             </form>
 
-            <p id="auth-footer-text" class="auth-form-footer">
+            <!-- Form de Esqueci Senha -->
+            <form id="forgot-form" onsubmit="handleForgotSubmit(event)" style="display: none;">
+                <div class="form-group" style="text-align: left;">
+                    <label for="forgot-email" class="form-label" data-i18n="forgot_email_label">Endereço de E-mail</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </span>
+                        <input type="email" id="forgot-email" class="form-input" placeholder="seuemail@provedor.com" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="btn-forgot-submit" style="margin-top: 1rem;" data-i18n="send_recovery_link_btn">
+                    Enviar Link de Recuperação
+                </button>
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <a href="javascript:void(0)" onclick="showLoginPane()" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;" data-i18n="back_to_login_link">Voltar para o Login</a>
+                </div>
+            </form>
+
+            <!-- Form de Redefinir Senha -->
+            <form id="reset-pwd-form" onsubmit="handleResetPwdSubmit(event)" style="display: none;">
+                <h3 class="card-title" style="margin-bottom: 1.5rem;" data-i18n="reset_pwd_title">Definir Nova Senha</h3>
+                <div class="form-group" style="text-align: left;">
+                    <label for="reset-pwd-new" class="form-label" data-i18n="new_password_label">Nova Senha</label>
+                    <input type="password" id="reset-pwd-new" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label for="reset-pwd-confirm" class="form-label" data-i18n="confirm_password_label">Confirmar Nova Senha</label>
+                    <input type="password" id="reset-pwd-confirm" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                </div>
+                <input type="hidden" id="reset-pwd-token" value="">
+                <button type="submit" class="btn-submit" id="btn-reset-pwd-submit" style="margin-top: 1rem;" data-i18n="reset_pwd_btn">
+                    Salvar Nova Senha
+                </button>
+            </form>
+ 
+            <p id="auth-footer-text" class="auth-form-footer" data-i18n="auth_footer_login_text">
                 Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.
             </p>
         </div>
@@ -2235,6 +2284,15 @@
                     </svg>
                     <span id="user-credits-display" style="color: var(--primary);">25</span>&nbsp;créditos
                 </div>
+
+                <!-- Botão de Configurações -->
+                <button class="btn-logout" id="btn-settings" title="Configurações" onclick="openSettingsModal()" style="margin-right: 0.25rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
 
                 <!-- Botão de Sair -->
                 <button class="btn-logout" id="btn-logout" title="Desconectar do SaaS" onclick="handleLogout()">
@@ -2550,6 +2608,67 @@
         </div>
     </div>
 
+    <!-- Modal Configurações -->
+    <div id="settings-modal" class="modal-wrapper">
+        <div class="modal-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title" data-i18n="settings_title">Configurações</h3>
+                <button class="modal-close-btn" onclick="closeSettingsModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-tabs" style="margin-bottom: 1.5rem;">
+                    <button class="auth-tab active" id="tab-settings-lang" onclick="switchSettingsTab('lang')" data-i18n="settings_tab_lang">Preferências</button>
+                    <button class="auth-tab" id="tab-settings-security" onclick="switchSettingsTab('security')" data-i18n="settings_tab_security">Alterar Senha</button>
+                </div>
+                
+                <!-- Preferências (Idioma) -->
+                <div id="settings-lang-pane">
+                    <div class="form-group" style="text-align: left;">
+                        <label for="settings-language-select" class="form-label" data-i18n="select_language_label">Idioma da Plataforma</label>
+                        <div class="input-wrapper">
+                            <select id="settings-language-select" class="form-input" style="padding-left: 1.25rem; appearance: none; -webkit-appearance: none; cursor: pointer;" onchange="changeLanguage(this.value)">
+                                <option value="pt">Português (PT)</option>
+                                <option value="en">English (EN)</option>
+                                <option value="es">Español (ES)</option>
+                            </select>
+                            <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5;">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Segurança (Alterar Senha) -->
+                <div id="settings-security-pane" style="display: none;">
+                    <form id="change-password-form" onsubmit="handleChangePassword(event)">
+                        <div class="form-group" style="text-align: left;">
+                            <label for="change-pwd-current" class="form-label" data-i18n="curr_password_label">Senha Atual</label>
+                            <input type="password" id="change-pwd-current" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                        </div>
+                        <div class="form-group" style="text-align: left;">
+                            <label for="change-pwd-new" class="form-label" data-i18n="new_password_label">Nova Senha</label>
+                            <input type="password" id="change-pwd-new" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                        </div>
+                        <div class="form-group" style="text-align: left;">
+                            <label for="change-pwd-confirm" class="form-label" data-i18n="confirm_password_label">Confirmar Nova Senha</label>
+                            <input type="password" id="change-pwd-confirm" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-change-password" style="margin-top: 1rem;" data-i18n="save_password_btn">
+                            Atualizar Senha
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ==========================================================================
          8. LÓGICA JAVASCRIPT VANILLA - SUPABASE AUTH & BACKEND INTEGRATION
          ========================================================================== -->
@@ -2587,7 +2706,25 @@
         // Inicialização do App
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
-            checkSession();
+            initLanguage();
+            
+            // Verifica se há token de redefinição de senha na URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const resetToken = urlParams.get('reset_token');
+            if (resetToken) {
+                document.getElementById('reset-pwd-token').value = resetToken;
+                document.getElementById('auth-form').style.display = 'none';
+                document.getElementById('forgot-form').style.display = 'none';
+                document.getElementById('reset-pwd-form').style.display = 'block';
+                document.querySelector('.auth-tabs').style.display = 'none';
+                document.querySelector('.auth-subtitle').style.display = 'none';
+                
+                document.getElementById('auth-view').style.display = 'flex';
+                document.getElementById('app-view').style.display = 'none';
+            } else {
+                checkSession();
+            }
+            
             // Inicializa dropdowns customizados para nicho e cidade
             setupCustomDropdown('nicho-input', 'nicho-dropdown');
             setupCustomDropdown('cidade-input', 'cidade-dropdown');
@@ -3522,6 +3659,538 @@
             }
         }
 
+        // ==========================================================================
+        // SISTEMA DE TRADUÇÃO DOURADA (i18n) E DICIONÁRIO
+        // ==========================================================================
+        const translations = {
+            pt: {
+                settings_title: "Configurações",
+                settings_tab_lang: "Preferências",
+                settings_tab_security: "Alterar Senha",
+                select_language_label: "Idioma da Plataforma",
+                curr_password_label: "Senha Atual",
+                new_password_label: "Nova Senha",
+                confirm_password_label: "Confirmar Nova Senha",
+                save_password_btn: "Atualizar Senha",
+                forgot_password_link: "Esqueci minha senha",
+                access_platform_btn: "Entrar na Plataforma",
+                forgot_email_label: "Endereço de E-mail",
+                send_recovery_link_btn: "Enviar Link de Recuperação",
+                back_to_login_link: "Voltar para o Login",
+                reset_pwd_title: "Definir Nova Senha",
+                reset_pwd_btn: "Salvar Nova Senha",
+                auth_footer_login_text: "Novo na plataforma? Altere a aba acima para \"Criar Conta\" e ganhe 5 créditos demonstrativos na hora.",
+                brand_subtitle: "Prospecção de Leads de Alto Impacto",
+                header_credits: "créditos",
+                config_search_title: "Configurar Nova Varredura",
+                config_search_desc: "Selecione o nicho de mercado e a cidade da Bahia para buscar estabelecimentos comerciais que faturam bem, mas não possuem site oficial cadastrado no Google.",
+                nicho_label: "Comércio / Nicho de Atuação",
+                cidade_label: "Cidade e Estado (Foco Bahia)",
+                nicho_placeholder: "Selecione ou digite um nicho...",
+                cidade_placeholder: "Selecione ou digite uma cidade da Bahia...",
+                start_scan_btn: "Iniciar Varredura de Leads (-1 crédito)",
+                metric_analyzed_label: "Locais Analisados",
+                metric_leads_label: "Leads Sem Site Oficial",
+                metric_conversion_label: "Presença Digital Local",
+                tooltip_text: "Esta métrica calcula a porcentagem de empresas analisadas que possuem um site oficial ou canal digital ativo. Quanto menor a porcentagem, maior é a oportunidade para agências de marketing e tecnologia oferecerem serviços de digitalização nessa região.",
+                table_qualified_leads: "Leads Qualificados",
+                table_subtitle: "Busca de comércios locais sem site",
+                table_col_name: "Nome do Estabelecimento",
+                table_col_phone: "Telefone Comercial",
+                table_col_wpp: "WhatsApp",
+                table_col_ig: "Instagram",
+                table_col_address: "Endereço do Local",
+                table_col_rating: "Avaliação Google Places",
+                table_col_actions: "Ações Rápidas",
+                btn_new_scan: "Nova Varredura",
+                btn_export_excel: "Exportar para Excel (.xlsx)",
+                footer_title_security: "Segurança",
+                footer_title_compliance: "Compliance",
+                footer_desc_security_1: "Conexões seguras ponta a ponta via HTTPS",
+                footer_desc_security_2: "Banco de dados isolado e criptografado via Supabase",
+                footer_desc_security_3: "Camada de processamento isolada no Render",
+                footer_desc_compliance: "Em total conformidade com a LGPD (Lei Geral de Proteção de Dados) para tratamento e coleta exclusiva de dados comerciais públicos e de legítimo interesse empresarial.",
+                footer_copyright: "© 2026 GridHunter. Todos os direitos reservados. Inteligência de dados com segurança e privacidade.",
+                about_us_title: "Quem Somos",
+                about_us_body_1: "O GridHunter é uma plataforma avançada de inteligência geográfica e automação B2B. Nossa tecnologia mapeia estabelecimentos comerciais com forte presença digital ou lacunas operacionais, permitindo que agências de marketing, tecnologia e designers identifiquem oportunidades comerciais com alto potencial de conversão.",
+                about_us_body_2: "Nossos algoritmos realizam varreduras inteligentes e cruzamento de dados públicos em tempo real para entregar leads altamente qualificados com velocidade e precisão.",
+                lp_pricing_title: "Nossos Planos",
+                lp_pricing_subtitle: "Escolha o plano ideal para alavancar a prospecção da sua agência ou estúdio de design.",
+                lp_starter_features_1: "5 créditos iniciais para testes",
+                lp_starter_features_2: "Acesso completo ao painel de busca",
+                lp_starter_features_3: "Filtros por nicho e cidade",
+                lp_starter_features_4: "Exportação para Excel (.xlsx)",
+                lp_starter_features_5: "Suporte premium prioritário",
+                lp_pro_badge: "Mais Escolhido",
+                lp_pro_features_1: "120 créditos recorrentes por mês",
+                lp_pro_features_2: "Acesso completo ao painel de busca",
+                lp_pro_features_3: "Filtros por nicho e cidade",
+                lp_pro_features_4: "Exportação para Excel (.xlsx)",
+                lp_pro_features_5: "Suporte premium via e-mail",
+                lp_enterprise_features_1: "Consultas de leads de forma ilimitada",
+                lp_enterprise_features_2: "Acesso completo à API exclusiva",
+                lp_enterprise_features_3: "Suporte dedicado 24/7",
+                lp_enterprise_features_4: "Exportação customizada e relatórios",
+                lp_enterprise_features_5: "Acordo de Nível de Serviço (SLA)",
+                lp_btn_free: "Começar Grátis",
+                lp_btn_pro: "Assinar Agora",
+                lp_btn_enterprise: "Falar com Vendas",
+                lp_testimonials_title: "O que dizem nossos clientes",
+                lp_faq_title: "Perguntas Frequentes",
+                lp_about_title: "Nossa História & Propósito",
+                toast_password_updated: "Senha atualizada com sucesso!",
+                toast_recovery_sent: "E-mail de recuperação enviado com sucesso!",
+                toast_password_reset: "Senha redefinida com sucesso! Faça login com a nova senha."
+            },
+            en: {
+                settings_title: "Settings",
+                settings_tab_lang: "Preferences",
+                settings_tab_security: "Change Password",
+                select_language_label: "Platform Language",
+                curr_password_label: "Current Password",
+                new_password_label: "New Password",
+                confirm_password_label: "Confirm New Password",
+                save_password_btn: "Update Password",
+                forgot_password_link: "Forgot password?",
+                access_platform_btn: "Sign In",
+                forgot_email_label: "E-mail Address",
+                send_recovery_link_btn: "Send Recovery Link",
+                back_to_login_link: "Back to Login",
+                reset_pwd_title: "Define New Password",
+                reset_pwd_btn: "Save New Password",
+                auth_footer_login_text: "New to the platform? Switch to the \"Create Account\" tab above and get 5 demo credits instantly.",
+                brand_subtitle: "High-Impact Lead Prospecting",
+                header_credits: "credits",
+                config_search_title: "Configure New Scan",
+                config_search_desc: "Select the industry niche and Bahia city to search for commercial establishments that generate good revenue but do not have an official website registered on Google.",
+                nicho_label: "Business / Industry Niche",
+                cidade_label: "City and State (Focus Bahia)",
+                nicho_placeholder: "Select or type a niche...",
+                cidade_placeholder: "Select or type a city in Bahia...",
+                start_scan_btn: "Start Leads Scan (-1 credit)",
+                metric_analyzed_label: "Analyzed Locations",
+                metric_leads_label: "Leads Without Official Site",
+                metric_conversion_label: "Local Digital Presence",
+                tooltip_text: "This metric calculates the percentage of analyzed businesses that have an official website or active digital channel. The lower the percentage, the higher the opportunity for marketing and tech agencies to offer digitalization services in that region.",
+                table_qualified_leads: "Qualified Leads",
+                table_subtitle: "Search for local businesses without website",
+                table_col_name: "Business Name",
+                table_col_phone: "Business Phone",
+                table_col_wpp: "WhatsApp",
+                table_col_ig: "Instagram",
+                table_col_address: "Location Address",
+                table_col_rating: "Google Places Rating",
+                table_col_actions: "Quick Actions",
+                btn_new_scan: "New Scan",
+                btn_export_excel: "Export to Excel (.xlsx)",
+                footer_title_security: "Security",
+                footer_title_compliance: "Compliance",
+                footer_desc_security_1: "End-to-end secure connections via HTTPS",
+                footer_desc_security_2: "Isolated and encrypted database via Supabase",
+                footer_desc_security_3: "Isolated processing layer on Render",
+                footer_desc_compliance: "In full compliance with LGPD (General Data Protection Law) for exclusive treatment and collection of public business data and legitimate business interest.",
+                footer_copyright: "© 2026 GridHunter. All rights reserved. Data intelligence with security and privacy.",
+                about_us_title: "About Us",
+                about_us_body_1: "GridHunter is an advanced geographic intelligence and B2B automation platform. Our technology maps commercial establishments with a strong digital presence or operational gaps, allowing marketing, technology agencies, and designers to identify high-converting commercial opportunities.",
+                about_us_body_2: "Our algorithms perform smart scans and cross-reference public data in real time to deliver highly qualified leads with speed and precision.",
+                lp_pricing_title: "Our Plans",
+                lp_pricing_subtitle: "Choose the ideal plan to scale your agency or design studio prospecting.",
+                lp_starter_features_1: "5 initial credits for testing",
+                lp_starter_features_2: "Full access to search panel",
+                lp_starter_features_3: "Niche and city filters",
+                lp_starter_features_4: "Export to Excel (.xlsx)",
+                lp_starter_features_5: "Priority premium support",
+                lp_pro_badge: "Most Popular",
+                lp_pro_features_1: "120 recurring credits per month",
+                lp_pro_features_2: "Full access to search panel",
+                lp_pro_features_3: "Niche and city filters",
+                lp_pro_features_4: "Export to Excel (.xlsx)",
+                lp_pro_features_5: "Premium support via email",
+                lp_enterprise_features_1: "Unlimited leads searches",
+                lp_enterprise_features_2: "Full access to exclusive API",
+                lp_enterprise_features_3: "24/7 dedicated support",
+                lp_enterprise_features_4: "Custom export and reports",
+                lp_enterprise_features_5: "Service Level Agreement (SLA)",
+                lp_btn_free: "Start Free",
+                lp_btn_pro: "Subscribe Now",
+                lp_btn_enterprise: "Talk to Sales",
+                lp_testimonials_title: "What our clients say",
+                lp_faq_title: "Frequently Asked Questions",
+                lp_about_title: "Our History & Purpose",
+                toast_password_updated: "Password updated successfully!",
+                toast_recovery_sent: "Recovery email sent successfully!",
+                toast_password_reset: "Password reset successfully! Please log in with your new password."
+            },
+            es: {
+                settings_title: "Configuración",
+                settings_tab_lang: "Preferencias",
+                settings_tab_security: "Cambiar Contraseña",
+                select_language_label: "Idioma de la Plataforma",
+                curr_password_label: "Contraseña Actual",
+                new_password_label: "Nueva Contraseña",
+                confirm_password_label: "Confirmar Nueva Contraseña",
+                save_password_btn: "Actualizar Contraseña",
+                forgot_password_link: "¿Olvidaste tu contraseña?",
+                access_platform_btn: "Iniciar Sesión",
+                forgot_email_label: "Correo Electrónico",
+                send_recovery_link_btn: "Enviar Enlace de Recuperación",
+                back_to_login_link: "Voltar al Inicio de Sesión",
+                reset_pwd_title: "Definir Nueva Contraseña",
+                reset_pwd_btn: "Guardar Nueva Contraseña",
+                auth_footer_login_text: "¿Nuevo en la plataforma? Cambie a la pestaña \"Crear cuenta\" arriba y obtenga 5 créditos de demostración al instante.",
+                brand_subtitle: "Prospección de Leads de Alto Impacto",
+                header_credits: "créditos",
+                config_search_title: "Configurar Nueva Búsqueda",
+                config_search_desc: "Seleccione el nicho de mercado y la ciudad de Bahía para buscar establecimientos comerciales que generen buenos ingresos pero no tengan un sitio web oficial registrado en Google.",
+                nicho_label: "Negocio / Nicho de Actuación",
+                cidade_label: "Ciudad y Estado (Enfoque Bahía)",
+                nicho_placeholder: "Seleccione o escriba un nicho...",
+                cidade_placeholder: "Seleccione o escriba una ciudad de Bahía...",
+                start_scan_btn: "Iniciar Búsqueda de Leads (-1 crédito)",
+                metric_analyzed_label: "Locales Analizados",
+                metric_leads_label: "Leads Sin Sitio Oficial",
+                metric_conversion_label: "Presença Digital Local",
+                tooltip_text: "Esta métrica calcula el porcentaje de empresas analizadas que poseen un sitio web oficial o canal digital activo. Cuanto menor sea el porcentaje, mayor será la oportunidad para que las agencias de marketing y tecnología ofrezcan servicios de digitalización en esa región.",
+                table_qualified_leads: "Leads Calificados",
+                table_subtitle: "Búsqueda de comercios locales sin sitio web",
+                table_col_name: "Nombre del Establecimiento",
+                table_col_phone: "Teléfono Comercial",
+                table_col_wpp: "WhatsApp",
+                table_col_ig: "Instagram",
+                table_col_address: "Dirección del Local",
+                table_col_rating: "Calificación Google Places",
+                table_col_actions: "Acciones Rápidas",
+                btn_new_scan: "Nueva Búsqueda",
+                btn_export_excel: "Exportar a Excel (.xlsx)",
+                footer_title_security: "Seguridad",
+                footer_title_compliance: "Cumplimiento",
+                footer_desc_security_1: "Conexiones seguras de extremo a extremo a través de HTTPS",
+                footer_desc_security_2: "Base de datos aislada y cifrada a través de Supabase",
+                footer_desc_security_3: "Capa de procesamiento aislada en Render",
+                footer_desc_compliance: "En total conformidad con la LGPD (Ley General de Protección de Datos) para el tratamiento y recogida exclusiva de datos comerciales públicos y de legítimo interés empresarial.",
+                footer_copyright: "© 2026 GridHunter. Todos los derechos reservados. Inteligencia de datos con seguridad y privacidad.",
+                about_us_title: "Quiénes Somos",
+                about_us_body_1: "GridHunter es una plataforma avanzada de inteligencia geográfica y automatización B2B. Nuestra tecnología mapea establecimientos comerciales con fuerte presencia digital o lagunas operativas, permitiendo que agencias de marketing, tecnología y diseñadores identifiquen oportunidades comerciales con alto potencial de conversión.",
+                about_us_body_2: "Nuestros algoritmos realizan búsquedas inteligentes y cruce de datos públicos en tiempo real para entregar leads altamente calificados con velocidad y precisión.",
+                lp_pricing_title: "Nuestros Planes",
+                lp_pricing_subtitle: "Elija el plan ideal para impulsar la prospección de su agencia o estudio de diseño.",
+                lp_starter_features_1: "5 créditos iniciales para pruebas",
+                lp_starter_features_2: "Acceso completo al panel de búsqueda",
+                lp_starter_features_3: "Filtros por nicho y ciudad",
+                lp_starter_features_4: "Exportación a Excel (.xlsx)",
+                lp_starter_features_5: "Soporte premium prioritario",
+                lp_pro_badge: "Más Elegido",
+                lp_pro_features_1: "120 créditos recurrentes por mes",
+                lp_pro_features_2: "Acceso completo al panel de búsqueda",
+                lp_pro_features_3: "Filtros por nicho y ciudad",
+                lp_pro_features_4: "Exportación a Excel (.xlsx)",
+                lp_pro_features_5: "Soporte premium por correo electrónico",
+                lp_enterprise_features_1: "Consultas de leads ilimitadas",
+                lp_enterprise_features_2: "Acceso completo a API exclusiva",
+                lp_enterprise_features_3: "Soporte dedicado 24/7",
+                lp_enterprise_features_4: "Exportación personalizada e informes",
+                lp_enterprise_features_5: "Acuerdo de Nivel de Servicio (SLA)",
+                lp_btn_free: "Comenzar Gratis",
+                lp_btn_pro: "Suscribirse Ahora",
+                lp_btn_enterprise: "Hablar con Ventas",
+                lp_testimonials_title: "Lo que dicen nuestros clientes",
+                lp_faq_title: "Preguntas Frecuentes",
+                lp_about_title: "Nuestra Historia & Propósito",
+                toast_password_updated: "¡Contraseña actualizada con éxito!",
+                toast_recovery_sent: "¡Correo electrónico de recuperación enviado con éxito!",
+                toast_password_reset: "¡Contraseña restablecida con éxito! Inicie sesión con la nueva contraseña."
+            }
+        };
+
+        function changeLanguage(lang) {
+            localStorage.setItem('gridhunter_lang', lang);
+            appState.currentLang = lang;
+            
+            const select = document.getElementById('settings-language-select');
+            if (select) select.value = lang;
+            
+            const t = translations[lang];
+            if (!t) return;
+            
+            // Traduzir elementos com data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = t[key];
+                    } else {
+                        el.textContent = t[key];
+                    }
+                }
+            });
+            
+            // Fallback de elementos estáticos via seletores CSS específicos
+            const map = {
+                '.brand-subtitle': 'brand_subtitle',
+                '#form-container .card-title': 'config_search_title',
+                '#form-container .card-description': 'config_search_desc',
+                'label[for="nicho-input"]': 'nicho_label',
+                'label[for="cidade-input"]': 'cidade_label',
+                '#nicho-input': 'nicho_placeholder',
+                '#cidade-input': 'cidade_placeholder',
+                '#leads-search-form .btn-submit': 'start_scan_btn',
+                '.metrics-grid .metric-card:nth-child(1) .metric-label': 'metric_analyzed_label',
+                '.metrics-grid .metric-card:nth-child(2) .metric-label': 'metric_leads_label',
+                '.metrics-grid .metric-card:nth-child(3) .metric-label': 'metric_conversion_label',
+                '#results-badge-title': 'table_qualified_leads',
+                '#results-badge-subtitle': 'table_subtitle',
+                '.leads-table th:nth-child(1)': 'table_col_name',
+                '.leads-table th:nth-child(2)': 'table_col_phone',
+                '.leads-table th:nth-child(3)': 'table_col_wpp',
+                '.leads-table th:nth-child(4)': 'table_col_ig',
+                '.leads-table th:nth-child(5)': 'table_col_address',
+                '.leads-table th:nth-child(6)': 'table_col_rating',
+                '.leads-table th:nth-child(7)': 'table_col_actions',
+                '.btn-reset': 'btn_new_scan',
+                '.btn-excel': 'btn_export_excel',
+                '.footer-col:nth-child(1) .footer-title': 'settings_title',
+                '.footer-col:nth-child(2) .footer-title': 'footer_title_security',
+                '.footer-col:nth-child(3) .footer-title': 'footer_title_compliance',
+                '.footer-info-list li:nth-child(1)': 'footer_desc_security_1',
+                '.footer-info-list li:nth-child(2)': 'footer_desc_security_2',
+                '.footer-info-list li:nth-child(3)': 'footer_desc_security_3',
+                '.footer-compliance-text': 'footer_desc_compliance',
+                '.footer-bottom p': 'footer_copyright',
+                '#about-modal .modal-title': 'about_us_title',
+                '#about-modal .modal-body p:nth-child(1)': 'about_us_body_1',
+                '#about-modal .modal-body p:nth-child(2)': 'about_us_body_2',
+                '.pricing-section .section-title': 'lp_pricing_title',
+                '.pricing-section .section-subtitle': 'lp_pricing_subtitle',
+                '.pricing-card:nth-child(1) .pricing-plan-name': 'settings_tab_lang',
+                '.pricing-card:nth-child(1) .pricing-features li:nth-child(1)': 'lp_starter_features_1',
+                '.pricing-card:nth-child(1) .pricing-features li:nth-child(2)': 'lp_starter_features_2',
+                '.pricing-card:nth-child(1) .pricing-features li:nth-child(3)': 'lp_starter_features_3',
+                '.pricing-card:nth-child(1) .pricing-features li:nth-child(4)': 'lp_starter_features_4',
+                '.pricing-card:nth-child(1) .pricing-features li:nth-child(5)': 'lp_starter_features_5',
+                '.pricing-card:nth-child(1) .pricing-btn': 'lp_btn_free',
+                '.pricing-card.popular .popular-badge': 'lp_pro_badge',
+                '.pricing-card.popular .pricing-features li:nth-child(1)': 'lp_pro_features_1',
+                '.pricing-card.popular .pricing-features li:nth-child(2)': 'lp_pro_features_2',
+                '.pricing-card.popular .pricing-features li:nth-child(3)': 'lp_pro_features_3',
+                '.pricing-card.popular .pricing-features li:nth-child(4)': 'lp_pro_features_4',
+                '.pricing-card.popular .pricing-features li:nth-child(5)': 'lp_pro_features_5',
+                '.pricing-card.popular .pricing-btn': 'lp_btn_pro',
+                '.pricing-card:nth-child(3) .pricing-plan-name': 'settings_title',
+                '.pricing-card:nth-child(3) .pricing-features li:nth-child(1)': 'lp_enterprise_features_1',
+                '.pricing-card:nth-child(3) .pricing-features li:nth-child(2)': 'lp_enterprise_features_2',
+                '.pricing-card:nth-child(3) .pricing-features li:nth-child(3)': 'lp_enterprise_features_3',
+                '.pricing-card:nth-child(3) .pricing-features li:nth-child(4)': 'lp_enterprise_features_4',
+                '.pricing-card:nth-child(3) .pricing-features li:nth-child(5)': 'lp_enterprise_features_5',
+                '.pricing-card:nth-child(3) .pricing-btn': 'lp_btn_enterprise',
+                '.testimonials-section .section-title': 'lp_testimonials_title',
+                '.faq-section .section-title': 'lp_faq_title',
+                '.history-section .section-title': 'lp_about_title',
+            };
+            
+            for (const [selector, key] of Object.entries(map)) {
+                const el = document.querySelector(selector);
+                if (el && t[key]) {
+                    if (el.tagName === 'INPUT') {
+                        el.placeholder = t[key];
+                    } else if (selector.includes('metric-label')) {
+                        const tooltipIcon = el.querySelector('.tooltip-icon');
+                        el.textContent = t[key] + ' ';
+                        if (tooltipIcon) el.appendChild(tooltipIcon);
+                    } else {
+                        if (key.includes('body_') || key.includes('desc_compliance')) {
+                            el.innerHTML = t[key];
+                        } else {
+                            el.textContent = t[key];
+                        }
+                    }
+                }
+            }
+            
+            // Traduzir data-tooltip
+            const tooltip = document.querySelector('.tooltip-icon');
+            if (tooltip && t['tooltip_text']) {
+                tooltip.setAttribute('data-tooltip', t['tooltip_text']);
+            }
+        }
+
+        function initLanguage() {
+            const saved = localStorage.getItem('gridhunter_lang');
+            if (saved && translations[saved]) {
+                changeLanguage(saved);
+            } else {
+                changeLanguage('pt');
+            }
+        }
+
+        // Modais de Configurações
+        function openSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = 'flex';
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+            switchSettingsTab('lang');
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                if (!modal.classList.contains('show')) {
+                    modal.style.display = 'none';
+                }
+            }, 300);
+            document.getElementById('change-password-form').reset();
+        }
+
+        function switchSettingsTab(tab) {
+            const tabLang = document.getElementById('tab-settings-lang');
+            const tabSec = document.getElementById('tab-settings-security');
+            const paneLang = document.getElementById('settings-lang-pane');
+            const paneSec = document.getElementById('settings-security-pane');
+
+            if (tab === 'lang') {
+                tabLang.classList.add('active');
+                tabSec.classList.remove('active');
+                paneLang.style.display = 'block';
+                paneSec.style.display = 'none';
+            } else {
+                tabSec.classList.add('active');
+                tabLang.classList.remove('active');
+                paneLang.style.display = 'none';
+                paneSec.style.display = 'block';
+            }
+        }
+
+        async function handleChangePassword(event) {
+            event.preventDefault();
+            const currentPassword = document.getElementById('change-pwd-current').value;
+            const newPassword = document.getElementById('change-pwd-new').value;
+            const confirmPassword = document.getElementById('change-pwd-confirm').value;
+
+            if (newPassword !== confirmPassword) {
+                createToast(appState.currentLang === 'en' ? 'New passwords do not match!' : 'As novas senhas não coincidem!', 'danger');
+                return;
+            }
+
+            const btn = document.getElementById('btn-change-password');
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/alterar-senha`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: appState.user.id,
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+
+                if (res.ok) {
+                    createToast(translations[appState.currentLang || 'pt']['toast_password_updated'], 'success');
+                    closeSettingsModal();
+                } else {
+                    const err = await res.json();
+                    createToast(err.detail || 'Erro ao alterar senha', 'danger');
+                }
+            } catch (e) {
+                createToast('Erro de rede: ' + e.message, 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = translations[appState.currentLang || 'pt']['save_password_btn'];
+            }
+        }
+
+        // Fluxo Esqueci Senha & Redefinição
+        function showForgotPane() {
+            document.getElementById('auth-form').style.display = 'none';
+            document.getElementById('forgot-form').style.display = 'block';
+            document.querySelector('.auth-tabs').style.display = 'none';
+            document.getElementById('auth-footer-text').style.display = 'none';
+        }
+
+        function showLoginPane() {
+            document.getElementById('auth-form').style.display = 'block';
+            document.getElementById('forgot-form').style.display = 'none';
+            document.querySelector('.auth-tabs').style.display = 'flex';
+            document.getElementById('auth-footer-text').style.display = 'block';
+            document.getElementById('forgot-form').reset();
+        }
+
+        async function handleForgotSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgot-email').value.trim();
+            const btn = document.getElementById('btn-forgot-submit');
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/esqueci-senha`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                if (res.ok) {
+                    createToast(translations[appState.currentLang || 'pt']['toast_recovery_sent'], 'success');
+                    showLoginPane();
+                } else {
+                    const err = await res.json();
+                    createToast(err.detail || 'Erro ao solicitar recuperação', 'danger');
+                }
+            } catch (e) {
+                createToast('Erro de rede: ' + e.message, 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = translations[appState.currentLang || 'pt']['send_recovery_link_btn'];
+            }
+        }
+
+        async function handleResetPwdSubmit(event) {
+            event.preventDefault();
+            const token = document.getElementById('reset-pwd-token').value;
+            const newPassword = document.getElementById('reset-pwd-new').value;
+            const confirmPassword = document.getElementById('reset-pwd-confirm').value;
+
+            if (newPassword !== confirmPassword) {
+                createToast(appState.currentLang === 'en' ? 'Passwords do not match!' : 'As senhas não coincidem!', 'danger');
+                return;
+            }
+
+            const btn = document.getElementById('btn-reset-pwd-submit');
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/redefinir-senha`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        password: newPassword
+                    })
+                });
+
+                if (res.ok) {
+                    createToast(translations[appState.currentLang || 'pt']['toast_password_reset'], 'success');
+                    window.history.replaceState({}, document.title, "/");
+                    document.getElementById('reset-pwd-form').style.display = 'none';
+                    showLoginPane();
+                    document.querySelector('.auth-subtitle').style.display = 'block';
+                } else {
+                    const err = await res.json();
+                    createToast(err.detail || 'Erro ao redefinir senha', 'danger');
+                }
+            } catch (e) {
+                createToast('Erro de rede: ' + e.message, 'danger');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = translations[appState.currentLang || 'pt']['reset_pwd_btn'];
+            }
+        }
+
         // Funções para controle do Modal "Quem Somos"
         function openAboutModal() {
             const modal = document.getElementById('about-modal');
@@ -3543,11 +4212,20 @@
 
         // Fecha o modal ao clicar fora do card
         document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('about-modal');
-            if (modal) {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
+            const aboutModal = document.getElementById('about-modal');
+            if (aboutModal) {
+                aboutModal.addEventListener('click', (e) => {
+                    if (e.target === aboutModal) {
                         closeAboutModal();
+                    }
+                });
+            }
+            
+            const settingsModal = document.getElementById('settings-modal');
+            if (settingsModal) {
+                settingsModal.addEventListener('click', (e) => {
+                    if (e.target === settingsModal) {
+                        closeSettingsModal();
                     }
                 });
             }
