@@ -23,6 +23,9 @@ from fastapi.responses import FileResponse, RedirectResponse
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 from dotenv import load_dotenv
 # pyrefly: ignore [missing-import]
 from supabase import create_client, Client
@@ -72,21 +75,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def hash_senha(senha: str, salt: bytes = None) -> str:
-    """Gera um hash PBKDF2 HMAC-SHA256 seguro para a senha."""
-    if not salt:
-        salt = secrets.token_bytes(16)
-    hash_bytes = hashlib.pbkdf2_hmac('sha256', senha.encode('utf-8'), salt, 100000)
-    return f"{salt.hex()}:{hash_bytes.hex()}"
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    return response
+
+def hash_senha(senha: str) -> str:
+    """Gera um hash bcrypt seguro para a senha."""
+    return pwd_context.hash(senha)
 
 def verificar_senha(senha: str, senha_hash: str) -> bool:
-    """Verifica se a senha coincide com o hash gerado."""
+    """Verifica se a senha coincide com o hash bcrypt."""
     try:
-        salt_hex, hash_hex = senha_hash.split(":")
-        salt = bytes.fromhex(salt_hex)
-        expected_hash = bytes.fromhex(hash_hex)
-        actual_hash = hashlib.pbkdf2_hmac('sha256', senha.encode('utf-8'), salt, 100000)
-        return actual_hash == expected_hash
+        return pwd_context.verify(senha, senha_hash)
     except Exception:
         return False
 

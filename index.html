@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.supabase.co https://*.onrender.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.google.com https://*.googleapis.com; connect-src 'self' https://*.supabase.co https://*.onrender.com http://127.0.0.1:8000 http://localhost:8000;">
+    <meta http-equiv="X-Frame-Options" content="DENY">
     <title>GridHunter | Inteligência em Leads B2B</title>
 
     <!-- Google Fonts: Outfit (Heading) & Inter (UI Body) -->
@@ -58,6 +60,80 @@
             --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
             --glass-blur: blur(16px);
+        }
+
+        /* Temas Alternativos */
+        body.theme-dark-puro {
+            --bg-deep: hsl(0, 0%, 5%);
+            --bg-base: hsl(0, 0%, 10%);
+            --bg-card: hsla(0, 0%, 13%, 0.85);
+            --bg-input: hsl(0, 0%, 18%);
+            --border-glow: rgba(255, 255, 255, 0.05);
+            --border-soft: rgba(255, 255, 255, 0.1);
+            --primary: hsl(0, 0%, 80%);
+            --primary-glow: rgba(255, 255, 255, 0.2);
+            --secondary: hsl(0, 0%, 60%);
+            --secondary-glow: rgba(255, 255, 255, 0.1);
+            --text-main: hsl(0, 0%, 95%);
+            --text-muted: hsl(0, 0%, 70%);
+            --text-dark: hsl(0, 0%, 10%);
+            background-image: none;
+        }
+
+        body.theme-light {
+            --bg-deep: hsl(220, 20%, 95%);
+            --bg-base: hsl(220, 20%, 98%);
+            --bg-card: hsla(0, 0%, 100%, 0.9);
+            --bg-input: hsl(220, 20%, 90%);
+            --border-glow: rgba(0, 0, 0, 0.05);
+            --border-soft: rgba(0, 0, 0, 0.1);
+            --primary: hsl(220, 90%, 56%);
+            --primary-glow: rgba(37, 99, 235, 0.3);
+            --secondary: hsl(220, 20%, 40%);
+            --secondary-glow: rgba(75, 85, 99, 0.2);
+            --text-main: hsl(220, 40%, 15%);
+            --text-muted: hsl(220, 20%, 40%);
+            --text-dark: hsl(0, 0%, 100%);
+            --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+            background-image: none;
+        }
+        
+        /* Ajuste do dropdown e campos no tema claro */
+        body.theme-light .custom-dropdown, 
+        body.theme-light .form-input, 
+        body.theme-light .auth-card,
+        body.theme-light .card-panel,
+        body.theme-light .results-panel,
+        body.theme-light .terminal-console,
+        body.theme-light .metric-card {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+        }
+        
+        body.theme-light .form-input {
+            color: var(--text-main);
+        }
+        
+        body.theme-light .form-input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+
+        body.theme-light .custom-dropdown li:hover {
+            background-color: var(--bg-input);
+        }
+        
+        body.theme-light .leads-table th {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+        }
+        
+        body.theme-light .leads-table td {
+            border-bottom-color: var(--border-soft);
+        }
+        
+        body.theme-light .terminal-console {
+            background: #000;
         }
 
         /* Reset Global */
@@ -1392,16 +1468,381 @@
                 gap: 2rem;
             }
             .footer-col {
-                text-align: center;
-            }
-            .footer-info-list li {
-                padding-left: 0;
-            }
-            .footer-info-list li::before {
-                display: none;
-            }
-            .footer-links a:hover {
-                transform: none;
+        }
+
+        /* Theme Toggle Button Floating */
+        .theme-toggle-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 10005;
+        }
+
+        .theme-toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: var(--shadow-premium);
+            transition: var(--transition-smooth);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* Landing Page content layout */
+        .auth-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 90vh;
+            padding: 4rem 1.5rem;
+            transition: var(--transition-smooth);
+            gap: 4rem;
+        }
+
+        .landing-container {
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .landing-section {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow-premium);
+            text-align: center;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-md);
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            text-align: center;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.1);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15);
+            background: rgba(0, 242, 254, 0.02);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: var(--text-dark);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .pricing-plan-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .price-currency {
+            font-size: 1.25rem;
+            font-weight: 600;
+            vertical-align: super;
+            margin-right: 2px;
+        }
+
+        .price-period {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pricing-features li::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .pricing-features li.disabled {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .pricing-features li.disabled::before {
+            content: "✗";
+            color: var(--danger);
+        }
+
+        .pricing-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-soft);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            margin-top: auto;
+        }
+
+        .pricing-btn:hover {
+            background: var(--primary);
+            color: var(--text-dark);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .pricing-card.popular .pricing-btn {
+            background: var(--primary);
+            color: var(--text-dark);
+            border-color: var(--primary);
+        }
+
+        .pricing-card.popular .pricing-btn:hover {
+            background: var(--primary-glow);
+            color: var(--text-main);
+        }
+
+        /* Testimonials Section */
+        .carousel-container {
+            position: relative;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-card {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateY(10px);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .testimonial-card.active {
+            position: relative;
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .testimonial-text {
+            font-size: 1.15rem;
+            font-style: italic;
+            color: var(--text-main);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .author-title {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bg-input);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .dot.active {
+            background: var(--primary);
+            transform: scale(1.2);
+        }
+
+        /* FAQ Section */
+        .faq-accordion {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            border: 1px solid var(--border-soft);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.01);
+            transition: var(--transition-smooth);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 1.25rem 1.5rem;
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-smooth);
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-icon {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 1.5rem 1.25rem 1.5rem;
+            max-height: 300px;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(0deg);
+            color: var(--primary);
+        }
+
+        /* History Section */
+        .history-content {
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* Responsive styling for pricing grid on mobile */
+        @media (max-width: 600px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1545,6 +1986,14 @@
 
 <body>
 
+    <!-- Alternador de Temas Tri-State -->
+    <div class="theme-toggle-container">
+        <button id="theme-toggle-btn" class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Tema">
+            <span id="theme-icon" class="theme-icon">🧬</span>
+            <span id="theme-label" class="theme-label">Cyber</span>
+        </button>
+    </div>
+
     <!-- ==========================================================================
          A. TELA DE AUTENTICAÇÃO (SUPABASE AUTH VIEW)
          ========================================================================== -->
@@ -1598,6 +2047,143 @@
             <p id="auth-footer-text" class="auth-form-footer">
                 Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.
             </p>
+        </div>
+
+        <!-- SEÇÕES INSTITUCIONAIS LANDING PAGE -->
+        <div class="landing-container">
+            <!-- 1. ABA DE PREÇOS -->
+            <section class="landing-section pricing-section">
+                <h2 class="section-title">Nossos Planos</h2>
+                <p class="section-subtitle">Escolha o plano ideal para alavancar a prospecção da sua agência ou estúdio de design.</p>
+                <div class="pricing-grid">
+                    <!-- Plano Starter -->
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <h3 class="pricing-plan-name">Starter</h3>
+                            <div class="pricing-price"><span class="price-currency">R$</span>0<span class="price-period">/mês</span></div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li>5 créditos iniciais para testes</li>
+                            <li>Acesso completo ao painel de busca</li>
+                            <li>Filtros por nicho e cidade</li>
+                            <li>Exportação para Excel (.xlsx)</li>
+                            <li class="disabled">Suporte premium prioritário</li>
+                        </ul>
+                        <button class="pricing-btn" onclick="switchAuthTab('signup')">Começar Grátis</button>
+                    </div>
+
+                    <!-- Plano Pro -->
+                    <div class="pricing-card popular">
+                        <div class="popular-badge">Mais Escolhido</div>
+                        <div class="pricing-header">
+                            <h3 class="pricing-plan-name">Pro</h3>
+                            <div class="pricing-price"><span class="price-currency">R$</span>49<span class="price-period">/mês</span></div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li>120 créditos recorrentes por mês</li>
+                            <li>Acesso completo ao painel de busca</li>
+                            <li>Filtros por nicho e cidade</li>
+                            <li>Exportação para Excel (.xlsx)</li>
+                            <li>Suporte premium via e-mail</li>
+                        </ul>
+                        <button class="pricing-btn" onclick="switchAuthTab('signup')">Assinar Agora</button>
+                    </div>
+
+                    <!-- Plano Enterprise -->
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <h3 class="pricing-plan-name">Enterprise</h3>
+                            <div class="pricing-price">Sob Consulta</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li>Consultas de leads de forma ilimitada</li>
+                            <li>Acesso completo à API exclusiva</li>
+                            <li>Suporte dedicado 24/7</li>
+                            <li>Exportação customizada e relatórios</li>
+                            <li>Acordo de Nível de Serviço (SLA)</li>
+                        </ul>
+                        <button class="pricing-btn contact-btn" onclick="location.href='mailto:contato@gridhunter.com'">Falar com Vendas</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. AVALIAÇÕES AUTOMATIZADAS -->
+            <section class="landing-section testimonials-section">
+                <h2 class="section-title">O que dizem nossos clientes</h2>
+                <div class="carousel-container">
+                    <div class="testimonial-card active" id="testimonial-0">
+                        <p class="testimonial-text">"Com o GridHunter, conseguimos fechar 4 novos projetos de sites em apenas 2 semanas. A precisão em achar empresas sem site oficial economizou centenas de horas de prospecção manual."</p>
+                        <div class="testimonial-author">
+                            <span class="author-name">Ricardo Santos</span>
+                            <span class="author-title">Diretor de Vendas - Alpha Digital</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card" id="testimonial-1">
+                        <p class="testimonial-text">"Ferramenta fantástica para designers freelancer. Conectar com negócios locais que faturam bem mas não possuem site nos deu uma mina de ouro de potenciais clientes."</p>
+                        <div class="testimonial-author">
+                            <span class="author-name">Mariana Costa</span>
+                            <span class="author-title">UI/UX Designer Freelancer</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-card" id="testimonial-2">
+                        <p class="testimonial-text">"Excelente precisão. A camada de conformidade com a LGPD e a estabilidade das consultas via Render nos trazem muita segurança para operar no dia a dia."</p>
+                        <div class="testimonial-author">
+                            <span class="author-name">Carlos Oliveira</span>
+                            <span class="author-title">Sócio-Fundador - Agência Vanguarda</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-dots">
+                    <span class="dot active" onclick="setTestimonial(0)"></span>
+                    <span class="dot" onclick="setTestimonial(1)"></span>
+                    <span class="dot" onclick="setTestimonial(2)"></span>
+                </div>
+            </section>
+
+            <!-- 3. FAQ ACCORDION -->
+            <section class="landing-section faq-section">
+                <h2 class="section-title">Perguntas Frequentes</h2>
+                <div class="faq-accordion">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            A coleta de dados é legal?
+                            <span class="faq-icon">▲</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Sim. O GridHunter realiza buscas baseadas estritamente em dados comerciais públicos fornecidos de forma voluntária pelas empresas na internet (Google Places API). O tratamento está em total conformidade com a LGPD (Lei Geral de Proteção de Dados), amparado pelas bases legais do legítimo interesse empresarial e publicidade de dados públicos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            Qual a velocidade das buscas?
+                            <span class="faq-icon">▲</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>As buscas levam entre 15 e 45 segundos dependendo do nicho de atuação e do volume de dados da cidade selecionada na Bahia. O processamento é realizado de forma paralela e em segundo plano para garantir máxima rapidez.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            Como os créditos são consumidos?
+                            <span class="faq-icon">▲</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Cada varredura executada em uma combinação de Nicho + Cidade consome exatamente 1 crédito. Se a varredura não retornar nenhum lead qualificado sem site, o crédito é retornado ou não debitado.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. HISTÓRIA E PROPÓSITO -->
+            <section class="landing-section history-section">
+                <h2 class="section-title">Nossa História & Propósito</h2>
+                <div class="history-content">
+                    <p>O <strong>GridHunter</strong> nasceu em 2026 com o propósito claro de eliminar o atrito comercial e democratizar o acesso a dados de mercado geolocalizados de alta precisão. Percebemos que agências de tecnologia e marketing digital perdiam incontáveis horas minerando a internet manualmente para encontrar comércios que precisavam de serviços de digitalização.</p>
+                    <p>Ao criar uma solução automatizada integrada a bancos de dados modernos (Supabase) e servidores robustos (Render), desenvolvemos uma ferramenta de inteligência geográfica que apoia o ecossistema comercial e impulsiona o crescimento de empresas locais e profissionais liberais por meio de conexões eficazes e baseadas em dados reais.</p>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -1983,10 +2569,12 @@
 
         // Inicialização do App
         document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
             checkSession();
             // Inicializa dropdowns customizados para nicho e cidade
             setupCustomDropdown('nicho-input', 'nicho-dropdown');
             setupCustomDropdown('cidade-input', 'cidade-dropdown');
+            initTestimonials();
         });
 
         // Helper para gerenciar Dropdowns Customizados com transição de opacidade/transform e filtro em tempo real
@@ -2532,7 +3120,7 @@
                 let instagramHtml = '';
                 if (lead.instagram_link && lead.instagram_link !== 'Não Encontrado' && lead.instagram_link !== 'None') {
                     instagramHtml = `
-                        <a href="${lead.instagram_link}" target="_blank" class="btn-table-action instagram" title="Abrir Instagram">
+                        <a href="${sanitizeHTML(lead.instagram_link)}" target="_blank" class="btn-table-action instagram" title="Abrir Instagram">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
                             </svg>
@@ -2544,26 +3132,26 @@
                 }
 
                 tr.innerHTML = `
-                    <td data-label="Nome do Estabelecimento" class="lead-name-cell">${lead.nome}</td>
-                    <td data-label="Telefone Comercial" class="lead-phone">${lead.telefone}</td>
+                    <td data-label="Nome do Estabelecimento" class="lead-name-cell">${sanitizeHTML(lead.nome)}</td>
+                    <td data-label="Telefone Comercial" class="lead-phone">${sanitizeHTML(lead.telefone)}</td>
                     <td data-label="WhatsApp">
-                        <span class="wpp-badge ${wppStatusClass}">${wppStatus}</span>
+                        <span class="wpp-badge ${wppStatusClass}">${sanitizeHTML(wppStatus)}</span>
                     </td>
                     <td data-label="Instagram">
                         ${instagramHtml}
                     </td>
-                    <td data-label="Endereço do Local">${lead.endereco}</td>
+                    <td data-label="Endereço do Local">${sanitizeHTML(lead.endereco)}</td>
                     <td data-label="Avaliação Google Places">
                         <div class="rating-badge">
-                            <span class="rating-val">${lead.nota}</span>
+                            <span class="rating-val">${sanitizeHTML(lead.nota)}</span>
                             <span class="rating-stars">${starsSvg}</span>
-                            <span class="rating-count">(${lead.avaliacoes})</span>
+                            <span class="rating-count">(${sanitizeHTML(lead.avaliacoes)})</span>
                         </div>
                     </td>
                     <td data-label="Ações Rápidas" class="actions-cell" style="display: flex; gap: 6px; align-items: center; overflow: visible;">
                         <div class="actions-cell-buttons">
                             ${wppButtonHtml}
-                            <a href="${lead.maps}" target="_blank" class="btn-table-action" title="${mapsTitle}">
+                            <a href="${sanitizeHTML(lead.maps)}" target="_blank" class="btn-table-action" title="${sanitizeHTML(mapsTitle)}">
                                 Maps
                                 <span class="maps-indicator-dot ${mapsDotClass}"></span>
                             </a>
@@ -2801,6 +3389,120 @@
                     toast.remove();
                 }, 300);
             }, 4000);
+        }
+
+        // Helper para sanitização de HTML contra ataques XSS
+        function sanitizeHTML(text) {
+            if (text === null || text === undefined) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#x27;',
+                "/": '&#x2F;'
+            };
+            return String(text).replace(/[&<>"'/]/g, function (m) {
+                return map[m];
+            });
+        }
+
+        // Lógica de alternador de temas tri-state
+        let currentThemeIndex = 0;
+        const themes = [
+            { class: '', label: 'Cyber', icon: '🧬' },
+            { class: 'theme-dark-puro', label: 'Dark Puro', icon: '🖤' },
+            { class: 'theme-light', label: 'Claro', icon: '☀️' }
+        ];
+
+        function applyTheme(themeIndex) {
+            currentThemeIndex = themeIndex;
+            const theme = themes[themeIndex];
+            
+            document.body.classList.remove('theme-dark-puro', 'theme-light');
+            if (theme.class) {
+                document.body.classList.add(theme.class);
+            }
+            
+            const labelEl = document.getElementById('theme-label');
+            const iconEl = document.getElementById('theme-icon');
+            if (labelEl) labelEl.textContent = theme.label;
+            if (iconEl) iconEl.textContent = theme.icon;
+            
+            localStorage.setItem('gridhunter_theme', themeIndex);
+        }
+
+        function toggleTheme() {
+            let nextIndex = (currentThemeIndex + 1) % themes.length;
+            applyTheme(nextIndex);
+        }
+
+        function initTheme() {
+            const saved = localStorage.getItem('gridhunter_theme');
+            if (saved !== null) {
+                applyTheme(parseInt(saved, 10));
+            } else {
+                applyTheme(0);
+            }
+        }
+
+        // Lógica do carrossel de depoimentos
+        let currentTestimonialIndex = 0;
+        let testimonialInterval = null;
+
+        function setTestimonial(index) {
+            currentTestimonialIndex = index;
+            const cards = document.querySelectorAll('.testimonial-card');
+            const dots = document.querySelectorAll('.carousel-dots .dot');
+            
+            cards.forEach((card, i) => {
+                if (i === index) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            
+            resetTestimonialInterval();
+        }
+
+        function nextTestimonial() {
+            const cards = document.querySelectorAll('.testimonial-card');
+            if (cards.length === 0) return;
+            let nextIndex = (currentTestimonialIndex + 1) % cards.length;
+            setTestimonial(nextIndex);
+        }
+
+        function resetTestimonialInterval() {
+            if (testimonialInterval) clearInterval(testimonialInterval);
+            testimonialInterval = setInterval(nextTestimonial, 5000);
+        }
+
+        function initTestimonials() {
+            setTestimonial(0);
+            resetTestimonialInterval();
+        }
+
+        // Lógica do acordeão do FAQ
+        function toggleFaq(button) {
+            const item = button.parentElement;
+            const isActive = item.classList.contains('active');
+            
+            document.querySelectorAll('.faq-item').forEach(faqItem => {
+                faqItem.classList.remove('active');
+            });
+            
+            if (!isActive) {
+                item.classList.add('active');
+            }
         }
 
         // Funções para controle do Modal "Quem Somos"
