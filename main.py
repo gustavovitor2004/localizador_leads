@@ -21,7 +21,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, status, Body, Response, Header
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -1051,13 +1051,13 @@ async def alterar_senha(req: ChangePasswordRequest, authorization: Optional[str]
 @app.post("/api/esqueci-senha")
 async def esqueci_senha(req: ForgotPasswordRequest):
     """Gera um token temporário e envia o link de redefinição de senha."""
-    print(f"[SMTP DIAGNOSTIC] Server: {os.getenv('SMTP_SERVER')}, User: {os.getenv('SMTP_USER')}, Has Pass: {bool(os.getenv('SMTP_PASSWORD'))}")
-    if not all([os.getenv("SMTP_SERVER"), os.getenv("SMTP_PORT"), os.getenv("SMTP_USER"), os.getenv("SMTP_PASSWORD")]):
-        from fastapi.responses import JSONResponse
-        return JSONResponse(
-            status_code=400,
-            content={"error": "Servidor de e-mail não configurado no painel do Render"}
-        )
+    SERVER = str(os.getenv("SMTP_SERVER", "smtp.gmail.com")).strip()
+    try:
+        PORT = int(os.getenv("SMTP_PORT", 587))
+    except (ValueError, TypeError):
+        PORT = 587
+    USER = str(os.getenv("SMTP_USER", "")).strip()
+    PASSWORD = str(os.getenv("SMTP_PASSWORD", "")).strip()
 
     email_addr = req.email.strip().lower()
     
@@ -1083,8 +1083,6 @@ async def esqueci_senha(req: ForgotPasswordRequest):
             detail="Conta não encontrada com este e-mail. Por favor, verifique ou crie uma conta."
         )
 
-    # As variáveis já foram verificadas no início do endpoint
-
     # Gera token de 32 bytes seguro
     token = secrets.token_urlsafe(32)
     # Expira em 30 minutos (1800 segundos)
@@ -1097,12 +1095,77 @@ async def esqueci_senha(req: ForgotPasswordRequest):
 
     # Dispara e-mail de recuperação com blindagem contra falhas SMTP
     try:
-        enviar_email_recuperacao(email_addr, token)
-    except Exception as smtp_err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Falha de comunicação/autenticação no servidor SMTP ao enviar o e-mail: {str(smtp_err)}"
+        server = smtplib.SMTP(SERVER, PORT, timeout=10)
+        server.starttls()
+        server.login(USER, PASSWORD)
+        
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = "Recuperação de senha - GridHunter"
+        msg["From"] = USER
+        msg["To"] = email_addr
+
+        reset_link = f"https://gridhunter.vercel.app/?reset_token={token}"
+        
+        text = (
+            "Olá!\n\n"
+            "Recebemos uma solicitação de redefinição de senha para a sua conta no GridHunter.\n"
+            f"Clique no link a seguir para redefinir sua senha: {reset_link}\n\n"
+            "Este link é válido por 30 minutos.\n"
+            "Se você não solicitou essa alteração, ignore este e-mail.\n\n"
+            "Equipe GridHunter"
         )
+
+        html = f"""
+        <html>
+        <body style="background-color: #0b0f19; color: #f8fafc; font-family: 'Inter', sans-serif; padding: 20px; margin: 0;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #0ea5e9; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.025em;">Grid<span style="color: #f8fafc;">Hunter</span></h1>
+                    <p style="color: #64748b; font-size: 14px; margin-top: 5px;">Recuperação de Acesso</p>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid #1e293b; margin-bottom: 30px;" />
+                
+                <h2 style="font-size: 20px; font-weight: 600; color: #f8fafc; margin-top: 0;">Redefinição de Senha</h2>
+                
+                <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                    Recebemos uma solicitação para redefinir a senha da sua conta no <strong>GridHunter</strong>. 
+                    Clique no botão abaixo para criar uma nova senha:
+                </p>
+                
+                <div style="text-align: center; margin-bottom: 30px; margin-top: 30px;">
+                    <a href="{reset_link}" style="background-color: #0ea5e9; color: #ffffff; text-decoration: none; padding: 12px 30px; font-weight: 600; border-radius: 8px; display: inline-block; font-size: 15px; box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.4);">
+                        Redefinir Minha Senha
+                    </a>
+                </div>
+                
+                <div style="background-color: #0b0f19; border-left: 4px solid #ef4444; padding: 15px; border-radius: 6px; margin-bottom: 30px;">
+                    <p style="margin: 0; color: #e2e8f0; font-size: 14px;">
+                        <strong>Importante:</strong> Este link é válido por apenas 30 minutos. Se você não solicitou essa redefinição, por favor ignore este e-mail.
+                    </p>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid #1e293b; margin-bottom: 30px;" />
+                
+                <div style="text-align: center; color: #64748b; font-size: 12px; line-height: 1.5;">
+                    <p style="margin: 0;">Você está recebendo este e-mail porque solicitou a redefinição de senha.</p>
+                    <p style="margin: 5px 0 0 0;">&copy; 2026 GridHunter. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        part1 = MIMEText(text, "plain")
+        part2 = MIMEText(html, "html")
+        msg.attach(part1)
+        msg.attach(part2)
+
+        server.sendmail(USER, email_addr, msg.as_string())
+        server.quit()
+    except Exception as smtp_err:
+        print(f"Erro Real detectado no SMTP: {str(smtp_err)}")
+        return JSONResponse(status_code=500, content={"error": f"Falha interna no servidor de e-mail: {str(smtp_err)}"})
 
     return {"status": "success", "message": "E-mail de recuperação enviado com sucesso!"}
 
