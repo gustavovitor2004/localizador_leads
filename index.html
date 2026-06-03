@@ -195,11 +195,13 @@
            ========================================================================== */
         .auth-wrapper {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
             min-height: 90vh;
-            padding: 2rem 1.5rem;
+            padding: 4rem 1.5rem;
             transition: var(--transition-smooth);
+            gap: 4rem;
         }
 
         .auth-card {
@@ -1467,7 +1469,6 @@
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
-            .footer-col {
         }
 
         /* Theme Toggle Button Floating */
@@ -1481,38 +1482,52 @@
         .theme-toggle-btn {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             background: var(--bg-card);
-            border: 1px solid var(--border-soft);
-            border-radius: 20px;
-            padding: 8px 16px;
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            padding: 10px 20px;
             color: var(--text-main);
             font-family: 'Outfit', sans-serif;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: var(--shadow-premium);
+            box-shadow: 0 4px 15px var(--primary-glow);
             transition: var(--transition-smooth);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s ease;
+        }
+
+        .theme-toggle-btn:hover::before {
+            left: 100%;
         }
 
         .theme-toggle-btn:hover {
+            transform: translateY(-2px) scale(1.03);
             border-color: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        .theme-toggle-btn:active {
+            transform: translateY(1px);
         }
 
         /* Landing Page content layout */
-        .auth-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 90vh;
-            padding: 4rem 1.5rem;
-            transition: var(--transition-smooth);
-            gap: 4rem;
-        }
 
         .landing-container {
             width: 100%;
@@ -1557,7 +1572,7 @@
         }
 
         .pricing-card {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--bg-card);
             border: 1px solid var(--border-soft);
             border-radius: var(--radius-md);
             padding: 2.5rem 1.5rem;
@@ -1567,6 +1582,7 @@
             transition: var(--transition-smooth);
             position: relative;
             text-align: center;
+            box-shadow: var(--shadow-premium);
         }
 
         .pricing-card:hover {
@@ -1577,8 +1593,8 @@
 
         .pricing-card.popular {
             border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15);
-            background: rgba(0, 242, 254, 0.02);
+            box-shadow: 0 10px 30px var(--primary-glow);
+            background: var(--bg-card);
         }
 
         .popular-badge {
@@ -1775,8 +1791,9 @@
             border: 1px solid var(--border-soft);
             border-radius: var(--radius-sm);
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.01);
+            background: var(--bg-card);
             transition: var(--transition-smooth);
+            box-shadow: var(--shadow-premium);
         }
 
         .faq-question {
