@@ -19,6 +19,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, status, Body, Response
+from fastapi.responses import FileResponse, RedirectResponse
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -56,11 +57,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configuração de CORS para permitir conexões do Frontend
+# Configuração de CORS para permitir conexões do Frontend (flexível para desenvolvimento e produção)
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+if allowed_origins_env == "*":
+    allowed_origins = ["*"]
+else:
+    allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Em produção, especifique os domínios permitidos (ex: seu-app.vercel.app)
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=True if "*" not in allowed_origins else False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -1052,6 +1059,25 @@ async def root():
             "webhook_asaas": "/api/webhooks/asaas [POST]"
         }
     }
+
+@app.get("/dashboard.html", include_in_schema=False)
+async def serve_dashboard():
+    dashboard_path = os.path.join(os.path.dirname(__file__), "dashboard.html")
+    if os.path.exists(dashboard_path):
+        return FileResponse(dashboard_path)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Arquivo dashboard.html não encontrado")
+
+@app.get("/dashborad.html", include_in_schema=False)
+async def redirect_dashborad_typo():
+    return RedirectResponse(url="/dashboard.html")
+
+@app.get("/dashboard", include_in_schema=False)
+async def redirect_dashboard():
+    return RedirectResponse(url="/dashboard.html")
+
+@app.get("/dashborad", include_in_schema=False)
+async def redirect_dashborad():
+    return RedirectResponse(url="/dashboard.html")
 
 if __name__ == "__main__":
     import uvicorn

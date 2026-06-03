@@ -1518,7 +1518,7 @@
         // ==========================================================================
         const SUPABASE_URL = 'https://sua-url-do-supabase.supabase.co'; // Placeholders prontos para produção
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.sua-chave-anon-placeholder';
-        const BACKEND_URL = 'http://127.0.0.1:8000'; // Vincula-se ao IP correto do backend FastAPI local
+        const API_BASE_URL = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" ? "http://127.0.0.1:8000" : "https://seu-backend-no-render.onrender.com";
 
         let supabaseClient = null;
         let isSupabaseSimulated = true;
@@ -1718,7 +1718,7 @@
         async function sincronizarCreditos() {
             if (!appState.user) return;
             try {
-                const response = await fetch(`${BACKEND_URL}/api/perfil/${appState.user.id}`);
+                const response = await fetch(`${API_BASE_URL}/api/perfil/${appState.user.id}`);
                 if (response.ok) {
                     const profile = await response.json();
                     appState.user.credits = profile.credits;
@@ -1783,7 +1783,7 @@
                         userEmail = data.user.email;
 
                         // Valida se o perfil existe no backend E se as credenciais batem
-                        const resProfile = await fetch(`${BACKEND_URL}/api/perfil/login`, {
+                        const resProfile = await fetch(`${API_BASE_URL}/api/perfil/login`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ email: userEmail, password: password })
@@ -1811,7 +1811,7 @@
                         userEmail = data.user.email;
 
                         // Cria o perfil no backend (inclui 5 créditos, senha criptografada e e-mail de boas-vindas)
-                        const resRegister = await fetch(`${BACKEND_URL}/api/perfil`, {
+                        const resRegister = await fetch(`${API_BASE_URL}/api/perfil`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ user_id: userId, email: userEmail, password: password })
@@ -1834,7 +1834,7 @@
 
                     if (appState.currentAuthTab === 'login') {
                         // Consulta perfil mockado no backend e valida a senha
-                        const resProfile = await fetch(`${BACKEND_URL}/api/perfil/login`, {
+                        const resProfile = await fetch(`${API_BASE_URL}/api/perfil/login`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ email: userEmail, password: password })
@@ -1856,7 +1856,7 @@
                         createToast('Acesso de testes concedido!', 'success');
                     } else {
                         // Cria perfil mockado no backend com senha
-                        const resRegister = await fetch(`${BACKEND_URL}/api/perfil`, {
+                        const resRegister = await fetch(`${API_BASE_URL}/api/perfil`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ user_id: userId, email: userEmail, password: password })
@@ -1954,7 +1954,7 @@
 
             try {
                 // Realiza a requisição fetch apontando para o nosso servidor FastAPI
-                const response = await fetch(`${BACKEND_URL}/api/buscar`, {
+                const response = await fetch(`${API_BASE_URL}/api/buscar`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
