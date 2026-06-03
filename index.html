@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeadFinder Pro - Painel de Varredura Comercial</title>
+    <title>GridHunter | Inteligência em Leads B2B</title>
 
     <!-- Google Fonts: Outfit (Heading) & Inter (UI Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1261,7 +1261,7 @@
          ========================================================================== -->
     <div class="auth-wrapper" id="auth-view">
         <div class="auth-card">
-            <div class="auth-logo">🔍 LEADFINDER PRO</div>
+            <div class="auth-logo">🔍 GRIDHUNTER</div>
             <div class="auth-subtitle">Painel de Prospecção SaaS para Agências e Designers</div>
 
             <div class="auth-tabs">
@@ -1321,7 +1321,7 @@
         <header>
             <div class="brand-container">
                 <h1 class="brand-title">
-                    🔍 LEADFINDER PRO <span class="badge">SaaS</span>
+                    🔍 GRIDHUNTER <span class="badge">SaaS</span>
                 </h1>
                 <span class="brand-subtitle">Prospecção de Leads de Alto Impacto</span>
             </div>
@@ -1595,7 +1595,7 @@
 
     <!-- Rodapé -->
     <footer>
-        <p>&copy; 2026 LeadFinder Pro - Plataforma SaaS. Buscas e acessos protegidos de forma segura no backend.</p>
+        <p>&copy; 2026 GridHunter - Plataforma SaaS. Buscas e acessos protegidos de forma segura no backend.</p>
     </footer>
 
     <!-- ==========================================================================
@@ -1737,14 +1737,14 @@
         // ==========================================================================
         function checkSession() {
             // Tenta obter sessão do sessionStorage
-            const sessionData = sessionStorage.getItem('leadfinder_session');
+            const sessionData = sessionStorage.getItem('gridhunter_session');
             if (sessionData) {
                 try {
                     appState.user = JSON.parse(sessionData);
                     showAuthenticatedApp();
                     return;
                 } catch (e) {
-                    sessionStorage.removeItem('leadfinder_session');
+                    sessionStorage.removeItem('gridhunter_session');
                 }
             }
 
@@ -1811,7 +1811,7 @@
                 if (response.ok) {
                     const profile = await response.json();
                     appState.user.credits = profile.credits;
-                    sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
+                    sessionStorage.setItem('gridhunter_session', JSON.stringify(appState.user));
                     updateUserPanel();
                 } else if (response.status === 404) {
                     // Se o perfil sumiu do banco, força deslogar
@@ -1964,7 +1964,7 @@
                     }
                 }
 
-                sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
+                sessionStorage.setItem('gridhunter_session', JSON.stringify(appState.user));
                 showAuthenticatedApp();
             } catch (err) {
                 createToast('Erro de Autenticação: ' + err.message, 'danger');
@@ -1975,7 +1975,7 @@
         }
 
         function handleLogout() {
-            sessionStorage.removeItem('leadfinder_session');
+            sessionStorage.removeItem('gridhunter_session');
             appState.user = null;
             createToast('Você desconectou da plataforma.', 'warn');
             showAuthScreen();
@@ -2081,7 +2081,7 @@
                             // Salva dados no estado e atualiza créditos do cliente
                             appState.leadsEncontrados = data.leads;
                             appState.user.credits = data.creditos_restantes;
-                            sessionStorage.setItem('leadfinder_session', JSON.stringify(appState.user));
+                            sessionStorage.setItem('gridhunter_session', JSON.stringify(appState.user));
 
                             // Atualiza saldo na tela
                             updateUserPanel();
@@ -2289,10 +2289,10 @@
  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:html="http://www.w3.org/TR/REC-html40">
  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
-  <Author>LeadFinder Pro</Author>
-  <LastAuthor>LeadFinder Pro</LastAuthor>
+  <Author>GridHunter</Author>
+  <LastAuthor>GridHunter</LastAuthor>
   <Created>${dateStr}</Created>
-  <Company>LeadFinder Inc</Company>
+  <Company>GridHunter Inc</Company>
   <Version>16.00</Version>
  </DocumentProperties>
  <Styles>

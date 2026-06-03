@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-LeadFinder Pro - Backend FastAPI API
+GridHunter - Backend FastAPI API
 Autor: Antigravity AI
 Descrição: Servidor backend robusto para controle de buscas, autenticação segura da API Key 
            do Google Places, validação de créditos de usuários (Supabase/Mock) e processamento de webhooks Asaas.
@@ -52,7 +52,7 @@ else:
     print("[DATABASE WARNING] Credenciais do Supabase não configuradas ou com placeholders no '.env'. Utilizando simulador local em memória.")
 
 app = FastAPI(
-    title="LeadFinder Pro - API Comercial",
+    title="GridHunter - API Comercial",
     description="Backend robusto para prospecção de leads sem presença digital oficial",
     version="1.0.0"
 )
@@ -312,17 +312,17 @@ def enviar_email_boas_vindas(email: str):
     try:
         # Monta a mensagem MIME
         msg = MIMEMultipart("alternative")
-        msg["Subject"] = "Sua conta no LeadFinder Pro foi criada com sucesso!"
+        msg["Subject"] = "Sua conta no GridHunter foi criada com sucesso!"
         msg["From"] = smtp_user
         msg["To"] = email
 
         # Versão em texto plano
         text = (
             "Olá!\n\n"
-            "Sua conta no LeadFinder Pro foi criada com sucesso!\n"
+            "Sua conta no GridHunter foi criada com sucesso!\n"
             "Você acaba de ganhar 5 créditos demonstrativos para começar a buscar leads qualificados agora mesmo.\n\n"
             "Boas prospecções!\n"
-            "Equipe LeadFinder Pro"
+            "Equipe GridHunter"
         )
 
         # Versão HTML rica (design Dark/Cyber sofisticado condizente com o dashboard)
@@ -331,7 +331,7 @@ def enviar_email_boas_vindas(email: str):
         <body style="background-color: #0b0f19; color: #f8fafc; font-family: 'Inter', sans-serif; padding: 20px; margin: 0;">
             <div style="max-width: 600px; margin: 0 auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);">
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #0ea5e9; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.025em;">LeadFinder <span style="color: #f8fafc;">Pro</span></h1>
+                    <h1 style="color: #0ea5e9; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.025em;">Grid<span style="color: #f8fafc;">Hunter</span></h1>
                     <p style="color: #64748b; font-size: 14px; margin-top: 5px;">Mapeamento Inteligente de Leads B2B</p>
                 </div>
                 
@@ -340,7 +340,7 @@ def enviar_email_boas_vindas(email: str):
                 <h2 style="font-size: 20px; font-weight: 600; color: #f8fafc; margin-top: 0;">Seja muito bem-vindo(a)!</h2>
                 
                 <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                    Sua conta no <strong>LeadFinder Pro</strong> foi criada com sucesso! 
+                    Sua conta no <strong>GridHunter</strong> foi criada com sucesso! 
                     Você acaba de ganhar <span style="color: #10b981; font-weight: 600;">5 créditos demonstrativos</span> para começar a prospectar imediatamente.
                 </p>
                 
@@ -359,8 +359,8 @@ def enviar_email_boas_vindas(email: str):
                 <hr style="border: 0; border-top: 1px solid #1e293b; margin-bottom: 30px;" />
                 
                 <div style="text-align: center; color: #64748b; font-size: 12px; line-height: 1.5;">
-                    <p style="margin: 0;">Você está recebendo este e-mail porque se cadastrou no LeadFinder Pro.</p>
-                    <p style="margin: 5px 0 0 0;">&copy; 2026 LeadFinder Pro. Todos os direitos reservados.</p>
+                    <p style="margin: 0;">Você está recebendo este e-mail porque se cadastrou no GridHunter.</p>
+                    <p style="margin: 5px 0 0 0;">&copy; 2026 GridHunter. Todos os direitos reservados.</p>
                 </div>
             </div>
         </body>
@@ -1053,7 +1053,7 @@ async def favicon():
 async def root():
     return {
         "status": "online",
-        "service": "LeadFinder Pro API",
+        "service": "GridHunter API",
         "endpoints": {
             "buscar": "/api/buscar [POST]",
             "webhook_asaas": "/api/webhooks/asaas [POST]"
