@@ -1085,31 +1085,11 @@ async def esqueci_senha(req: ForgotPasswordRequest):
         "expira_em": expira_em
     }
 
-    SERVER = str(os.getenv("SMTP_SERVER", "smtp.gmail.com")).strip()
-    PORT = int(os.getenv("SMTP_PORT", 465))
-    USER = str(os.getenv("SMTP_USER", "")).strip()
-    PASSWORD = str(os.getenv("SMTP_PASSWORD", "")).strip()
-
-    print(f"[SMTP EXECUTION] Conectando via SSL a {SERVER}:{PORT} como {USER}")
-
-    # Configuração de envio do e-mail rico
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = "Recuperação de senha - GridHunter"
-    msg["From"] = USER
-    msg["To"] = email
-
+    API_KEY = os.getenv("RESEND_API_KEY", "")
+    resend_from = os.getenv("RESEND_FROM") or "GridHunter <onboarding@resend.dev>"
     reset_link = f"https://gridhunter.vercel.app/?reset_token={token}"
-    
-    text = (
-        "Olá!\n\n"
-        "Recebemos uma solicitação de redefinição de senha para a sua conta no GridHunter.\n"
-        f"Clique no link a seguir para redefinir sua senha: {reset_link}\n\n"
-        "Este link é válido por 30 minutos.\n"
-        "Se você não solicitou essa alteração, ignore este e-mail.\n\n"
-        "Equipe GridHunter"
-    )
 
-    html = f"""
+    html_content = f"""
     <html>
     <body style="background-color: #0b0f19; color: #f8fafc; font-family: 'Inter', sans-serif; padding: 20px; margin: 0;">
         <div style="max-width: 600px; margin: 0 auto; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);">
@@ -1150,24 +1130,33 @@ async def esqueci_senha(req: ForgotPasswordRequest):
     </html>
     """
 
-    part1 = MIMEText(text, "plain")
-    part2 = MIMEText(html, "html")
-    msg.attach(part1)
-    msg.attach(part2)
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "from": resend_from,
+        "to": [email],
+        "subject": "Recuperação de Senha - GridHunter",
+        "html": html_content
+    }
 
     try:
-        # Conexão SSL direta obrigatória para a porta 465
-        server = smtplib.SMTP_SSL(SERVER, PORT, timeout=15)
-        server.login(USER, PASSWORD)
-        server.sendmail(USER, email, msg.as_string())
-        server.quit()
-        print("[SMTP SUCCESS] E-mail enviado com sucesso!")
-        return {"message": "E-mail de recuperação enviado com sucesso."}
+        resp = requests.post("https://api.resend.com/emails", headers=headers, json=payload, timeout=15)
+        if resp.status_code in [200, 201]:
+            print("[RESEND SUCCESS] E-mail enviado com sucesso via API!")
+            return {"message": "E-mail de recuperação enviado com sucesso."}
+        else:
+            print(f"[RESEND ERROR] Status code: {resp.status_code}, Response: {resp.text}")
+            return JSONResponse(
+                status_code=500,
+                content={"error": f"Erro da API do Resend ao enviar e-mail: {resp.text}"}
+            )
     except Exception as smtp_err:
-        print(f"[SMTP HARD ERROR] Erro crítico no disparo: {str(smtp_err)}")
+        print(f"[RESEND HARD ERROR] Falha na chamada HTTP para o Resend: {str(smtp_err)}")
         return JSONResponse(
-            status_code=500, 
-            content={"error": f"Erro de comunicação segura: {str(smtp_err)}"}
+            status_code=500,
+            content={"error": f"Erro de rede ao enviar e-mail via API do Resend: {str(smtp_err)}"}
         )
 
 @app.post("/api/redefinir-senha")
