@@ -351,7 +351,7 @@ def enviar_email_boas_vindas(email: str):
                 </div>
                 
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <a href="http://localhost:8080/dashboard.html" style="background-color: #0ea5e9; color: #ffffff; text-decoration: none; padding: 12px 30px; font-weight: 600; border-radius: 8px; display: inline-block; font-size: 15px; box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.4);">
+                    <a href="http://localhost:8080/index.html" style="background-color: #0ea5e9; color: #ffffff; text-decoration: none; padding: 12px 30px; font-weight: 600; border-radius: 8px; display: inline-block; font-size: 15px; box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.4);">
                         Acessar Meu Painel
                     </a>
                 </div>
@@ -1060,24 +1060,28 @@ async def root():
         }
     }
 
-@app.get("/dashboard.html", include_in_schema=False)
+@app.get("/index.html", include_in_schema=False)
 async def serve_dashboard():
-    dashboard_path = os.path.join(os.path.dirname(__file__), "dashboard.html")
+    dashboard_path = os.path.join(os.path.dirname(__file__), "index.html")
     if os.path.exists(dashboard_path):
         return FileResponse(dashboard_path)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Arquivo dashboard.html não encontrado")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Arquivo index.html não encontrado")
+
+@app.get("/dashboard.html", include_in_schema=False)
+async def redirect_dashboard_html():
+    return RedirectResponse(url="/index.html")
 
 @app.get("/dashborad.html", include_in_schema=False)
 async def redirect_dashborad_typo():
-    return RedirectResponse(url="/dashboard.html")
+    return RedirectResponse(url="/index.html")
 
 @app.get("/dashboard", include_in_schema=False)
 async def redirect_dashboard():
-    return RedirectResponse(url="/dashboard.html")
+    return RedirectResponse(url="/index.html")
 
 @app.get("/dashborad", include_in_schema=False)
 async def redirect_dashborad():
-    return RedirectResponse(url="/dashboard.html")
+    return RedirectResponse(url="/index.html")
 
 if __name__ == "__main__":
     import uvicorn
