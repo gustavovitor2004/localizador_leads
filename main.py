@@ -140,14 +140,33 @@ def eh_telefone_fixo(telefone: str) -> bool:
     """Retorna True se o telefone brasileiro for um número fixo (começa com 2, 3, 4 ou 5)."""
     if not telefone or telefone == "Não informado":
         return False
+    if telefone.startswith("+") and not telefone.startswith("+55"):
+        return False
     nums = "".join(c for c in telefone if c.isdigit())
     if nums.startswith("55") and len(nums) > 10:
         nums = nums[2:]
+    if not telefone.startswith("+55") and not nums.startswith("55") and len(nums) > 11:
+        return False
         
     if len(nums) == 10:
         return nums[2] in ['2', '3', '4', '5']
     elif len(nums) == 8:
         return nums[0] in ['2', '3', '4', '5']
+    return False
+
+def normalize_phone_match(num1: str, num2: str) -> bool:
+    if not num1 or not num2:
+        return False
+    n1 = "".join(c for c in num1 if c.isdigit())
+    n2 = "".join(c for c in num2 if c.isdigit())
+    if not n1 or not n2:
+        return False
+    if n1 == n2:
+        return True
+    l1, l2 = len(n1), len(n2)
+    if l1 >= 8 and l2 >= 8:
+        min_l = min(l1, l2)
+        return n1[-min_l:] == n2[-min_l:]
     return False
 
 def extrair_digitos_whatsapp(html_cleaned: str) -> list:
@@ -214,15 +233,19 @@ def obter_validacao_whatsapp(telefone: str, wpp_no_site: bool = False) -> str:
         
     if not telefone or telefone == "Não informado":
         return "Apenas Ligação"
-    # Remove tudo que não for dígito
+        
+    is_br = True
+    if telefone.startswith("+") and not telefone.startswith("+55"):
+        is_br = False
+        
     nums = "".join(c for c in telefone if c.isdigit())
     
-    # Se começar com 55 e tiver 12 ou 13 dígitos, remove o 55
+    if not is_br or (not nums.startswith("55") and len(nums) > 11):
+        return "Provável"
+
     if nums.startswith("55") and len(nums) in [12, 13]:
         nums = nums[2:]
         
-    # Celulares no Brasil têm 11 dígitos e o número local começa com 9: e.g. 71999998888
-    # Telefones fixos têm 10 dígitos: e.g. 7133334444
     if len(nums) == 11 and nums[2] == '9':
         return "Provável"
     elif len(nums) == 10:
@@ -231,12 +254,8 @@ def obter_validacao_whatsapp(telefone: str, wpp_no_site: bool = False) -> str:
         else:
             return "Apenas Ligação"
     else:
-        # Caso tenha apenas 9 dígitos e comece com 9 (celular sem DDD)
         if len(nums) == 9 and nums[0] == '9':
             return "Provável"
-        # Caso tenha 8 dígitos (fixo sem DDD)
-        elif len(nums) == 8:
-            return "Apenas Ligação"
         return "Apenas Ligação"
 
 # ==========================================================================
@@ -271,6 +290,7 @@ class SearchRequest(BaseModel):
     cidade: str
     user_id: Optional[str] = "usr_demo_123"  # ID do Supabase
     email: Optional[str] = None
+    lang: Optional[str] = "pt"
 
 class ProfileCreateRequest(BaseModel):
     user_id: str
@@ -457,6 +477,30 @@ def gerar_leads_fallback(nicho: str, cidade: str) -> List[Dict[str, Any]]:
     prefixos = NICHOS_DICT.get(nicho, ["Premium", "Central", "Líder", "Mais", "Soluções", "Destaque"])
     sufixos = ["", " e Cia", " Comercial", " VIP", " Prime", " Concept", " do Bonfim", " da Bahia"]
     
+    # Detecção de cidades internacionais
+    city_lower = cidade.lower()
+    is_intl = False
+    intl_phone_format = ""
+    intl_address_format = ""
+    
+    if any(city in city_lower for city in ["miami", "london", "londres", "berlin", "berlim", "tokyo", "toquio", "paris"]):
+        is_intl = True
+        if "london" in city_lower or "londres" in city_lower:
+            intl_phone_format = "+44 7911 123{num}"
+            intl_address_format = "{num} Baker St, London, UK"
+        elif "berlin" in city_lower or "berlim" in city_lower:
+            intl_phone_format = "+49 172 {num}"
+            intl_address_format = "{num} Friedrichstraße, Berlin, Germany"
+        elif "tokyo" in city_lower or "toquio" in city_lower:
+            intl_phone_format = "+81 90 {num}"
+            intl_address_format = "{num} Shibuya, Tokyo, Japan"
+        elif "paris" in city_lower:
+            intl_phone_format = "+33 6 {num}"
+            intl_address_format = "{num} Rue de Rivoli, Paris, France"
+        else: # miami
+            intl_phone_format = "+1 (305) 555-{num}"
+            intl_address_format = "{num} Ocean Dr, Miami, FL, USA"
+
     ddd = "71" if any(sub in cidade for sub in ["Salvador", "Lauro de Freitas", "Camaçari"]) else "75"
     
     num_leads = random.randint(8, 15)
@@ -471,22 +515,29 @@ def gerar_leads_fallback(nicho: str, cidade: str) -> List[Dict[str, Any]]:
         nome = f"{nicho} {pref}{suf}".strip()
         
         is_cel = random.random() > 0.3
-        if is_cel:
-            fone_num = f"9{random.randint(8000, 9999)}-{random.randint(1000, 9999)}"
-        else:
-            fone_num = f"3{random.randint(200, 399)}-{random.randint(1000, 9999)}"
-        telefone = f"({ddd}) {fone_num}"
         
-        rua = ruas_random[i % len(ruas_random)]
-        num = random.randint(10, 1999)
-        endereco = f"{rua}, {num} - Centro - {cidade}"
+        if is_intl:
+            rand_num = random.randint(1000, 9999)
+            telefone = intl_phone_format.format(num=rand_num)
+            endereco = intl_address_format.format(num=random.randint(10, 999))
+            wpp_status = "Provável"
+        else:
+            if is_cel:
+                fone_num = f"9{random.randint(8000, 9999)}-{random.randint(1000, 9999)}"
+            else:
+                fone_num = f"3{random.randint(200, 399)}-{random.randint(1000, 9999)}"
+            telefone = f"({ddd}) {fone_num}"
+            
+            rua = ruas_random[i % len(ruas_random)]
+            num = random.randint(10, 1999)
+            endereco = f"{rua}, {num} - Centro - {cidade}"
+            wpp_status = "Provável" if is_cel else "Apenas Ligação"
         
         nota = round(random.uniform(3.2, 4.9), 1)
         avaliacoes = random.randint(5, 230)
         maps = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(nome + ' ' + endereco)}"
         
         instagram_link = None
-        wpp_status = "Provável" if is_cel else "Apenas Ligação"
 
         leads.append({
             "nome": nome,
@@ -507,19 +558,30 @@ def gerar_leads_fallback(nicho: str, cidade: str) -> List[Dict[str, Any]]:
 # ==========================================================================
 # CHAMADAS DE INTEGRAÇÃO COM A API DO GOOGLE PLACES (100% PROTEGIDAS)
 # ==========================================================================
-def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[List[Dict[str, Any]]]:
+def buscar_places_google_api(nicho: str, cidade: str, api_key: str, lang: str = "pt") -> Optional[List[Dict[str, Any]]]:
     """Tenta chamar a Google Places API real usando o backend."""
+    LANG_MAP = {
+        "pt": "pt-BR",
+        "en": "en",
+        "es": "es",
+        "fr": "fr",
+        "de": "de",
+        "ru": "ru",
+        "ja": "ja"
+    }
+    google_lang = LANG_MAP.get(lang, "pt-BR")
+
     # 1. Tenta a nova API Places v1 (searchText)
     try:
         url = "https://places.googleapis.com/v1/places:searchText"
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": api_key,
-            "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.nationalPhoneNumber,places.websiteUri,places.googleMapsUri"
+            "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.nationalPhoneNumber,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri"
         }
         body = {
             "textQuery": f"{nicho} em {cidade}",
-            "languageCode": "pt-BR"
+            "languageCode": google_lang
         }
         
         response = requests.post(url, headers=headers, json=body, timeout=12)
@@ -547,23 +609,16 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                             if "api.whatsapp.com" in html_cleaned or "wa.me" in html_cleaned:
                                 wpp_no_site = True
                                 
-                                # Validação Cruzada se for telefone fixo
-                                telefone = place.get("nationalPhoneNumber", "Não informado")
-                                if eh_telefone_fixo(telefone):
-                                    wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
-                                    # Normaliza números (remove DDI 55)
-                                    normalized_wpps = []
-                                    for num in wpp_numbers:
-                                        if num.startswith("55") and len(num) > 10:
-                                            normalized_wpps.append(num[2:])
-                                        else:
-                                            normalized_wpps.append(num)
-                                            
-                                    google_digits = "".join(c for c in telefone if c.isdigit())
-                                    if google_digits.startswith("55") and len(google_digits) > 10:
-                                        google_digits = google_digits[2:]
-                                        
-                                    if google_digits not in normalized_wpps:
+                                # Validação Cruzada
+                                telefone = place.get("internationalPhoneNumber") or place.get("nationalPhoneNumber", "Não informado")
+                                wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
+                                if wpp_numbers:
+                                    match_found = False
+                                    for wpp_num in wpp_numbers:
+                                        if normalize_phone_match(telefone, wpp_num):
+                                            match_found = True
+                                            break
+                                    if not match_found:
                                         wpp_no_site = False
                     except Exception:
                         pass
@@ -571,7 +626,7 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                 # Filtra comércios que NÃO possuem website cadastrado
                 if not website:
                     nome = place.get("displayName", {}).get("text", "Sem nome")
-                    telefone = place.get("nationalPhoneNumber", "Não informado")
+                    telefone = place.get("internationalPhoneNumber") or place.get("nationalPhoneNumber", "Não informado")
                     endereco = place.get("formattedAddress", "Não informado")
                     rating = place.get("rating", 0.0)
                     user_ratings = place.get("userRatingCount", 0)
@@ -605,7 +660,7 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
         params = {
             "query": f"{nicho} em {cidade}",
             "key": api_key,
-            "language": "pt-BR"
+            "language": google_lang
         }
         response = requests.get(search_url, params=params, timeout=10)
         if response.status_code == 200:
@@ -621,9 +676,9 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                 details_url = "https://maps.googleapis.com/maps/api/place/details/json"
                 d_params = {
                     "place_id": place_id,
-                    "fields": "name,formatted_phone_number,formatted_address,rating,user_ratings_total,website,url",
+                    "fields": "name,international_phone_number,formatted_phone_number,formatted_address,rating,user_ratings_total,website,url",
                     "key": api_key,
-                    "language": "pt-BR"
+                    "language": google_lang
                 }
                 
                 try:
@@ -649,23 +704,16 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                                     if "api.whatsapp.com" in html_cleaned or "wa.me" in html_cleaned:
                                         wpp_no_site = True
                                         
-                                        # Validação Cruzada se for telefone fixo
-                                        telefone = details.get("formatted_phone_number", "Não informado")
-                                        if eh_telefone_fixo(telefone):
-                                            wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
-                                            # Normaliza números (remove DDI 55)
-                                            normalized_wpps = []
-                                            for num in wpp_numbers:
-                                                if num.startswith("55") and len(num) > 10:
-                                                    normalized_wpps.append(num[2:])
-                                                else:
-                                                    normalized_wpps.append(num)
-                                                    
-                                            google_digits = "".join(c for c in telefone if c.isdigit())
-                                            if google_digits.startswith("55") and len(google_digits) > 10:
-                                                google_digits = google_digits[2:]
-                                                
-                                            if google_digits not in normalized_wpps:
+                                        # Validação Cruzada
+                                        telefone = details.get("international_phone_number") or details.get("formatted_phone_number", "Não informado")
+                                        wpp_numbers = extrair_digitos_whatsapp(html_cleaned)
+                                        if wpp_numbers:
+                                            match_found = False
+                                            for wpp_num in wpp_numbers:
+                                                if normalize_phone_match(telefone, wpp_num):
+                                                    match_found = True
+                                                    break
+                                            if not match_found:
                                                 wpp_no_site = False
                             except Exception:
                                 pass
@@ -673,6 +721,7 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                         if not website:
                             nome_det = details.get("name", place.get("name"))
                             endereco_det = details.get("formatted_address", "Não informado")
+                            telefone = details.get("international_phone_number") or details.get("formatted_phone_number", "Não informado")
                             
                             if place_id:
                                 maps_link = f"https://www.google.com/maps/search/?api=1&query=Google&query_place_id={place_id}"
@@ -683,12 +732,12 @@ def buscar_places_google_api(nicho: str, cidade: str, api_key: str) -> Optional[
                                 
                             leads.append({
                                 "nome": nome_det,
-                                "telefone": details.get("formatted_phone_number", "Não informado"),
+                                "telefone": telefone,
                                 "endereco": endereco_det,
                                 "nota": details.get("rating", 0.0),
                                 "avaliacoes": details.get("user_ratings_total", 0),
                                 "maps": maps_link,
-                                "validacao_whatsapp": obter_validacao_whatsapp(details.get("formatted_phone_number", "Não informado"), wpp_no_site),
+                                "validacao_whatsapp": obter_validacao_whatsapp(telefone, wpp_no_site),
                                 "instagram_link": instagram_link or None,
                                 "tipo_link_maps": tipo_link_maps
                             })
@@ -1268,7 +1317,7 @@ async def buscar_leads(req: SearchRequest):
         else:
             try:
                 # Tenta disparar a chamada real à API
-                leads_real = buscar_places_google_api(nicho, cidade, google_key.strip())
+                leads_real = buscar_places_google_api(nicho, cidade, google_key.strip(), req.lang)
                 if leads_real is not None:
                     leads_encontrados = leads_real
                     api_usada = "Google Places API (Real Live Connection)"

@@ -2595,8 +2595,8 @@
             <!-- Coluna 3: Conformidade Legal -->
             <div class="footer-col">
                 <h4 class="footer-title">Compliance</h4>
-                <p class="footer-compliance-text">
-                    Em total conformidade com a LGPD (Lei Geral de Proteção de Dados) para tratamento e coleta exclusiva de dados comerciais públicos e de legítimo interesse empresarial.
+                <p class="footer-compliance-text" data-i18n="footer_desc_compliance">
+                    Em total conformidade com a LGPD, GDPR e CCPA para o tratamento e coleta exclusiva de dados comerciais públicos de legítimo interesse empresarial.
                 </p>
             </div>
         </div>
@@ -3285,7 +3285,8 @@
                         nicho: nicho,
                         cidade: cidade,
                         user_id: appState.user.id,
-                        email: appState.user.email
+                        email: appState.user.email,
+                        lang: appState.currentLang || 'pt'
                     })
                 });
 
@@ -3378,14 +3379,19 @@
                 let wppLink = '#';
                 let hasPhone = false;
                 if (lead.telefone && lead.telefone !== "Não informado") {
-                    let cleanPhone = lead.telefone.replace(/\D/g, '');
+                    let cleanPhone = '';
+                    if (lead.telefone.startsWith('+')) {
+                        cleanPhone = lead.telefone.replace(/\D/g, '');
+                    } else {
+                        let digits = lead.telefone.replace(/\D/g, '');
+                        if (digits.length === 10 || digits.length === 11) {
+                            cleanPhone = '55' + digits;
+                        } else {
+                            cleanPhone = digits;
+                        }
+                    }
                     if (cleanPhone.length > 0) {
                         hasPhone = true;
-                        if (cleanPhone.startsWith('55') && (cleanPhone.length === 12 || cleanPhone.length === 13)) {
-                            // Já inclui o código do país (+55)
-                        } else {
-                            cleanPhone = '55' + cleanPhone;
-                        }
                         wppLink = `https://wa.me/${cleanPhone}?text=Olá,%20vi%20sua%20empresa%20${encodeURIComponent(lead.nome)}%20no%20Google%20e%20gostaria%20de%20apresentar%20uma%20proposta...`;
                     }
                 }
@@ -3870,7 +3876,7 @@
         "footer_desc_security_1": "Conexões seguras ponta a ponta via HTTPS",
         "footer_desc_security_2": "Banco de dados isolado e criptografado via Supabase",
         "footer_desc_security_3": "Camada de processamento isolada no Render",
-        "footer_desc_compliance": "Em total conformidade com a LGPD (Lei Geral de Proteção de Dados) para tratamento e coleta exclusiva de dados comerciais públicos e de legítimo interesse empresarial.",
+        "footer_desc_compliance": "Em total conformidade com a LGPD, GDPR e CCPA para o tratamento e coleta exclusiva de dados comerciais públicos de legítimo interesse empresarial.",
         "footer_copyright": "© 2026 GridHunter. Todos os direitos reservados. Inteligência de dados com segurança e privacidade.",
         "about_us_title": "Quem Somos",
         "about_us_body_1": "O GridHunter é uma plataforma avançada de inteligência geográfica e automação B2B. Nossa tecnologia mapeia estabelecimentos comerciais com forte presença digital ou lacunas operacionais, permitindo que agências de marketing, tecnologia e designers identifiquem oportunidades comerciais com alto potencial de conversão.",
@@ -4017,7 +4023,7 @@
         "footer_desc_security_1": "End-to-end secure connections via HTTPS",
         "footer_desc_security_2": "Isolated and encrypted database via Supabase",
         "footer_desc_security_3": "Isolated processing layer on Render",
-        "footer_desc_compliance": "In full compliance with LGPD (General Data Protection Law) for exclusive treatment and collection of public business data and legitimate business interest.",
+        "footer_desc_compliance": "In full compliance with LGPD, GDPR, and CCPA for the treatment and exclusive collection of public commercial data of legitimate business interest.",
         "footer_copyright": "© 2026 GridHunter. All rights reserved. Data intelligence with security and privacy.",
         "about_us_title": "About Us",
         "about_us_body_1": "GridHunter is an advanced geographic intelligence and B2B automation platform. Our technology maps commercial establishments with a strong digital presence or operational gaps, allowing marketing, technology agencies, and designers to identify high-converting commercial opportunities.",
@@ -4164,7 +4170,7 @@
         "footer_desc_security_1": "Conexiones seguras de extremo a extremo a través de HTTPS",
         "footer_desc_security_2": "Base de datos aislada y cifrada a través de Supabase",
         "footer_desc_security_3": "Capa de procesamiento aislada en Render",
-        "footer_desc_compliance": "En total conformidad con la LGPD (Ley General de Protección de Datos) para el tratamiento y recogida exclusiva de datos comerciales públicos y de legítimo interés empresarial.",
+        "footer_desc_compliance": "En total conformidad con la LGPD, GDPR y CCPA para el tratamento y recogida exclusiva de dados comerciais públicos de interés comercial legítimo.",
         "footer_copyright": "© 2026 GridHunter. Todos los derechos reservados. Inteligencia de datos con seguridad y privacidad.",
         "about_us_title": "Quiénes Somos",
         "about_us_body_1": "GridHunter es una plataforma avanzada de inteligencia geográfica y automatización B2B. Nuestra tecnología mapea establecimientos comerciales con fuerte presencia digital o lagunas operativas, permitiendo que agencias de marketing, tecnología y diseñadores identifiquen oportunidades comerciales con alto potencial de conversión.",
@@ -4311,7 +4317,7 @@
         "footer_desc_security_1": "Connexions sécurisées de bout en bout via HTTPS",
         "footer_desc_security_2": "Base de données isolée et chiffrée via Supabase",
         "footer_desc_security_3": "Couche de traitement isolée sur Render",
-        "footer_desc_compliance": "En totale conformité avec la LGPD (Loi générale sur la protection des données) pour le traitement et la collecte exclusive de données commerciales publiques et d'intérêt commercial légitime.",
+        "footer_desc_compliance": "En totale conformité avec la LGPD, le GDPR et la CCPA pour le traitement et la collecte exclusive de données commerciales publiques d'intérêt commercial légitime.",
         "footer_copyright": "© 2026 GridHunter. Tous droits réservés. Intelligence des données avec sécurité et confidentialité.",
         "about_us_title": "Qui sommes-nous",
         "about_us_body_1": "GridHunter est une plateforme avancée d'intelligence géographique et d'automatisation B2B. Notre technologie cartographie les établissements commerciaux avec une forte présence numérique ou des lacunes opérationnelles, permettant aux agences de marketing, de technologie et aux concepteurs d'identifier des opportunités commerciales à fort potentiel de conversion.",
@@ -4458,7 +4464,7 @@
         "footer_desc_security_1": "Ende-zu-Ende-Sicherheitsverbindungen über HTTPS",
         "footer_desc_security_2": "Isolierte und verschlüsselte Datenbank über Supabase",
         "footer_desc_security_3": "Isolierte Verarbeitungsschicht auf Render",
-        "footer_desc_compliance": "In voller Übereinstimmung mit der LGPD (Allgemeines Datenschutzgesetz) für die ausschließliche Verarbeitung und Erhebung öffentlicher Geschäftsdaten und berechtigter geschäftlicher Interessen.",
+        "footer_desc_compliance": "In voller Übereinstimmung mit LGPD, GDPR und CCPA für die Verarbeitung und ausschließliche Erfassung öffentlicher kommerzieller Daten von berechtigtem Geschäftsinteresse.",
         "footer_copyright": "© 2026 GridHunter. Alle Rechte vorbehalten. Datenintelligenz mit Sicherheit und Datenschutz.",
         "about_us_title": "Über uns",
         "about_us_body_1": "GridHunter ist eine fortschrittliche geografische Informations- und B2B-Automatisierungsplattform. Unsere Technologie erfasst gewerbliche Betriebe mit starker digitaler Präsenz oder betrieblichen Lücken, sodass Marketing- und Technologieagenturen sowie Designer vielversprechende Geschäftsmöglichkeiten identifizieren können.",
@@ -4605,7 +4611,7 @@
         "footer_desc_security_1": "Безопасные соединения из конца в конец через HTTPS",
         "footer_desc_security_2": "Изолированная и зашифрованная база данных через Supabase",
         "footer_desc_security_3": "Изолированный слой обработки на Render",
-        "footer_desc_compliance": "В полном соответствии с LGPD (Общим законом о защите персональных данных) для обработки и исключительного сбора общедоступных коммерческих данных в законных деловых интересах.",
+        "footer_desc_compliance": "В полном соответствии с LGPD, GDPR и CCPA для обработки и исключительного сбора общедоступных коммерческих данных, представляющих законный деловой интерес.",
         "footer_copyright": "© 2026 GridHunter. Все права защищены. Интеллектуальный анализ данных с безопасностью и конфиденциальностью.",
         "about_us_title": "О нас",
         "about_us_body_1": "GridHunter — это передовая платформа географического анализа и автоматизации B2B. Наша технология находит коммерческие заведения с сильным цифровым присутствием или операционными пробелами, позволяя маркетинговым, технологическим агентствам и дизайнерам выявлять высокоэффективные коммерческие возможности.",
@@ -4752,7 +4758,7 @@
         "footer_desc_security_1": "HTTPS経由のエンドツーエンドの安全な接続",
         "footer_desc_security_2": "Supabase経由の隔離および暗号化されたデータベース",
         "footer_desc_security_3": "Render上の隔離された処理レイヤー",
-        "footer_desc_compliance": "公共のビジネスデータの処理および収集、ならびに正当なビジネス上の利益のためのLGPD（一般データ保護法）に完全に準拠しています。",
+        "footer_desc_compliance": "正当なビジネス上の利益のための公開商業データの処理および独占的収集について、LGPD、GDPR、およびCCPAに完全に準拠しています。",
         "footer_copyright": "© 2026 GridHunter. All rights reserved. セキュリティとプライバシーを兼ね備えたデータインテリジェンス。",
         "about_us_title": "会社概要",
         "about_us_body_1": "GridHunterは、高度な地理情報とB2B自動化のプラットフォームです。当社のテクノロジーは、強力なデジタルプレゼンスまたは運用上のギャップを持つ商業施設をマッピングし、マーケティングやテクノロジーの代理店、デザイナーが成約率の高い商業機会を特定できるようにします。",
