@@ -627,6 +627,8 @@
             transition: var(--transition-smooth);
             position: relative;
             overflow: hidden;
+            flex-wrap: wrap;
+            word-break: break-word;
         }
 
         .btn-submit::after {
@@ -1018,6 +1020,8 @@
             gap: 0.5rem;
             transition: var(--transition-smooth);
             border: 1px solid transparent;
+            flex-wrap: wrap;
+            word-break: break-word;
         }
 
         .btn-excel {
@@ -1589,6 +1593,8 @@
             position: relative;
             text-align: center;
             box-shadow: var(--shadow-premium);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .pricing-card:hover {
@@ -1659,8 +1665,10 @@
             font-size: 0.85rem;
             color: var(--text-muted);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 8px;
+            word-break: break-word;
+            flex-wrap: wrap;
         }
 
         .pricing-features li::before {
@@ -1690,6 +1698,8 @@
             cursor: pointer;
             transition: var(--transition-smooth);
             margin-top: auto;
+            flex-wrap: wrap;
+            word-break: break-word;
         }
 
         .pricing-btn:hover {
@@ -1817,6 +1827,9 @@
             justify-content: space-between;
             align-items: center;
             transition: var(--transition-smooth);
+            flex-wrap: wrap;
+            word-break: break-word;
+            gap: 0.5rem;
         }
 
         .faq-question:hover {
@@ -2023,16 +2036,16 @@
     <div class="auth-wrapper" id="auth-view">
         <div class="auth-card">
             <div class="auth-logo">🔍 GRIDHUNTER</div>
-            <div class="auth-subtitle">Painel de Prospecção SaaS para Agências e Designers</div>
+            <div class="auth-subtitle" data-i18n="auth_subtitle">Painel de Prospecção SaaS para Agências e Designers</div>
 
             <div class="auth-tabs">
-                <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Acessar Conta</button>
-                <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Criar Conta</button>
+                <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')" data-i18n="tab_login">Acessar Conta</button>
+                <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')" data-i18n="tab_signup">Criar Conta</button>
             </div>
 
             <form id="auth-form" onsubmit="handleAuthSubmit(event)">
                 <div class="form-group" style="text-align: left;">
-                    <label for="auth-email" class="form-label">Endereço de E-mail</label>
+                    <label for="auth-email" class="form-label" data-i18n="auth_email_label">Endereço de E-mail</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2043,12 +2056,12 @@
                             </svg>
                         </span>
                         <input type="email" id="auth-email" class="form-input" placeholder="seuemail@provedor.com"
-                            required autocomplete="email">
+                            required autocomplete="email" data-i18n="auth_email_placeholder">
                     </div>
                 </div>
 
                 <div class="form-group" style="text-align: left;">
-                    <label for="auth-password" class="form-label">Senha de Acesso</label>
+                    <label for="auth-password" class="form-label" data-i18n="auth_password_label">Senha de Acesso</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2058,7 +2071,7 @@
                             </svg>
                         </span>
                         <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required
-                            autocomplete="current-password">
+                            autocomplete="current-password" data-i18n="auth_password_placeholder">
                     </div>
                 </div>
 
@@ -2082,7 +2095,7 @@
                                 <polyline points="22,6 12,13 2,6"></polyline>
                             </svg>
                         </span>
-                        <input type="email" id="forgot-email" class="form-input" placeholder="seuemail@provedor.com" required>
+                        <input type="email" id="forgot-email" class="form-input" placeholder="seuemail@provedor.com" required data-i18n="auth_email_placeholder">
                     </div>
                 </div>
                 <button type="submit" class="btn-submit" id="btn-forgot-submit" style="margin-top: 1rem;" data-i18n="send_recovery_link_btn">
@@ -2098,11 +2111,11 @@
                 <h3 class="card-title" style="margin-bottom: 1.5rem;" data-i18n="reset_pwd_title">Definir Nova Senha</h3>
                 <div class="form-group" style="text-align: left;">
                     <label for="reset-pwd-new" class="form-label" data-i18n="new_password_label">Nova Senha</label>
-                    <input type="password" id="reset-pwd-new" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                    <input type="password" id="reset-pwd-new" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required data-i18n="auth_password_placeholder">
                 </div>
                 <div class="form-group" style="text-align: left;">
                     <label for="reset-pwd-confirm" class="form-label" data-i18n="confirm_password_label">Confirmar Nova Senha</label>
-                    <input type="password" id="reset-pwd-confirm" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                    <input type="password" id="reset-pwd-confirm" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required data-i18n="auth_password_placeholder">
                 </div>
                 <input type="hidden" id="reset-pwd-token" value="">
                 <button type="submit" class="btn-submit" id="btn-reset-pwd-submit" style="margin-top: 1rem;" data-i18n="reset_pwd_btn">
@@ -2124,83 +2137,83 @@
         <div class="landing-container">
             <!-- 1. ABA DE PREÇOS -->
             <section class="landing-section pricing-section">
-                <h2 class="section-title">Nossos Planos</h2>
-                <p class="section-subtitle">Escolha o plano ideal para alavancar a prospecção da sua agência ou estúdio de design.</p>
+                <h2 class="section-title" data-i18n="lp_pricing_title">Nossos Planos</h2>
+                <p class="section-subtitle" data-i18n="lp_pricing_subtitle">Escolha o plano ideal para alavancar a prospecção da sua agência ou estúdio de design.</p>
                 <div class="pricing-grid">
                     <!-- Plano Starter -->
                     <div class="pricing-card">
                         <div class="pricing-header">
-                            <h3 class="pricing-plan-name">Starter</h3>
-                            <div class="pricing-price"><span class="price-currency">R$</span>0<span class="price-period">/mês</span></div>
+                            <h3 class="pricing-plan-name" data-i18n="plan_starter_name">Starter</h3>
+                            <div class="pricing-price"><span class="price-currency" data-i18n="price_currency">R$</span>0<span class="price-period" data-i18n="price_period">/mês</span></div>
                         </div>
                         <ul class="pricing-features">
-                            <li>5 créditos iniciais para testes</li>
-                            <li>Acesso completo ao painel de busca</li>
-                            <li>Filtros por nicho e cidade</li>
-                            <li>Exportação para Excel (.xlsx)</li>
-                            <li class="disabled">Suporte premium prioritário</li>
+                            <li data-i18n="lp_starter_features_1">5 créditos iniciais para testes</li>
+                            <li data-i18n="lp_starter_features_2">Acesso completo ao painel de busca</li>
+                            <li data-i18n="lp_starter_features_3">Filtros por nicho e cidade</li>
+                            <li data-i18n="lp_starter_features_4">Exportação para Excel (.xlsx)</li>
+                            <li class="disabled" data-i18n="lp_starter_features_5">Suporte premium prioritário</li>
                         </ul>
-                        <button class="pricing-btn" onclick="switchAuthTab('signup')">Começar Grátis</button>
+                        <button class="pricing-btn" onclick="switchAuthTab('signup')" data-i18n="lp_btn_free">Começar Grátis</button>
                     </div>
 
                     <!-- Plano Pro -->
                     <div class="pricing-card popular">
-                        <div class="popular-badge">Mais Escolhido</div>
+                        <div class="popular-badge" data-i18n="lp_pro_badge">Mais Escolhido</div>
                         <div class="pricing-header">
-                            <h3 class="pricing-plan-name">Pro</h3>
-                            <div class="pricing-price"><span class="price-currency">R$</span>49<span class="price-period">/mês</span></div>
+                            <h3 class="pricing-plan-name" data-i18n="plan_pro_name">Pro</h3>
+                            <div class="pricing-price"><span class="price-currency" data-i18n="price_currency">R$</span>49<span class="price-period" data-i18n="price_period">/mês</span></div>
                         </div>
                         <ul class="pricing-features">
-                            <li>120 créditos recorrentes por mês</li>
-                            <li>Acesso completo ao painel de busca</li>
-                            <li>Filtros por nicho e cidade</li>
-                            <li>Exportação para Excel (.xlsx)</li>
-                            <li>Suporte premium via e-mail</li>
+                            <li data-i18n="lp_pro_features_1">120 créditos recorrentes por mês</li>
+                            <li data-i18n="lp_pro_features_2">Acesso completo ao painel de busca</li>
+                            <li data-i18n="lp_pro_features_3">Filtros por nicho e cidade</li>
+                            <li data-i18n="lp_pro_features_4">Exportação para Excel (.xlsx)</li>
+                            <li data-i18n="lp_pro_features_5">Suporte premium via e-mail</li>
                         </ul>
-                        <button class="pricing-btn" onclick="switchAuthTab('signup')">Assinar Agora</button>
+                        <button class="pricing-btn" onclick="switchAuthTab('signup')" data-i18n="lp_btn_pro">Assinar Agora</button>
                     </div>
 
                     <!-- Plano Enterprise -->
                     <div class="pricing-card">
                         <div class="pricing-header">
-                            <h3 class="pricing-plan-name">Enterprise</h3>
-                            <div class="pricing-price">Sob Consulta</div>
+                            <h3 class="pricing-plan-name" data-i18n="plan_enterprise_name">Enterprise</h3>
+                            <div class="pricing-price" data-i18n="lp_enterprise_price">Sob Consulta</div>
                         </div>
                         <ul class="pricing-features">
-                            <li>Consultas de leads de forma ilimitada</li>
-                            <li>Acesso completo à API exclusiva</li>
-                            <li>Suporte dedicado 24/7</li>
-                            <li>Exportação customizada e relatórios</li>
-                            <li>Acordo de Nível de Serviço (SLA)</li>
+                            <li data-i18n="lp_enterprise_features_1">Consultas de leads de forma ilimitada</li>
+                            <li data-i18n="lp_enterprise_features_2">Acesso completo à API exclusiva</li>
+                            <li data-i18n="lp_enterprise_features_3">Suporte dedicado 24/7</li>
+                            <li data-i18n="lp_enterprise_features_4">Exportação customizada e relatórios</li>
+                            <li data-i18n="lp_enterprise_features_5">Acordo de Nível de Serviço (SLA)</li>
                         </ul>
-                        <button class="pricing-btn contact-btn" onclick="location.href='mailto:contato@gridhunter.com'">Falar com Vendas</button>
+                        <button class="pricing-btn contact-btn" onclick="location.href='mailto:contato@gridhunter.com'" data-i18n="lp_btn_enterprise">Falar com Vendas</button>
                     </div>
                 </div>
             </section>
 
             <!-- 2. AVALIAÇÕES AUTOMATIZADAS -->
             <section class="landing-section testimonials-section">
-                <h2 class="section-title">O que dizem nossos clientes</h2>
+                <h2 class="section-title" data-i18n="lp_testimonials_title">O que dizem nossos clientes</h2>
                 <div class="carousel-container">
                     <div class="testimonial-card active" id="testimonial-0">
-                        <p class="testimonial-text">"Com o GridHunter, conseguimos fechar 4 novos projetos de sites em apenas 2 semanas. A precisão em achar empresas sem site oficial economizou centenas de horas de prospecção manual."</p>
+                        <p class="testimonial-text" data-i18n="testimonial_text_0">"Com o GridHunter, conseguimos fechar 4 novos projetos de sites em apenas 2 semanas. A precisão em achar empresas sem site oficial economizou centenas de horas de prospecção manual."</p>
                         <div class="testimonial-author">
-                            <span class="author-name">Ricardo Santos</span>
-                            <span class="author-title">Diretor de Vendas - Alpha Digital</span>
+                            <span class="author-name" data-i18n="testimonial_author_0">Ricardo Santos</span>
+                            <span class="author-title" data-i18n="testimonial_title_0">Diretor de Vendas - Alpha Digital</span>
                         </div>
                     </div>
                     <div class="testimonial-card" id="testimonial-1">
-                        <p class="testimonial-text">"Ferramenta fantástica para designers freelancer. Conectar com negócios locais que faturam bem mas não possuem site nos deu uma mina de ouro de potenciais clientes."</p>
+                        <p class="testimonial-text" data-i18n="testimonial_text_1">"Ferramenta fantástica para designers freelancer. Conectar com negócios locais que faturam bem mas não possuem site nos deu uma mina de ouro de potenciais clientes."</p>
                         <div class="testimonial-author">
-                            <span class="author-name">Mariana Costa</span>
-                            <span class="author-title">UI/UX Designer Freelancer</span>
+                            <span class="author-name" data-i18n="testimonial_author_1">Mariana Costa</span>
+                            <span class="author-title" data-i18n="testimonial_title_1">UI/UX Designer Freelancer</span>
                         </div>
                     </div>
                     <div class="testimonial-card" id="testimonial-2">
-                        <p class="testimonial-text">"Excelente precisão. A camada de conformidade com a LGPD e a estabilidade das consultas via Render nos trazem muita segurança para operar no dia a dia."</p>
+                        <p class="testimonial-text" data-i18n="testimonial_text_2">"Excelente precisão. A camada de conformidade com a LGPD e a estabilidade das consultas via Render nos trazem muita segurança para operar no dia a dia."</p>
                         <div class="testimonial-author">
-                            <span class="author-name">Carlos Oliveira</span>
-                            <span class="author-title">Sócio-Fundador - Agência Vanguarda</span>
+                            <span class="author-name" data-i18n="testimonial_author_2">Carlos Oliveira</span>
+                            <span class="author-title" data-i18n="testimonial_title_2">Sócio-Fundador - Agência Vanguarda</span>
                         </div>
                     </div>
                 </div>
@@ -2213,35 +2226,35 @@
 
             <!-- 3. FAQ ACCORDION -->
             <section class="landing-section faq-section">
-                <h2 class="section-title">Perguntas Frequentes</h2>
+                <h2 class="section-title" data-i18n="lp_faq_title">Perguntas Frequentes</h2>
                 <div class="faq-accordion">
                     <div class="faq-item">
-                        <button class="faq-question" onclick="toggleFaq(this)">
+                        <button class="faq-question" onclick="toggleFaq(this)" data-i18n="faq_q1">
                             A coleta de dados é legal?
                             <span class="faq-icon">▲</span>
                         </button>
                         <div class="faq-answer">
-                            <p>Sim. O GridHunter realiza buscas baseadas estritamente em dados comerciais públicos fornecidos de forma voluntária pelas empresas na internet (Google Places API). O tratamento está em total conformidade com a LGPD (Lei Geral de Proteção de Dados), amparado pelas bases legais do legítimo interesse empresarial e publicidade de dados públicos.</p>
+                            <p data-i18n="faq_a1">Sim. O GridHunter realiza buscas baseadas estritamente em dados comerciais públicos fornecidos de forma voluntária pelas empresas na internet (Google Places API). O tratamento está em total conformidade com a LGPD (Lei Geral de Proteção de Dados), amparado pelas bases legais de legítimo interesse empresarial e publicidade de dados públicos.</p>
                         </div>
                     </div>
                     
                     <div class="faq-item">
-                        <button class="faq-question" onclick="toggleFaq(this)">
+                        <button class="faq-question" onclick="toggleFaq(this)" data-i18n="faq_q2">
                             Qual a velocidade das buscas?
                             <span class="faq-icon">▲</span>
                         </button>
                         <div class="faq-answer">
-                            <p>As buscas levam entre 15 e 45 segundos dependendo do nicho de atuação e do volume de dados da cidade selecionada na Bahia. O processamento é realizado de forma paralela e em segundo plano para garantir máxima rapidez.</p>
+                            <p data-i18n="faq_a2">As buscas levam entre 15 e 45 segundos dependendo do nicho de atuação e do volume de dados da cidade selecionada na Bahia. O processamento é realizado de forma paralela e em segundo plano para garantir máxima rapidez.</p>
                         </div>
                     </div>
 
                     <div class="faq-item">
-                        <button class="faq-question" onclick="toggleFaq(this)">
+                        <button class="faq-question" onclick="toggleFaq(this)" data-i18n="faq_q3">
                             Como os créditos são consumidos?
                             <span class="faq-icon">▲</span>
                         </button>
                         <div class="faq-answer">
-                            <p>Cada varredura executada em uma combinação de Nicho + Cidade consome exatamente 1 crédito. Se a varredura não retornar nenhum lead qualificado sem site, o crédito é retornado ou não debitado.</p>
+                            <p data-i18n="faq_a3">Cada varredura executada em uma combinação de Nicho + Cidade consome exatamente 1 crédito. Se a varredura não retornar nenhum lead qualificado sem site, o crédito é retornado ou não debitado.</p>
                         </div>
                     </div>
                 </div>
@@ -2249,10 +2262,10 @@
 
             <!-- 4. HISTÓRIA E PROPÓSITO -->
             <section class="landing-section history-section">
-                <h2 class="section-title">Nossa História & Propósito</h2>
+                <h2 class="section-title" data-i18n="lp_about_title">Nossa História & Propósito</h2>
                 <div class="history-content">
-                    <p>O <strong>GridHunter</strong> nasceu em 2026 com o propósito claro de eliminar o atrito comercial e democratizar o acesso a dados de mercado geolocalizados de alta precisão. Percebemos que agências de tecnologia e marketing digital perdiam incontáveis horas minerando a internet manualmente para encontrar comércios que precisavam de serviços de digitalização.</p>
-                    <p>Ao criar uma solução automatizada integrada a bancos de dados modernos (Supabase) e servidores robustos (Render), desenvolvemos uma ferramenta de inteligência geográfica que apoia o ecossistema comercial e impulsiona o crescimento de empresas locais e profissionais liberais por meio de conexões eficazes e baseadas em dados reais.</p>
+                    <p data-i18n="lp_about_body_1">O <strong>GridHunter</strong> nasceu em 2026 com o propósito claro de eliminar o atrito comercial e democratizar o acesso a dados de mercado geolocalizados de alta precisão. Percebemos que agências de tecnologia e marketing digital perdiam incontáveis horas minerando a internet manualmente para encontrar comércios que precisavam de serviços de digitalização.</p>
+                    <p data-i18n="lp_about_body_2">Ao criar uma solução automatizada integrada a bancos de dados modernos (Supabase) e servidores robustos (Render), desenvolvemos uma ferramenta de inteligência geográfica que apoia o ecossistema comercial e impulsiona o crescimento de empresas locais e profissionais liberais por meio de conexões eficazes e baseadas em dados reais.</p>
                 </div>
             </section>
         </div>
@@ -2269,7 +2282,7 @@
                 <h1 class="brand-title">
                     🔍 GRIDHUNTER
                 </h1>
-                <span class="brand-subtitle">Prospecção de Leads de Alto Impacto</span>
+                <span class="brand-subtitle" data-i18n="brand_subtitle">Prospecção de Leads de Alto Impacto</span>
             </div>
 
             <div class="user-status-wrapper" id="user-status-area">
@@ -2287,7 +2300,7 @@
                         <line x1="12" y1="8" x2="12" y2="12"></line>
                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
-                    <span id="user-credits-display" style="color: var(--primary);">25</span>&nbsp;créditos
+                    <span id="user-credits-display" style="color: var(--primary);">25</span>&nbsp;<span data-i18n="header_credits">créditos</span>
                 </div>
 
                 <!-- Botão de Configurações -->
@@ -2315,8 +2328,8 @@
         <section class="form-section" id="form-container">
             <div class="card-panel">
                 <div class="card-header">
-                    <h2 class="card-title">Configurar Nova Varredura</h2>
-                    <p class="card-description">Selecione o nicho de mercado e a cidade da Bahia para buscar
+                    <h2 class="card-title" data-i18n="config_search_title">Configurar Nova Varredura</h2>
+                    <p class="card-description" data-i18n="config_search_desc">Selecione o nicho de mercado e a cidade da Bahia para buscar
                         estabelecimentos comerciais que faturam bem, mas não possuem site oficial cadastrado no Google.
                     </p>
                 </div>
@@ -2324,7 +2337,7 @@
                 <form id="leads-search-form" onsubmit="handleFormSubmit(event)">
                     <!-- Nicho / Comércio (Autocomplete customizado) -->
                     <div class="form-group">
-                        <label for="nicho-input" class="form-label">Comércio / Nicho de Atuação</label>
+                        <label for="nicho-input" class="form-label" data-i18n="nicho_label">Comércio / Nicho de Atuação</label>
                         <div class="input-wrapper">
                             <span class="input-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2334,7 +2347,7 @@
                                 </svg>
                             </span>
                             <input type="text" id="nicho-input" class="form-input"
-                                placeholder="Selecione ou digite um nicho..." autocomplete="off" required>
+                                placeholder="Selecione ou digite um nicho..." autocomplete="off" required data-i18n="nicho_placeholder">
                             <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -2370,7 +2383,7 @@
 
                     <!-- Cidade / Bahia (Autocomplete customizado) -->
                     <div class="form-group">
-                        <label for="cidade-input" class="form-label">Cidade e Estado (Foco Bahia)</label>
+                        <label for="cidade-input" class="form-label" data-i18n="cidade_label">Cidade e Estado (Foco Bahia)</label>
                         <div class="input-wrapper">
                             <span class="input-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2380,7 +2393,7 @@
                                 </svg>
                             </span>
                             <input type="text" id="cidade-input" class="form-input"
-                                placeholder="Selecione ou digite uma cidade da Bahia..." autocomplete="off" required>
+                                placeholder="Selecione ou digite uma cidade da Bahia..." autocomplete="off" required data-i18n="cidade_placeholder">
                             <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -2415,7 +2428,7 @@
                             <path
                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                         </svg>
-                        Iniciar Varredura de Leads (-1 crédito)
+                        <span data-i18n="start_scan_btn">Iniciar Varredura de Leads (-1 crédito)</span>
                     </button>
                 </form>
             </div>
@@ -2502,8 +2515,7 @@
                 <div class="results-header-actions">
                     <div class="results-meta">
                         <h3 class="results-title" id="results-badge-title">Leads Qualificados</h3>
-                        <span class="results-subtitle" id="results-badge-subtitle">Busca de comércios locais sem
-                            site</span>
+                        <span class="results-subtitle" id="results-badge-subtitle" data-i18n="table_subtitle">Busca de comércios locais sem site</span>
                     </div>
 
                     <div class="results-buttons">
@@ -2637,9 +2649,13 @@
                         <label for="settings-language-select" class="form-label" data-i18n="select_language_label">Idioma da Plataforma</label>
                         <div class="input-wrapper">
                             <select id="settings-language-select" class="form-input" style="padding-left: 1.25rem; appearance: none; -webkit-appearance: none; cursor: pointer;" onchange="changeLanguage(this.value)">
-                                <option value="pt">Português (PT)</option>
-                                <option value="en">English (EN)</option>
-                                <option value="es">Español (ES)</option>
+                                <option value="pt">🇧🇷 Português</option>
+                                <option value="en">🇺🇸 English</option>
+                                <option value="es">🇪🇸 Español</option>
+                                <option value="fr">🇫🇷 Français</option>
+                                <option value="de">🇩🇪 Deutsch</option>
+                                <option value="ru">🇷🇺 Русский</option>
+                                <option value="ja">🇯🇵 日本語</option>
                             </select>
                             <span class="input-icon" style="right: 1.25rem; left: auto; pointer-events: none;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5;">
@@ -2655,15 +2671,15 @@
                     <form id="change-password-form" onsubmit="handleChangePassword(event)">
                         <div class="form-group" style="text-align: left;">
                             <label for="change-pwd-current" class="form-label" data-i18n="curr_password_label">Senha Atual</label>
-                            <input type="password" id="change-pwd-current" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                            <input type="password" id="change-pwd-current" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required data-i18n="auth_password_placeholder">
                         </div>
                         <div class="form-group" style="text-align: left;">
                             <label for="change-pwd-new" class="form-label" data-i18n="new_password_label">Nova Senha</label>
-                            <input type="password" id="change-pwd-new" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                            <input type="password" id="change-pwd-new" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required data-i18n="auth_password_placeholder">
                         </div>
                         <div class="form-group" style="text-align: left;">
                             <label for="change-pwd-confirm" class="form-label" data-i18n="confirm_password_label">Confirmar Nova Senha</label>
-                            <input type="password" id="change-pwd-confirm" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required>
+                            <input type="password" id="change-pwd-confirm" class="form-input" style="padding-left: 1.25rem;" placeholder="••••••••" required data-i18n="auth_password_placeholder">
                         </div>
                         <button type="submit" class="btn-submit" id="btn-change-password" style="margin-top: 1rem;" data-i18n="save_password_btn">
                             Atualizar Senha
@@ -2991,17 +3007,19 @@
             const btnSignup = document.getElementById('tab-signup');
             const btnSubmit = document.getElementById('btn-auth-submit');
             const footerText = document.getElementById('auth-footer-text');
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
 
             if (tab === 'login') {
                 btnLogin.classList.add('active');
                 btnSignup.classList.remove('active');
-                btnSubmit.textContent = 'Acessar Plataforma';
-                footerText.innerHTML = 'Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.';
+                btnSubmit.textContent = t['access_platform_btn'] || 'Acessar Plataforma';
+                footerText.innerHTML = t['auth_footer_login_text'] || 'Novo na plataforma? Altere a aba acima para "Criar Conta" e ganhe 5 créditos demonstrativos na hora.';
             } else {
                 btnSignup.classList.add('active');
                 btnLogin.classList.remove('active');
-                btnSubmit.textContent = 'Criar Minha Conta Grátis';
-                footerText.innerHTML = 'Já possui cadastro? Altere a aba acima para "Acessar Conta" e insira suas credenciais.';
+                btnSubmit.textContent = t['btn_signup_submit'] || 'Criar Minha Conta Grátis';
+                footerText.innerHTML = t['auth_footer_signup_text'] || 'Já possui cadastro? Altere a aba acima para "Acessar Conta" e insira suas credenciais.';
             }
         }
 
@@ -3020,14 +3038,16 @@
             const btnSubmit = document.getElementById('btn-auth-submit');
 
             btnSubmit.disabled = true;
-            btnSubmit.textContent = 'Processando...';
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
+            btnSubmit.textContent = t['btn_processing'] || 'Processando...';
 
             if (appState.currentAuthTab === 'signup') {
                 if (!validatePassword(password)) {
                     createToast(
-                        appState.currentLang === 'en'
+                        lang === 'en'
                         ? 'Password must be at least 3 characters long.'
-                        : 'A senha deve conter no mínimo 3 caracteres.',
+                        : (t['auth_password_short'] || 'A senha deve conter no mínimo 3 caracteres.'),
                         'danger'
                     );
                     btnSubmit.disabled = false;
@@ -3071,7 +3091,7 @@
                             credits: profile.credits,
                             token: sessionToken
                         };
-                        createToast('Conectado com sucesso!', 'success');
+                        createToast(t['toast_login_success'] || 'Conectado com sucesso!', 'success');
                     } else {
                         const { data, error } = await supabaseClient.auth.signUp({ email, password });
                         if (error) throw error;
@@ -3096,7 +3116,7 @@
                             credits: profile.credits,
                             token: sessionToken
                         };
-                        createToast('Conta criada com sucesso! Verifique seu e-mail.', 'success');
+                        createToast(t['toast_signup_success'] || 'Conta criada com sucesso! Verifique seu e-mail.', 'success');
                     }
                 } else {
                     // FLUXO DE TESTES / DESENVOLVEDOR LOCAL SIMULADO
@@ -3126,7 +3146,7 @@
                             credits: profile.credits,
                             token: mockToken
                         };
-                        createToast('Acesso de testes concedido!', 'success');
+                        createToast(t['toast_test_access'] || 'Acesso de testes concedido!', 'success');
                     } else {
                         // Cria perfil mockado no backend com senha
                         const resRegister = await fetch(`${API_BASE_URL}/api/perfil`, {
@@ -3147,14 +3167,31 @@
                             credits: profile.credits,
                             token: mockToken
                         };
-                        createToast('Conta demonstrativa criada no simulador! Você ganhou 5 créditos grátis.', 'success');
+                        createToast(t['toast_demo_signup_success'] || 'Conta demonstrativa criada no simulador! Você ganhou 5 créditos grátis.', 'success');
                     }
                 }
 
                 sessionStorage.setItem('gridhunter_session', JSON.stringify(appState.user));
                 showAuthenticatedApp();
             } catch (err) {
-                createToast('Erro de Autenticação: ' + err.message, 'danger');
+                const lang = appState.currentLang || 'pt';
+                const t = translations[lang] || translations['pt'];
+                let message = err.message;
+                if (message === "Senha incorreta.") {
+                    message = t['error_incorrect_password'] || message;
+                } else if (message === "Conta não encontrada. Por favor, cadastre-se.") {
+                    message = t['error_account_not_found'] || message;
+                } else if (message === "Erro ao registrar perfil de usuário.") {
+                    message = t['error_register_failed'] || message;
+                } else if (message === "Erro ao registrar conta simulada.") {
+                    message = t['error_register_sim_failed'] || message;
+                } else if (message === "Erro de comunicação com o servidor ao consultar perfil.") {
+                    message = t['error_conn_profile_failed'] || message;
+                } else if (message === "Erro de comunicação com o backend simulado.") {
+                    message = t['error_conn_sim_failed'] || message;
+                }
+                const errPrefix = t['toast_auth_error'] || 'Erro de Autenticação: ';
+                createToast(errPrefix + message, 'danger');
             } finally {
                 btnSubmit.disabled = false;
                 switchAuthTab(appState.currentAuthTab);
@@ -3164,7 +3201,9 @@
         function handleLogout() {
             sessionStorage.removeItem('gridhunter_session');
             appState.user = null;
-            createToast('Você desconectou da plataforma.', 'warn');
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
+            createToast(t['toast_logout'] || 'Você desconectou da plataforma.', 'warn');
             showAuthScreen();
         }
 
@@ -3176,14 +3215,16 @@
 
             const nichoVal = document.getElementById('nicho-input').value.trim();
             const cidadeVal = document.getElementById('cidade-input').value.trim();
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
 
             if (!nichoVal || !cidadeVal) {
-                createToast('Preencha os campos obrigatórios!', 'warn');
+                createToast(t['toast_fill_fields'] || 'Preencha os campos obrigatórios!', 'warn');
                 return;
             }
 
             if (appState.user.credits <= 0) {
-                createToast('Créditos insuficientes! Faça uma recarga para continuar buscando.', 'danger');
+                createToast(t['toast_no_credits'] || 'Créditos insuficientes! Faça uma recarga para continuar buscando.', 'danger');
                 return;
             }
 
@@ -3205,7 +3246,9 @@
 
             // Reset do terminal
             consoleBox.innerHTML = '';
-            appendTerminalLine('[SYSTEM] Inicializando módulo de varredura SaaS...', 'info');
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
+            appendTerminalLine(t['status_connecting'] || '[SYSTEM] Inicializando módulo de varredura SaaS...', 'info');
             appendTerminalLine('[CONEXÃO] Estabelecendo conexão segura HTTP com o Backend...', 'info');
 
             // Animação de progresso rica visual (carrega até 90% enquanto aguarda a API do backend responder)
@@ -3216,14 +3259,17 @@
                     progressFill.style.width = `${progress}%`;
                     percentText.textContent = `${progress}%`;
 
+                    const lang = appState.currentLang || 'pt';
+                    const t = translations[lang] || translations['pt'];
                     if (progress > 15 && progress <= 35) {
-                        statusText.textContent = '[CONEXÃO] Validando credenciais e créditos de busca...';
+                        statusText.textContent = t['status_validating'] || '[CONEXÃO] Validando credenciais e créditos de busca...';
                     } else if (progress > 35 && progress <= 60) {
-                        statusText.textContent = `[PLACES] Consultando Google Places no nicho '${nicho}'...`;
+                        const template = t['status_searching'] || "[PLACES] Consultando Google Places no nicho '{nicho}'...";
+                        statusText.textContent = template.replace('{nicho}', nicho);
                     } else if (progress > 60 && progress <= 85) {
-                        statusText.textContent = '[ANÁLISE] Filtrando estabelecimentos que não têm site oficial...';
+                        statusText.textContent = t['status_analyzing'] || '[ANÁLISE] Filtrando estabelecimentos que não têm site oficial...';
                     } else if (progress > 85) {
-                        statusText.textContent = '[QUALIFICAÇÃO] Preparando planilha de abordagem comercial...';
+                        statusText.textContent = t['status_qualifying'] || '[QUALIFICAÇÃO] Preparando planilha de abordagem comercial...';
                     }
                 }
             }, 120);
@@ -3293,9 +3339,9 @@
 
                 let friendlyMessage = err.message;
                 if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-                    friendlyMessage = "Não foi possível conectar ao servidor. Certifique-se de que a API está rodando no terminal.";
+                    friendlyMessage = t['toast_network_error'] || "Não foi possível conectar ao servidor. Certifique-se de que a API está rodando no terminal.";
                 }
-                createToast('Erro na Varredura: ' + friendlyMessage, 'danger');
+                createToast((t['toast_scan_error'] || 'Erro na Varredura: ') + friendlyMessage, 'danger');
             }
         }
 
@@ -3313,7 +3359,9 @@
             tbody.innerHTML = '';
 
             if (leads.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!</td></tr>`;
+                const lang = appState.currentLang || 'pt';
+                const t = translations[lang] || translations['pt'];
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem 0;">${t['table_empty_message'] || 'Nenhum lead sem site encontrado para os critérios especificados. Tente outro nicho!'}</td></tr>`;
                 return;
             }
 
@@ -3453,20 +3501,36 @@
         // ==========================================================================
         function triggerExcelExport() {
             if (appState.leadsEncontrados.length === 0) {
-                createToast('Nenhum dado para exportar!', 'warn');
+                const lang = appState.currentLang || 'pt'; const t = translations[lang] || translations['pt']; createToast(t['toast_no_data'] || 'Nenhum dado para exportar!', 'warn');
                 return;
             }
 
             try {
                 exportToExcel(appState.leadsEncontrados, appState.nichoAtual, appState.cidadeAtual);
-                createToast('Exportação para Excel (.xlsx) iniciada!', 'success');
+                const lang = appState.currentLang || 'pt'; const t = translations[lang] || translations['pt']; createToast(t['toast_export_started'] || 'Exportação para Excel (.xlsx) iniciada!', 'success');
             } catch (err) {
-                createToast('Erro ao exportar: ' + err.message, 'danger');
+                const lang = appState.currentLang || 'pt'; const t = translations[lang] || translations['pt']; createToast((t['toast_export_error'] || 'Erro ao exportar: ') + err.message, 'danger');
             }
         }
 
         function exportToExcel(leads, nicho, cidade) {
             const dateStr = new Date().toISOString();
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
+
+            const colName = t['excel_col_name'] || "Nome";
+            const colPhone = t['excel_col_phone'] || "Telefone";
+            const colAddress = t['excel_col_address'] || "Endereço";
+            const colRating = t['excel_col_rating'] || "Avaliação (Nota)";
+            const colReviews = t['excel_col_reviews'] || "Avaliações (Total)";
+            const colMaps = t['excel_col_maps'] || "Link do Google Maps";
+            const colInstagram = t['excel_col_instagram'] || "Link do Instagram";
+            const colWhatsapp = t['excel_col_whatsapp'] || "WhatsApp";
+
+            const openIgText = t['excel_open_instagram'] || "Abrir Instagram";
+            const notFoundText = t['excel_not_found'] || "Não Encontrado";
+            const openMapsText = t['excel_open_maps'] || "Abrir no Maps";
+            const verifyText = t['excel_verify'] || "Verificar";
 
             let xml = `<?xml version="1.0" encoding="utf-8"?>
 <?mso-application progid="Excel.Sheet"?>
@@ -3541,22 +3605,22 @@
     <Column ss:Width="150"/>
     <Column ss:Width="100"/>
     <Row ss:Height="26">
-     <Cell ss:StyleID="Header"><Data ss:Type="String">Nome</Data></Cell>
-     <Cell ss:StyleID="Header"><Data ss:Type="String">Telefone</Data></Cell>
-     <Cell ss:StyleID="Header"><Data ss:Type="String">Endereço</Data></Cell>
-     <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliação (Nota)</Data></Cell>
-     <Cell ss:StyleID="Header"><Data ss:Type="String">Avaliações (Total)</Data></Cell>
-     <Cell ss:StyleID="Header"><Data ss:Type="String">Link do Google Maps</Data></Cell>
-     <Cell ss:StyleID="Header"><Data ss:Type="String">Link do Instagram</Data></Cell>
-     <Cell ss:StyleID="Header"><Data ss:Type="String">WhatsApp</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colName)}</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colPhone)}</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colAddress)}</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colRating)}</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colReviews)}</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colMaps)}</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colInstagram)}</Data></Cell>
+     <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXml(colWhatsapp)}</Data></Cell>
     </Row>`;
 
             leads.forEach(lead => {
                 let instagramCellXml = '';
-                if (lead.instagram_link && lead.instagram_link !== 'Não Encontrado') {
-                    instagramCellXml = `<Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.instagram_link)}"><Data ss:Type="String">Abrir Instagram</Data></Cell>`;
+                if (lead.instagram_link && lead.instagram_link !== 'Não Encontrado' && lead.instagram_link !== 'Not Found' && lead.instagram_link !== 'No Encontrado') {
+                    instagramCellXml = `<Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.instagram_link)}"><Data ss:Type="String">${escapeXml(openIgText)}</Data></Cell>`;
                 } else {
-                    instagramCellXml = `<Cell ss:StyleID="CellCenter"><Data ss:Type="String">Não Encontrado</Data></Cell>`;
+                    instagramCellXml = `<Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(notFoundText)}</Data></Cell>`;
                 }
 
                 xml += `
@@ -3566,9 +3630,9 @@
      <Cell ss:StyleID="Cell"><Data ss:Type="String">${escapeXml(lead.endereco)}</Data></Cell>
      <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.nota}</Data></Cell>
      <Cell ss:StyleID="CellCenter"><Data ss:Type="Number">${lead.avaliacoes}</Data></Cell>
-     <Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.maps)}"><Data ss:Type="String">Abrir no Maps</Data></Cell>
+     <Cell ss:StyleID="Hyperlink" ss:HRef="${escapeXml(lead.maps)}"><Data ss:Type="String">${escapeXml(openMapsText)}</Data></Cell>
      ${instagramCellXml}
-     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(lead.validacao_whatsapp || 'Verificar')}</Data></Cell>
+     <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeXml(lead.validacao_whatsapp || verifyText)}</Data></Cell>
     </Row>`;
             });
 
@@ -3759,248 +3823,1041 @@
         // SISTEMA DE TRADUÇÃO DOURADA (i18n) E DICIONÁRIO
         // ==========================================================================
         const translations = {
-            pt: {
-                settings_title: "Configurações",
-                settings_tab_lang: "Preferências",
-                settings_tab_security: "Alterar Senha",
-                select_language_label: "Idioma da Plataforma",
-                curr_password_label: "Senha Atual",
-                new_password_label: "Nova Senha",
-                confirm_password_label: "Confirmar Nova Senha",
-                save_password_btn: "Atualizar Senha",
-                forgot_password_link: "Esqueci minha senha",
-                access_platform_btn: "Entrar na Plataforma",
-                forgot_email_label: "Endereço de E-mail",
-                send_recovery_link_btn: "Enviar Link de Recuperação",
-                back_to_login_link: "Voltar para o Login",
-                reset_pwd_title: "Definir Nova Senha",
-                reset_pwd_btn: "Salvar Nova Senha",
-                auth_footer_login_text: "Novo na plataforma? Altere a aba acima para \"Criar Conta\" e ganhe 5 créditos demonstrativos na hora.",
-                brand_subtitle: "Prospecção de Leads de Alto Impacto",
-                header_credits: "créditos",
-                config_search_title: "Configurar Nova Varredura",
-                config_search_desc: "Selecione o nicho de mercado e a cidade da Bahia para buscar estabelecimentos comerciais que faturam bem, mas não possuem site oficial cadastrado no Google.",
-                nicho_label: "Comércio / Nicho de Atuação",
-                cidade_label: "Cidade e Estado (Foco Bahia)",
-                nicho_placeholder: "Selecione ou digite um nicho...",
-                cidade_placeholder: "Selecione ou digite uma cidade da Bahia...",
-                start_scan_btn: "Iniciar Varredura de Leads (-1 crédito)",
-                metric_analyzed_label: "Locais Analisados",
-                metric_leads_label: "Leads Sem Site Oficial",
-                metric_conversion_label: "Presença Digital Local",
-                tooltip_text: "Esta métrica calcula a porcentagem de empresas analisadas que possuem um site oficial ou canal digital ativo. Quanto menor a porcentagem, maior é a oportunidade para agências de marketing e tecnologia oferecerem serviços de digitalização nessa região.",
-                table_qualified_leads: "Leads Qualificados",
-                table_subtitle: "Busca de comércios locais sem site",
-                table_col_name: "Nome do Estabelecimento",
-                table_col_phone: "Telefone Comercial",
-                table_col_wpp: "WhatsApp",
-                table_col_ig: "Instagram",
-                table_col_address: "Endereço do Local",
-                table_col_rating: "Avaliação Google Places",
-                table_col_actions: "Ações Rápidas",
-                btn_new_scan: "Nova Varredura",
-                btn_export_excel: "Exportar para Excel (.xlsx)",
-                footer_title_security: "Segurança",
-                footer_title_compliance: "Compliance",
-                footer_desc_security_1: "Conexões seguras ponta a ponta via HTTPS",
-                footer_desc_security_2: "Banco de dados isolado e criptografado via Supabase",
-                footer_desc_security_3: "Camada de processamento isolada no Render",
-                footer_desc_compliance: "Em total conformidade com a LGPD (Lei Geral de Proteção de Dados) para tratamento e coleta exclusiva de dados comerciais públicos e de legítimo interesse empresarial.",
-                footer_copyright: "© 2026 GridHunter. Todos os direitos reservados. Inteligência de dados com segurança e privacidade.",
-                about_us_title: "Quem Somos",
-                about_us_body_1: "O GridHunter é uma plataforma avançada de inteligência geográfica e automação B2B. Nossa tecnologia mapeia estabelecimentos comerciais com forte presença digital ou lacunas operacionais, permitindo que agências de marketing, tecnologia e designers identifiquem oportunidades comerciais com alto potencial de conversão.",
-                about_us_body_2: "Nossos algoritmos realizam varreduras inteligentes e cruzamento de dados públicos em tempo real para entregar leads altamente qualificados com velocidade e precisão.",
-                lp_pricing_title: "Nossos Planos",
-                lp_pricing_subtitle: "Escolha o plano ideal para alavancar a prospecção da sua agência ou estúdio de design.",
-                lp_starter_features_1: "5 créditos iniciais para testes",
-                lp_starter_features_2: "Acesso completo ao painel de busca",
-                lp_starter_features_3: "Filtros por nicho e cidade",
-                lp_starter_features_4: "Exportação para Excel (.xlsx)",
-                lp_starter_features_5: "Suporte premium prioritário",
-                lp_pro_badge: "Mais Escolhido",
-                lp_pro_features_1: "120 créditos recorrentes por mês",
-                lp_pro_features_2: "Acesso completo ao painel de busca",
-                lp_pro_features_3: "Filtros por nicho e cidade",
-                lp_pro_features_4: "Exportação para Excel (.xlsx)",
-                lp_pro_features_5: "Suporte premium via e-mail",
-                lp_enterprise_features_1: "Consultas de leads de forma ilimitada",
-                lp_enterprise_features_2: "Acesso completo à API exclusiva",
-                lp_enterprise_features_3: "Suporte dedicado 24/7",
-                lp_enterprise_features_4: "Exportação customizada e relatórios",
-                lp_enterprise_features_5: "Acordo de Nível de Serviço (SLA)",
-                lp_btn_free: "Começar Grátis",
-                lp_btn_pro: "Assinar Agora",
-                lp_btn_enterprise: "Falar com Vendas",
-                lp_testimonials_title: "O que dizem nossos clientes",
-                lp_faq_title: "Perguntas Frequentes",
-                lp_about_title: "Nossa História & Propósito",
-                toast_password_updated: "Senha atualizada com sucesso!",
-                toast_recovery_sent: "E-mail de recuperação enviado com sucesso!",
-                toast_password_reset: "Senha redefinida com sucesso! Faça login com a nova senha."
-            },
-            en: {
-                settings_title: "Settings",
-                settings_tab_lang: "Preferences",
-                settings_tab_security: "Change Password",
-                select_language_label: "Platform Language",
-                curr_password_label: "Current Password",
-                new_password_label: "New Password",
-                confirm_password_label: "Confirm New Password",
-                save_password_btn: "Update Password",
-                forgot_password_link: "Forgot password?",
-                access_platform_btn: "Sign In",
-                forgot_email_label: "E-mail Address",
-                send_recovery_link_btn: "Send Recovery Link",
-                back_to_login_link: "Back to Login",
-                reset_pwd_title: "Define New Password",
-                reset_pwd_btn: "Save New Password",
-                auth_footer_login_text: "New to the platform? Switch to the \"Create Account\" tab above and get 5 demo credits instantly.",
-                brand_subtitle: "High-Impact Lead Prospecting",
-                header_credits: "credits",
-                config_search_title: "Configure New Scan",
-                config_search_desc: "Select the industry niche and Bahia city to search for commercial establishments that generate good revenue but do not have an official website registered on Google.",
-                nicho_label: "Business / Industry Niche",
-                cidade_label: "City and State (Focus Bahia)",
-                nicho_placeholder: "Select or type a niche...",
-                cidade_placeholder: "Select or type a city in Bahia...",
-                start_scan_btn: "Start Leads Scan (-1 credit)",
-                metric_analyzed_label: "Analyzed Locations",
-                metric_leads_label: "Leads Without Official Site",
-                metric_conversion_label: "Local Digital Presence",
-                tooltip_text: "This metric calculates the percentage of analyzed businesses that have an official website or active digital channel. The lower the percentage, the higher the opportunity for marketing and tech agencies to offer digitalization services in that region.",
-                table_qualified_leads: "Qualified Leads",
-                table_subtitle: "Search for local businesses without website",
-                table_col_name: "Business Name",
-                table_col_phone: "Business Phone",
-                table_col_wpp: "WhatsApp",
-                table_col_ig: "Instagram",
-                table_col_address: "Location Address",
-                table_col_rating: "Google Places Rating",
-                table_col_actions: "Quick Actions",
-                btn_new_scan: "New Scan",
-                btn_export_excel: "Export to Excel (.xlsx)",
-                footer_title_security: "Security",
-                footer_title_compliance: "Compliance",
-                footer_desc_security_1: "End-to-end secure connections via HTTPS",
-                footer_desc_security_2: "Isolated and encrypted database via Supabase",
-                footer_desc_security_3: "Isolated processing layer on Render",
-                footer_desc_compliance: "In full compliance with LGPD (General Data Protection Law) for exclusive treatment and collection of public business data and legitimate business interest.",
-                footer_copyright: "© 2026 GridHunter. All rights reserved. Data intelligence with security and privacy.",
-                about_us_title: "About Us",
-                about_us_body_1: "GridHunter is an advanced geographic intelligence and B2B automation platform. Our technology maps commercial establishments with a strong digital presence or operational gaps, allowing marketing, technology agencies, and designers to identify high-converting commercial opportunities.",
-                about_us_body_2: "Our algorithms perform smart scans and cross-reference public data in real time to deliver highly qualified leads with speed and precision.",
-                lp_pricing_title: "Our Plans",
-                lp_pricing_subtitle: "Choose the ideal plan to scale your agency or design studio prospecting.",
-                lp_starter_features_1: "5 initial credits for testing",
-                lp_starter_features_2: "Full access to search panel",
-                lp_starter_features_3: "Niche and city filters",
-                lp_starter_features_4: "Export to Excel (.xlsx)",
-                lp_starter_features_5: "Priority premium support",
-                lp_pro_badge: "Most Popular",
-                lp_pro_features_1: "120 recurring credits per month",
-                lp_pro_features_2: "Full access to search panel",
-                lp_pro_features_3: "Niche and city filters",
-                lp_pro_features_4: "Export to Excel (.xlsx)",
-                lp_pro_features_5: "Premium support via email",
-                lp_enterprise_features_1: "Unlimited leads searches",
-                lp_enterprise_features_2: "Full access to exclusive API",
-                lp_enterprise_features_3: "24/7 dedicated support",
-                lp_enterprise_features_4: "Custom export and reports",
-                lp_enterprise_features_5: "Service Level Agreement (SLA)",
-                lp_btn_free: "Start Free",
-                lp_btn_pro: "Subscribe Now",
-                lp_btn_enterprise: "Talk to Sales",
-                lp_testimonials_title: "What our clients say",
-                lp_faq_title: "Frequently Asked Questions",
-                lp_about_title: "Our History & Purpose",
-                toast_password_updated: "Password updated successfully!",
-                toast_recovery_sent: "Recovery email sent successfully!",
-                toast_password_reset: "Password reset successfully! Please log in with your new password."
-            },
-            es: {
-                settings_title: "Configuración",
-                settings_tab_lang: "Preferencias",
-                settings_tab_security: "Cambiar Contraseña",
-                select_language_label: "Idioma de la Plataforma",
-                curr_password_label: "Contraseña Actual",
-                new_password_label: "Nueva Contraseña",
-                confirm_password_label: "Confirmar Nueva Contraseña",
-                save_password_btn: "Actualizar Contraseña",
-                forgot_password_link: "¿Olvidaste tu contraseña?",
-                access_platform_btn: "Iniciar Sesión",
-                forgot_email_label: "Correo Electrónico",
-                send_recovery_link_btn: "Enviar Enlace de Recuperación",
-                back_to_login_link: "Voltar al Inicio de Sesión",
-                reset_pwd_title: "Definir Nueva Contraseña",
-                reset_pwd_btn: "Guardar Nueva Contraseña",
-                auth_footer_login_text: "¿Nuevo en la plataforma? Cambie a la pestaña \"Crear cuenta\" arriba y obtenga 5 créditos de demostración al instante.",
-                brand_subtitle: "Prospección de Leads de Alto Impacto",
-                header_credits: "créditos",
-                config_search_title: "Configurar Nueva Búsqueda",
-                config_search_desc: "Seleccione el nicho de mercado y la ciudad de Bahía para buscar establecimientos comerciales que generen buenos ingresos pero no tengan un sitio web oficial registrado en Google.",
-                nicho_label: "Negocio / Nicho de Actuación",
-                cidade_label: "Ciudad y Estado (Enfoque Bahía)",
-                nicho_placeholder: "Seleccione o escriba un nicho...",
-                cidade_placeholder: "Seleccione o escriba una ciudad de Bahía...",
-                start_scan_btn: "Iniciar Búsqueda de Leads (-1 crédito)",
-                metric_analyzed_label: "Locales Analizados",
-                metric_leads_label: "Leads Sin Sitio Oficial",
-                metric_conversion_label: "Presença Digital Local",
-                tooltip_text: "Esta métrica calcula el porcentaje de empresas analizadas que poseen un sitio web oficial o canal digital activo. Cuanto menor sea el porcentaje, mayor será la oportunidad para que las agencias de marketing y tecnología ofrezcan servicios de digitalización en esa región.",
-                table_qualified_leads: "Leads Calificados",
-                table_subtitle: "Búsqueda de comercios locales sin sitio web",
-                table_col_name: "Nombre del Establecimiento",
-                table_col_phone: "Teléfono Comercial",
-                table_col_wpp: "WhatsApp",
-                table_col_ig: "Instagram",
-                table_col_address: "Dirección del Local",
-                table_col_rating: "Calificación Google Places",
-                table_col_actions: "Acciones Rápidas",
-                btn_new_scan: "Nueva Búsqueda",
-                btn_export_excel: "Exportar a Excel (.xlsx)",
-                footer_title_security: "Seguridad",
-                footer_title_compliance: "Cumplimiento",
-                footer_desc_security_1: "Conexiones seguras de extremo a extremo a través de HTTPS",
-                footer_desc_security_2: "Base de datos aislada y cifrada a través de Supabase",
-                footer_desc_security_3: "Capa de procesamiento aislada en Render",
-                footer_desc_compliance: "En total conformidad con la LGPD (Ley General de Protección de Datos) para el tratamiento y recogida exclusiva de datos comerciales públicos y de legítimo interés empresarial.",
-                footer_copyright: "© 2026 GridHunter. Todos los derechos reservados. Inteligencia de datos con seguridad y privacidad.",
-                about_us_title: "Quiénes Somos",
-                about_us_body_1: "GridHunter es una plataforma avanzada de inteligencia geográfica y automatización B2B. Nuestra tecnología mapea establecimientos comerciales con fuerte presencia digital o lagunas operativas, permitiendo que agencias de marketing, tecnología y diseñadores identifiquen oportunidades comerciales con alto potencial de conversión.",
-                about_us_body_2: "Nuestros algoritmos realizan búsquedas inteligentes y cruce de datos públicos en tiempo real para entregar leads altamente calificados con velocidad y precisión.",
-                lp_pricing_title: "Nuestros Planes",
-                lp_pricing_subtitle: "Elija el plan ideal para impulsar la prospección de su agencia o estudio de diseño.",
-                lp_starter_features_1: "5 créditos iniciales para pruebas",
-                lp_starter_features_2: "Acceso completo al panel de búsqueda",
-                lp_starter_features_3: "Filtros por nicho y ciudad",
-                lp_starter_features_4: "Exportación a Excel (.xlsx)",
-                lp_starter_features_5: "Soporte premium prioritario",
-                lp_pro_badge: "Más Elegido",
-                lp_pro_features_1: "120 créditos recurrentes por mes",
-                lp_pro_features_2: "Acceso completo al panel de búsqueda",
-                lp_pro_features_3: "Filtros por nicho y ciudad",
-                lp_pro_features_4: "Exportación a Excel (.xlsx)",
-                lp_pro_features_5: "Soporte premium por correo electrónico",
-                lp_enterprise_features_1: "Consultas de leads ilimitadas",
-                lp_enterprise_features_2: "Acceso completo a API exclusiva",
-                lp_enterprise_features_3: "Soporte dedicado 24/7",
-                lp_enterprise_features_4: "Exportación personalizada e informes",
-                lp_enterprise_features_5: "Acuerdo de Nivel de Servicio (SLA)",
-                lp_btn_free: "Comenzar Gratis",
-                lp_btn_pro: "Suscribirse Ahora",
-                lp_btn_enterprise: "Hablar con Ventas",
-                lp_testimonials_title: "Lo que dicen nuestros clientes",
-                lp_faq_title: "Preguntas Frecuentes",
-                lp_about_title: "Nuestra Historia & Propósito",
-                toast_password_updated: "¡Contraseña actualizada con éxito!",
-                toast_recovery_sent: "¡Correo electrónico de recuperación enviado con éxito!",
-                toast_password_reset: "¡Contraseña restablecida con éxito! Inicie sesión con la nueva contraseña."
-            }
-        };
+    "pt": {
+        "settings_title": "Configurações",
+        "settings_tab_lang": "Preferências",
+        "settings_tab_security": "Alterar Senha",
+        "select_language_label": "Idioma da Plataforma",
+        "curr_password_label": "Senha Atual",
+        "new_password_label": "Nova Senha",
+        "confirm_password_label": "Confirmar Nova Senha",
+        "save_password_btn": "Atualizar Senha",
+        "forgot_password_link": "Esqueci minha senha",
+        "access_platform_btn": "Entrar na Plataforma",
+        "forgot_email_label": "Endereço de E-mail",
+        "send_recovery_link_btn": "Enviar Link de Recuperação",
+        "back_to_login_link": "Voltar para o Login",
+        "reset_pwd_title": "Definir Nova Senha",
+        "reset_pwd_btn": "Salvar Nova Senha",
+        "auth_footer_login_text": "Novo na plataforma? Altere a aba acima para \"Criar Conta\" e ganhe 5 créditos demonstrativos na hora.",
+        "auth_footer_signup_text": "Já possui cadastro? Altere a aba acima para \"Acessar Conta\" e insira suas credenciais.",
+        "brand_subtitle": "Prospecção de Leads de Alto Impacto",
+        "header_credits": "créditos",
+        "config_search_title": "Configurar Nova Varredura",
+        "config_search_desc": "Selecione o nicho de mercado e a cidade da Bahia para buscar estabelecimentos comerciais que faturam bem, mas não possuem site oficial cadastrado no Google.",
+        "nicho_label": "Comércio / Nicho de Atuação",
+        "cidade_label": "Cidade e Estado (Foco Bahia)",
+        "nicho_placeholder": "Selecione ou digite um nicho...",
+        "cidade_placeholder": "Selecione ou digite uma cidade da Bahia...",
+        "start_scan_btn": "Iniciar Varredura de Leads (-1 crédito)",
+        "metric_analyzed_label": "Locais Analisados",
+        "metric_leads_label": "Leads Sem Site Oficial",
+        "metric_conversion_label": "Presença Digital Local",
+        "tooltip_text": "Esta métrica calcula a porcentagem de empresas analisadas que possuem um site oficial ou canal digital ativo. Quanto menor a porcentagem, maior é a oportunidade para agências de marketing e tecnologia oferecerem serviços de digitalização nessa região.",
+        "table_qualified_leads": "Leads Qualificados",
+        "table_subtitle": "Busca de comércios locais sem site",
+        "table_col_name": "Nome do Estabelecimento",
+        "table_col_phone": "Telefone Comercial",
+        "table_col_wpp": "WhatsApp",
+        "table_col_ig": "Instagram",
+        "table_col_address": "Endereço do Local",
+        "table_col_rating": "Avaliação Google Places",
+        "table_col_actions": "Ações Rápidas",
+        "btn_new_scan": "Nova Varredura",
+        "btn_export_excel": "Exportar para Excel (.xlsx)",
+        "footer_title_security": "Segurança",
+        "footer_title_compliance": "Compliance",
+        "footer_desc_security_1": "Conexões seguras ponta a ponta via HTTPS",
+        "footer_desc_security_2": "Banco de dados isolado e criptografado via Supabase",
+        "footer_desc_security_3": "Camada de processamento isolada no Render",
+        "footer_desc_compliance": "Em total conformidade com a LGPD (Lei Geral de Proteção de Dados) para tratamento e coleta exclusiva de dados comerciais públicos e de legítimo interesse empresarial.",
+        "footer_copyright": "© 2026 GridHunter. Todos os direitos reservados. Inteligência de dados com segurança e privacidade.",
+        "about_us_title": "Quem Somos",
+        "about_us_body_1": "O GridHunter é uma plataforma avançada de inteligência geográfica e automação B2B. Nossa tecnologia mapeia estabelecimentos comerciais com forte presença digital ou lacunas operacionais, permitindo que agências de marketing, tecnologia e designers identifiquem oportunidades comerciais com alto potencial de conversão.",
+        "about_us_body_2": "Nossos algoritmos realizam varreduras inteligentes e cruzamento de dados públicos em tempo real para entregar leads altamente qualificados com velocidade e precisão.",
+        "lp_pricing_title": "Nossos Planos",
+        "lp_pricing_subtitle": "Escolha o plano ideal para alavancar a prospecção da sua agência ou estúdio de design.",
+        "lp_starter_features_1": "5 créditos iniciais para testes",
+        "lp_starter_features_2": "Acesso completo ao painel de busca",
+        "lp_starter_features_3": "Filtros por nicho e cidade",
+        "lp_starter_features_4": "Exportação para Excel (.xlsx)",
+        "lp_starter_features_5": "Suporte premium prioritário",
+        "lp_pro_badge": "Mais Escolhido",
+        "plan_starter_name": "Starter",
+        "plan_pro_name": "Pro",
+        "plan_enterprise_name": "Enterprise",
+        "price_currency": "R$",
+        "price_period": "/mês",
+        "lp_enterprise_price": "Sob Consulta",
+        "lp_pro_features_1": "120 créditos recorrentes por mês",
+        "lp_pro_features_2": "Acesso completo ao painel de busca",
+        "lp_pro_features_3": "Filtros por nicho e cidade",
+        "lp_pro_features_4": "Exportação para Excel (.xlsx)",
+        "lp_pro_features_5": "Suporte premium via e-mail",
+        "lp_enterprise_features_1": "Consultas de leads de forma ilimitada",
+        "lp_enterprise_features_2": "Acesso completo à API exclusiva",
+        "lp_enterprise_features_3": "Suporte dedicado 24/7",
+        "lp_enterprise_features_4": "Exportação customizada e relatórios",
+        "lp_enterprise_features_5": "Acordo de Nível de Serviço (SLA)",
+        "lp_btn_free": "Começar Grátis",
+        "lp_btn_pro": "Assinar Agora",
+        "lp_btn_enterprise": "Falar com Vendas",
+        "lp_testimonials_title": "O que dizem nossos clientes",
+        "lp_faq_title": "Perguntas Frequentes",
+        "toast_password_updated": "Senha atualizada com sucesso!",
+        "toast_recovery_sent": "E-mail de recuperação enviado com sucesso!",
+        "toast_password_reset": "Senha redefinida com sucesso! Faça login com a nova senha.",
+        "auth_subtitle": "Painel de Prospecção SaaS para Agências e Designers",
+        "tab_login": "Acessar Conta",
+        "tab_signup": "Criar Conta",
+        "auth_email_label": "Endereço de E-mail",
+        "auth_email_placeholder": "seuemail@provedor.com",
+        "auth_password_label": "Senha de Acesso",
+        "auth_password_placeholder": "••••••••",
+        "btn_signup_submit": "Criar Minha Conta Grátis",
+        "btn_processing": "Processando...",
+        "btn_loading": "...",
+        "toast_login_success": "Conectado com sucesso!",
+        "toast_signup_success": "Conta criada com sucesso! Verifique seu e-mail.",
+        "toast_test_access": "Acesso de testes concedido!",
+        "toast_demo_signup_success": "Conta demonstrativa criada no simulador! Você ganhou 5 créditos grátis.",
+        "toast_auth_error": "Erro de Autenticação: ",
+        "toast_logout": "Você desconectou da plataforma.",
+        "toast_fill_fields": "Preencha os campos obrigatórios!",
+        "toast_no_credits": "Créditos insuficientes! Faça uma recarga para continuar buscando.",
+        "toast_scan_error": "Erro na Varredura: ",
+        "toast_no_data": "Nenhum dado para exportar!",
+        "toast_export_started": "Exportação para Excel (.xlsx) iniciada!",
+        "toast_export_error": "Erro ao exportar: ",
+        "toast_network_error": "Erro de rede: ",
+        "error_incorrect_password": "Senha incorreta.",
+        "error_account_not_found": "Conta não encontrada. Por favor, cadastre-se.",
+        "error_register_failed": "Erro ao registrar perfil de usuário.",
+        "error_register_sim_failed": "Erro ao registrar conta simulada.",
+        "error_conn_profile_failed": "Erro de comunicação com o servidor ao consultar perfil.",
+        "error_conn_sim_failed": "Erro de comunicação com o backend simulado.",
+        "error_change_pwd_failed": "Erro ao alterar senha",
+        "error_recovery_failed": "Erro ao solicitar recuperação",
+        "error_reset_pwd_failed": "Erro ao redefinir senha",
+        "status_connecting": "Conectando ao gateway de busca...",
+        "status_validating": "[CONEXÃO] Validando credenciais e créditos de busca...",
+        "status_searching": "[PLACES] Consultando Google Places...",
+        "status_analyzing": "[ANÁLISE] Filtrando estabelecimentos que não têm site oficial...",
+        "status_qualifying": "[QUALIFICAÇÃO] Preparando planilha de abordagem comercial...",
+        "subtitle_generated_by": "Dados gerados através do backend",
+        "table_empty_message": "Nenhum lead qualificado sem site oficial foi encontrado nesta varredura. Tente outro nicho ou cidade.",
+        "leads_title_prefix": "Leads",
+        "leads_title_in": "em",
+        "testimonial_text_0": "\"Com o GridHunter, conseguimos fechar 4 novos projetos de sites em apenas 2 semanas. A precisão em achar empresas sem site oficial economizou centenas de horas de prospecção manual.\"",
+        "testimonial_author_0": "Ricardo Santos",
+        "testimonial_title_0": "Diretor de Vendas - Alpha Digital",
+        "testimonial_text_1": "\"Ferramenta fantástica para designers freelancer. Conectar com negócios locais que faturam bem mas não possuem site nos deu uma mina de ouro de potenciais clientes.\"",
+        "testimonial_author_1": "Mariana Costa",
+        "testimonial_title_1": "UI/UX Designer Freelancer",
+        "testimonial_text_2": "\"Excelente precisão. A camada de conformidade com a LGPD e a estabilidade das consultas via Render nos trazem muita segurança para operar no dia a dia.\"",
+        "testimonial_author_2": "Carlos Oliveira",
+        "testimonial_title_2": "Sócio-Fundador - Agência Vanguarda",
+        "faq_q1": "A coleta de dados é legal? <span class=\"faq-icon\">▲</span>",
+        "faq_a1": "Sim. O GridHunter realiza buscas baseadas estritamente em dados comerciais públicos fornecidos de forma voluntária pelas empresas na internet (Google Places API). O tratamento está em total conformidade com a LGPD (Lei Geral de Proteção de Dados), amparado pelas bases legais de legítimo interesse empresarial e publicidade de dados públicos.",
+        "faq_q2": "Qual a velocidade das buscas? <span class=\"faq-icon\">▲</span>",
+        "faq_a2": "As buscas levam entre 15 e 45 segundos dependendo do nicho de atuação e do volume de dados da cidade selecionada na Bahia. O processamento é realizado de forma paralela e em segundo plano para garantir máxima rapidez.",
+        "faq_q3": "Como os créditos são consumidos? <span class=\"faq-icon\">▲</span>",
+        "faq_a3": "Cada varredura executada em uma combinação de Nicho + Cidade consome exatamente 1 crédito. Se a varredura não retornar nenhum lead qualificado sem site, o crédito é retornado ou não debitado.",
+        "auth_password_short": "A senha deve conter no mínimo 3 caracteres.",
+        "error_passwords_dont_match": "As senhas não coincidem!",
+        "logout_title": "Desconectar do SaaS",
+        "lp_about_title": "Nossa História & Propósito",
+        "lp_about_body_1": "O <strong>GridHunter</strong> nasceu em 2026 com o propósito claro de eliminar o atrito comercial e democratizar o acesso a dados de mercado geolocalizados de alta precisão. Percebemos que agências de tecnologia e marketing digital perdiam incontáveis horas minerando a internet manualmente para encontrar comércios que precisavam de serviços de digitalização.",
+        "lp_about_body_2": "Ao criar uma solução automatizada integrada a bancos de dados modernos (Supabase) e servidores robustos (Render), desenvolvemos uma ferramenta de inteligência geográfica que apoia o ecossistema comercial e impulsiona o crescimento de empresas locais e profissionais liberais por meio de conexões eficazes e baseadas em dados reais."
+    },
+    "en": {
+        "settings_title": "Settings",
+        "settings_tab_lang": "Preferences",
+        "settings_tab_security": "Change Password",
+        "select_language_label": "Platform Language",
+        "curr_password_label": "Current Password",
+        "new_password_label": "New Password",
+        "confirm_password_label": "Confirm New Password",
+        "save_password_btn": "Update Password",
+        "forgot_password_link": "Forgot password?",
+        "access_platform_btn": "Sign In",
+        "forgot_email_label": "E-mail Address",
+        "send_recovery_link_btn": "Send Recovery Link",
+        "back_to_login_link": "Back to Login",
+        "reset_pwd_title": "Define New Password",
+        "reset_pwd_btn": "Save New Password",
+        "auth_footer_login_text": "New to the platform? Switch to the \"Create Account\" tab above and get 5 demo credits instantly.",
+        "auth_footer_signup_text": "Already registered? Switch to the \"Sign In\" tab above and enter your credentials.",
+        "brand_subtitle": "High-Impact Lead Prospecting",
+        "header_credits": "credits",
+        "config_search_title": "Configure New Scan",
+        "config_search_desc": "Select the industry niche and Bahia city to search for commercial establishments that generate good revenue but do not have an official website registered on Google.",
+        "nicho_label": "Business / Industry Niche",
+        "cidade_label": "City and State (Focus Bahia)",
+        "nicho_placeholder": "Select or type a niche...",
+        "cidade_placeholder": "Select or type a city in Bahia...",
+        "start_scan_btn": "Start Leads Scan (-1 credit)",
+        "metric_analyzed_label": "Analyzed Locations",
+        "metric_leads_label": "Leads Without Official Site",
+        "metric_conversion_label": "Local Digital Presence",
+        "tooltip_text": "This metric calculates the percentage of analyzed businesses that have an official website or active digital channel. The lower the percentage, the higher the opportunity for marketing and tech agencies to offer digitalization services in that region.",
+        "table_qualified_leads": "Qualified Leads",
+        "table_subtitle": "Search for local businesses without website",
+        "table_col_name": "Business Name",
+        "table_col_phone": "Business Phone",
+        "table_col_wpp": "WhatsApp",
+        "table_col_ig": "Instagram",
+        "table_col_address": "Location Address",
+        "table_col_rating": "Google Places Rating",
+        "table_col_actions": "Quick Actions",
+        "btn_new_scan": "New Scan",
+        "btn_export_excel": "Export to Excel (.xlsx)",
+        "footer_title_security": "Security",
+        "footer_title_compliance": "Compliance",
+        "footer_desc_security_1": "End-to-end secure connections via HTTPS",
+        "footer_desc_security_2": "Isolated and encrypted database via Supabase",
+        "footer_desc_security_3": "Isolated processing layer on Render",
+        "footer_desc_compliance": "In full compliance with LGPD (General Data Protection Law) for exclusive treatment and collection of public business data and legitimate business interest.",
+        "footer_copyright": "© 2026 GridHunter. All rights reserved. Data intelligence with security and privacy.",
+        "about_us_title": "About Us",
+        "about_us_body_1": "GridHunter is an advanced geographic intelligence and B2B automation platform. Our technology maps commercial establishments with a strong digital presence or operational gaps, allowing marketing, technology agencies, and designers to identify high-converting commercial opportunities.",
+        "about_us_body_2": "Our algorithms perform smart scans and cross-reference public data in real time to deliver highly qualified leads with speed and precision.",
+        "lp_pricing_title": "Our Plans",
+        "lp_pricing_subtitle": "Choose the ideal plan to scale your agency or design studio prospecting.",
+        "lp_starter_features_1": "5 initial credits for testing",
+        "lp_starter_features_2": "Full access to search panel",
+        "lp_starter_features_3": "Niche and city filters",
+        "lp_starter_features_4": "Export to Excel (.xlsx)",
+        "lp_starter_features_5": "Priority premium support",
+        "lp_pro_badge": "Most Popular",
+        "plan_starter_name": "Starter",
+        "plan_pro_name": "Pro",
+        "plan_enterprise_name": "Enterprise",
+        "price_currency": "$",
+        "price_period": "/month",
+        "lp_enterprise_price": "Contact Us",
+        "lp_pro_features_1": "120 recurring credits per month",
+        "lp_pro_features_2": "Full access to search panel",
+        "lp_pro_features_3": "Niche and city filters",
+        "lp_pro_features_4": "Export to Excel (.xlsx)",
+        "lp_pro_features_5": "Premium support via email",
+        "lp_enterprise_features_1": "Unlimited leads searches",
+        "lp_enterprise_features_2": "Full access to exclusive API",
+        "lp_enterprise_features_3": "24/7 dedicated support",
+        "lp_enterprise_features_4": "Custom export and reports",
+        "lp_enterprise_features_5": "Service Level Agreement (SLA)",
+        "lp_btn_free": "Start Free",
+        "lp_btn_pro": "Subscribe Now",
+        "lp_btn_enterprise": "Talk to Sales",
+        "lp_testimonials_title": "What our clients say",
+        "lp_faq_title": "Frequently Asked Questions",
+        "toast_password_updated": "Password updated successfully!",
+        "toast_recovery_sent": "Recovery email sent successfully!",
+        "toast_password_reset": "Password reset successfully! Please log in with your new password.",
+        "auth_subtitle": "SaaS Prospecting Panel for Agencies and Designers",
+        "tab_login": "Sign In",
+        "tab_signup": "Create Account",
+        "auth_email_label": "E-mail Address",
+        "auth_email_placeholder": "your-email@provider.com",
+        "auth_password_label": "Password",
+        "auth_password_placeholder": "••••••••",
+        "btn_signup_submit": "Create My Free Account",
+        "btn_processing": "Processing...",
+        "btn_loading": "...",
+        "toast_login_success": "Logged in successfully!",
+        "toast_signup_success": "Account created successfully! Check your email.",
+        "toast_test_access": "Test access granted!",
+        "toast_demo_signup_success": "Demo account created in the simulator! You won 5 free credits.",
+        "toast_auth_error": "Authentication Error: ",
+        "toast_logout": "You disconnected from the platform.",
+        "toast_fill_fields": "Please fill in the required fields!",
+        "toast_no_credits": "Insufficient credits! Refill to continue searching.",
+        "toast_scan_error": "Scan Error: ",
+        "toast_no_data": "No data to export!",
+        "toast_export_started": "Export to Excel (.xlsx) started!",
+        "toast_export_error": "Error exporting: ",
+        "toast_network_error": "Network error: ",
+        "error_incorrect_password": "Incorrect password.",
+        "error_account_not_found": "Account not found. Please sign up.",
+        "error_register_failed": "Error registering user profile.",
+        "error_register_sim_failed": "Error registering simulated account.",
+        "error_conn_profile_failed": "Error communicating with server while fetching profile.",
+        "error_conn_sim_failed": "Error communicating with simulated backend.",
+        "error_change_pwd_failed": "Error changing password",
+        "error_recovery_failed": "Error requesting recovery",
+        "error_reset_pwd_failed": "Error resetting password",
+        "status_connecting": "Connecting to search gateway...",
+        "status_validating": "[CONNECTION] Validating credentials and search credits...",
+        "status_searching": "[PLACES] Querying Google Places...",
+        "status_analyzing": "[ANALYSIS] Filtering businesses without an official website...",
+        "status_qualifying": "[QUALIFICATION] Preparing commercial outreach spreadsheet...",
+        "subtitle_generated_by": "Data generated via backend",
+        "table_empty_message": "No qualified leads without official website were found in this scan. Try another niche or city.",
+        "leads_title_prefix": "Leads",
+        "leads_title_in": "in",
+        "testimonial_text_0": "\"With GridHunter, we closed 4 new website projects in just 2 weeks. The precision in finding companies without an official site saved hundreds of hours of manual prospecting.\"",
+        "testimonial_author_0": "Ricardo Santos",
+        "testimonial_title_0": "Sales Director - Alpha Digital",
+        "testimonial_text_1": "\"Fantastic tool for freelance designers. Connecting with local businesses that generate good revenue but don't have a website gave us a gold mine of potential clients.\"",
+        "testimonial_author_1": "Mariana Costa",
+        "testimonial_title_1": "Freelance UI/UX Designer",
+        "testimonial_text_2": "\"Excellent accuracy. The compliance layer with LGPD/GDPR and the stability of searches via Render bring us a lot of safety to operate day-to-day.\"",
+        "testimonial_author_2": "Carlos Oliveira",
+        "testimonial_title_2": "Co-Founder - Agência Vanguarda",
+        "faq_q1": "Is data collection legal? <span class=\"faq-icon\">▲</span>",
+        "faq_a1": "Yes. GridHunter performs searches based strictly on public commercial data voluntarily provided by companies on the internet (Google Places API). Processing is in full compliance with data protection laws (LGPD/GDPR), supported by legal bases of legitimate business interest and public data publicity.",
+        "faq_q2": "How fast are the searches? <span class=\"faq-icon\">▲</span>",
+        "faq_a2": "Searches take between 15 and 45 seconds depending on the industry niche and the volume of data in the selected city. Processing is carried out in parallel and in the background to ensure maximum speed.",
+        "faq_q3": "How are credits consumed? <span class=\"faq-icon\">▲</span>",
+        "faq_a3": "Each scan performed on a combination of Niche + City consumes exactly 1 credit. If the scan does not return any qualified leads without a website, the credit is returned or not debited.",
+        "auth_password_short": "Password must be at least 3 characters long.",
+        "error_passwords_dont_match": "Passwords do not match!",
+        "logout_title": "Disconnect from SaaS",
+        "lp_about_title": "Our History & Purpose",
+        "lp_about_body_1": "<strong>GridHunter</strong> was born in 2026 with the clear purpose of eliminating commercial friction and democratizing access to high-precision geolocated market data. We noticed that technology and digital marketing agencies lost countless hours mining the internet manually to find local shops that needed digitalization services.",
+        "lp_about_body_2": "By creating an automated solution integrated with modern databases (Supabase) and robust servers (Render), we developed a geographic intelligence tool that supports the commercial ecosystem and drives the growth of local businesses and freelancers through effective, data-driven connections."
+    },
+    "es": {
+        "settings_title": "Configuración",
+        "settings_tab_lang": "Preferencias",
+        "settings_tab_security": "Cambiar Contraseña",
+        "select_language_label": "Idioma de la Plataforma",
+        "curr_password_label": "Contraseña Actual",
+        "new_password_label": "Nueva Contraseña",
+        "confirm_password_label": "Confirmar Nueva Contraseña",
+        "save_password_btn": "Actualizar Contraseña",
+        "forgot_password_link": "¿Olvidaste tu contraseña?",
+        "access_platform_btn": "Iniciar Sesión",
+        "forgot_email_label": "Correo Electrónico",
+        "send_recovery_link_btn": "Enviar Enlace de Recuperación",
+        "back_to_login_link": "Volver al Inicio de Sesión",
+        "reset_pwd_title": "Definir Nueva Contraseña",
+        "reset_pwd_btn": "Guardar Nueva Contraseña",
+        "auth_footer_login_text": "¿Nuevo en la plataforma? Cambie a la pestaña \"Crear cuenta\" arriba y obtenga 5 créditos de demostración al instante.",
+        "auth_footer_signup_text": "¿Ya estás registrado? Cambie a la pestaña \"Iniciar Sesión\" arriba e ingrese sus credenciales.",
+        "brand_subtitle": "Prospección de Leads de Alto Impacto",
+        "header_credits": "créditos",
+        "config_search_title": "Configurar Nueva Búsqueda",
+        "config_search_desc": "Seleccione el nicho de mercado y la ciudad de Bahía para buscar establecimientos comerciales que generen buenos ingresos pero no tengan un sitio web oficial registrado en Google.",
+        "nicho_label": "Negocio / Nicho de Actuación",
+        "cidade_label": "Ciudad y Estado (Enfoque Bahía)",
+        "nicho_placeholder": "Seleccione o escriba un nicho...",
+        "cidade_placeholder": "Seleccione o escriba una ciudad de Bahía...",
+        "start_scan_btn": "Iniciar Búsqueda de Leads (-1 crédito)",
+        "metric_analyzed_label": "Locais Analisados",
+        "metric_leads_label": "Leads Sin Sitio Oficial",
+        "metric_conversion_label": "Presencia Digital Local",
+        "tooltip_text": "Esta métrica calcula el porcentaje de empresas analizadas que poseen un sitio web oficial o canal digital activo. Cuanto menor sea el porcentaje, mayor será la oportunidad para que las agencias de marketing y tecnología ofrezcan servicios de digitalización en esa región.",
+        "table_qualified_leads": "Leads Calificados",
+        "table_subtitle": "Búsqueda de comercios locales sin sitio web",
+        "table_col_name": "Nombre del Establecimiento",
+        "table_col_phone": "Teléfono Comercial",
+        "table_col_wpp": "WhatsApp",
+        "table_col_ig": "Instagram",
+        "table_col_address": "Dirección del Local",
+        "table_col_rating": "Calificación Google Places",
+        "table_col_actions": "Acciones Rápidas",
+        "btn_new_scan": "Nueva Búsqueda",
+        "btn_export_excel": "Exportar a Excel (.xlsx)",
+        "footer_title_security": "Seguridad",
+        "footer_title_compliance": "Cumplimiento",
+        "footer_desc_security_1": "Conexiones seguras de extremo a extremo a través de HTTPS",
+        "footer_desc_security_2": "Base de datos aislada y cifrada a través de Supabase",
+        "footer_desc_security_3": "Capa de procesamiento aislada en Render",
+        "footer_desc_compliance": "En total conformidad con la LGPD (Ley General de Protección de Datos) para el tratamiento y recogida exclusiva de datos comerciales públicos y de legítimo interés empresarial.",
+        "footer_copyright": "© 2026 GridHunter. Todos los derechos reservados. Inteligencia de datos con seguridad y privacidad.",
+        "about_us_title": "Quiénes Somos",
+        "about_us_body_1": "GridHunter es una plataforma avanzada de inteligencia geográfica y automatización B2B. Nuestra tecnología mapea establecimientos comerciales con fuerte presencia digital o lagunas operativas, permitiendo que agencias de marketing, tecnología y diseñadores identifiquen oportunidades comerciales con alto potencial de conversión.",
+        "about_us_body_2": "Nuestros algoritmos realizan búsquedas inteligentes y cruce de datos públicos en tiempo real para entregar leads altamente calificados con velocidad y precisión.",
+        "lp_pricing_title": "Nuestros Planes",
+        "lp_pricing_subtitle": "Elija el plan ideal para impulsar la prospección de su agencia o estudio de diseño.",
+        "lp_starter_features_1": "5 créditos iniciales para pruebas",
+        "lp_starter_features_2": "Acceso completo al panel de búsqueda",
+        "lp_starter_features_3": "Filtros por nicho y ciudad",
+        "lp_starter_features_4": "Exportación a Excel (.xlsx)",
+        "lp_starter_features_5": "Soporte premium prioritario",
+        "lp_pro_badge": "Más Elegido",
+        "plan_starter_name": "Starter",
+        "plan_pro_name": "Pro",
+        "plan_enterprise_name": "Enterprise",
+        "price_currency": "€",
+        "price_period": "/mes",
+        "lp_enterprise_price": "Bajo Consulta",
+        "lp_pro_features_1": "120 créditos recurrentes por mes",
+        "lp_pro_features_2": "Acceso completo al panel de búsqueda",
+        "lp_pro_features_3": "Filtros por nicho y ciudad",
+        "lp_pro_features_4": "Exportación a Excel (.xlsx)",
+        "lp_pro_features_5": "Soporte premium por correo electrónico",
+        "lp_enterprise_features_1": "Consultas de leads de forma ilimitada",
+        "lp_enterprise_features_2": "Acceso completo a API exclusiva",
+        "lp_enterprise_features_3": "Soporte dedicado 24/7",
+        "lp_enterprise_features_4": "Exportación personalizada e informes",
+        "lp_enterprise_features_5": "Acuerdo de Nivel de Serviço (SLA)",
+        "lp_btn_free": "Comenzar Gratis",
+        "lp_btn_pro": "Suscribirse Ahora",
+        "lp_btn_enterprise": "Hablar con Ventas",
+        "lp_testimonials_title": "Lo que dicen nuestros clientes",
+        "lp_faq_title": "Preguntas Frequentes",
+        "toast_password_updated": "¡Contraseña actualizada con éxito!",
+        "toast_recovery_sent": "¡Correo electrónico de recuperación enviado con éxito!",
+        "toast_password_reset": "¡Contraseña restablecida con éxito! Inicie sesión con la nueva contraseña.",
+        "auth_subtitle": "Panel de Prospecção SaaS para Agências e Designers",
+        "tab_login": "Iniciar Sesión",
+        "tab_signup": "Crear Cuenta",
+        "auth_email_label": "Correo Electrónico",
+        "auth_email_placeholder": "tuemail@proveedor.com",
+        "auth_password_label": "Contraseña de Acceso",
+        "auth_password_placeholder": "••••••••",
+        "btn_signup_submit": "Crear Mi Cuenta Gratis",
+        "btn_processing": "Procesando...",
+        "btn_loading": "...",
+        "toast_login_success": "¡Conectado con éxito!",
+        "toast_signup_success": "¡Cuenta creada con éxito! Revise su correo electrónico.",
+        "toast_test_access": "¡Acceso de prueba concedido!",
+        "toast_demo_signup_success": "¡Cuenta de demostración creada en el simulador! Has ganado 5 créditos gratis.",
+        "toast_auth_error": "Error de Autenticación: ",
+        "toast_logout": "Se ha desconectado de la plataforma.",
+        "toast_fill_fields": "¡Por favor, complete los campos obligatorios!",
+        "toast_no_credits": "¡Créditos insuficientes! Recargue para continuar buscando.",
+        "toast_scan_error": "Error en la Búsqueda: ",
+        "toast_no_data": "¡No hay datos para exportar!",
+        "toast_export_started": "¡Exportación a Excel (.xlsx) iniciada!",
+        "toast_export_error": "Error al exportar: ",
+        "toast_network_error": "Error de red: ",
+        "error_incorrect_password": "Contraseña incorrecta.",
+        "error_account_not_found": "Cuenta no encontrada. Por favor, regístrese.",
+        "error_register_failed": "Error al registrar el perfil del usuario.",
+        "error_register_sim_failed": "Error al registrar la cuenta simulada.",
+        "error_conn_profile_failed": "Error de comunicación con el servidor al consultar perfil.",
+        "error_conn_sim_failed": "Error de comunicación con el backend simulado.",
+        "error_change_pwd_failed": "Error al cambiar la contraseña",
+        "error_recovery_failed": "Error al solicitar la recuperación",
+        "error_reset_pwd_failed": "Error al restablecer la contraseña",
+        "status_connecting": "Conectando con la pasarela de búsqueda...",
+        "status_validating": "[CONEXIÓN] Validando credenciales y créditos de búsqueda...",
+        "status_searching": "[PLACES] Consultando Google Places...",
+        "status_analyzing": "[ANÁLISIS] Filtrando establecimientos sin sitio web oficial...",
+        "status_qualifying": "[CUALIFICACIÓN] Preparando la hoja de prospección comercial...",
+        "subtitle_generated_by": "Datos generados a través del backend",
+        "table_empty_message": "No se encontraron leads calificados sin sitio web oficial en esta búsqueda. Pruebe con otro nicho o ciudad.",
+        "leads_title_prefix": "Leads",
+        "leads_title_in": "en",
+        "testimonial_text_0": "\"Con GridHunter, logramos cerrar 4 nuevos proyectos de sitios web en solo 2 semanas. La precisión al encontrar empresas sin sitio oficial nos ahorró cientos de horas de prospección manual.\"",
+        "testimonial_author_0": "Ricardo Santos",
+        "testimonial_title_0": "Director de Ventas - Alpha Digital",
+        "testimonial_text_1": "\"Herramienta fantástica para diseñadores freelance. Conectar con negocios locales que facturan bien pero no tienen sitio web nos dio una mina de oro de clientes potenciales.\"",
+        "testimonial_author_1": "Mariana Costa",
+        "testimonial_title_1": "Diseñadora UI/UX Freelance",
+        "testimonial_text_2": "\"Excelente precisión. La capa de cumplimiento con la LGPD/GDPR y la estabilidad de las consultas a través de Render nos brindan mucha seguridad para operar día a día.\"",
+        "testimonial_author_2": "Carlos Oliveira",
+        "testimonial_title_2": "Socio Fundador - Agência Vanguarda",
+        "faq_q1": "¿Es legal la recopilación de datos? <span class=\"faq-icon\">▲</span>",
+        "faq_a1": "Sí. GridHunter realiza búsquedas basadas estrictamente en datos comerciales públicos provistos voluntariamente por las empresas en internet (Google Places API). El tratamiento cumple plenamente con las leyes de protección de datos (LGPD/GDPR), amparado en las bases legales de interés comercial legítimo y publicidad de datos públicos.",
+        "faq_q2": "¿Qué tan rápidas son las búsquedas? <span class=\"faq-icon\">▲</span>",
+        "faq_a2": "Las búsquedas demoran entre 15 y 45 segundos según el nicho y el volumen de datos de la ciudad seleccionada. El procesamiento se ejecuta en paralelo y en segundo plano para garantizar la máxima rapidez.",
+        "faq_q3": "¿Cómo se consumen los créditos? <span class=\"faq-icon\">▲</span>",
+        "faq_a3": "Cada búsqueda realizada en una combinación de Oferta + Ciudad consume exactamente 1 crédito. Si la búsqueda no arroja ningún lead cualificado sin sitio web, el crédito se devuelve o no se debita.",
+        "auth_password_short": "La contraseña debe tener al menos 3 caracteres.",
+        "error_passwords_dont_match": "¡Las contraseñas no coinciden!",
+        "logout_title": "Desconectar del SaaS",
+        "lp_about_title": "Nuestra Historia & Propósito",
+        "lp_about_body_1": "<strong>GridHunter</strong> nació en 2026 con el claro propósito de eliminar la fricción comercial y democratizar el acceso a datos de mercado geolocalizados de alta precisión. Nos dimos cuenta de que las agencias de tecnología y marketing digital perdían incontables horas buscando en internet manualmente negocios locales que necesitaran digitalización.",
+        "lp_about_body_2": "Al crear una solución automatizada integrada con bases de datos modernas (Supabase) y servidores robustos (Render), desarrollamos una herramienta de inteligencia geográfica que apoya el ecosistema comercial e impulsa el crecimiento de empresas locales y profesionales independientes a través de conexiones efectivas y basadas en datos reales."
+    },
+    "fr": {
+        "settings_title": "Paramètres",
+        "settings_tab_lang": "Préférences",
+        "settings_tab_security": "Changer le mot de passe",
+        "select_language_label": "Langue de la plateforme",
+        "curr_password_label": "Mot de passe actuel",
+        "new_password_label": "Nouveau mot de passe",
+        "confirm_password_label": "Confirmer le nouveau mot de passe",
+        "save_password_btn": "Mettre à jour le mot de passe",
+        "forgot_password_link": "Mot de passe oublié ?",
+        "access_platform_btn": "Accéder à la plateforme",
+        "forgot_email_label": "Adresse e-mail",
+        "send_recovery_link_btn": "Envoyer le lien de récupération",
+        "back_to_login_link": "Retour à la connexion",
+        "reset_pwd_title": "Définir un nouveau mot de passe",
+        "reset_pwd_btn": "Enregistrer le nouveau mot de passe",
+        "auth_footer_login_text": "Nouveau sur la plateforme ? Passez à l'onglet \"Créer un compte\" ci-dessus et obtenez instantanément 5 crédits de démonstration.",
+        "auth_footer_signup_text": "Déjà inscrit ? Passez à l'onglet \"Se connecter\" ci-dessus et entrez vos identifiants.",
+        "brand_subtitle": "Prospection de leads à fort impact",
+        "header_credits": "crédits",
+        "config_search_title": "Configurer un nouveau balayage",
+        "config_search_desc": "Sélectionnez le secteur d'activité et la ville de Bahia pour rechercher des établissements commerciaux qui génèrent de bons revenus mais n'ont pas de site web officiel enregistré sur Google.",
+        "nicho_label": "Commerce / Secteur d'activité",
+        "cidade_label": "Ville et État (Focus Bahia)",
+        "nicho_placeholder": "Sélectionnez ou saisissez un secteur...",
+        "cidade_placeholder": "Sélectionnez ou saisissez une ville de Bahia...",
+        "start_scan_btn": "Démarrer le balayage de leads (-1 crédit)",
+        "metric_analyzed_label": "Emplacements analysés",
+        "metric_leads_label": "Leads sans site officiel",
+        "metric_conversion_label": "Présence numérique locale",
+        "tooltip_text": "Cette métrique calcule le pourcentage d'entreprises analysées qui possèdent un site officiel ou un canal numérique actif. Plus le pourcentage est bas, plus grande est l'opportunité pour les agences de marketing et de technologie de proposer des services de numérisation dans cette région.",
+        "table_qualified_leads": "Leads qualifiés",
+        "table_subtitle": "Recherche de commerces locaux sans site",
+        "table_col_name": "Nom de l'établissement",
+        "table_col_phone": "Téléphone commercial",
+        "table_col_wpp": "WhatsApp",
+        "table_col_ig": "Instagram",
+        "table_col_address": "Adresse de l'emplacement",
+        "table_col_rating": "Note Google Places",
+        "table_col_actions": "Actions rapides",
+        "btn_new_scan": "Nouveau balayage",
+        "btn_export_excel": "Exporter vers Excel (.xlsx)",
+        "footer_title_security": "Sécurité",
+        "footer_title_compliance": "Conformité",
+        "footer_desc_security_1": "Connexions sécurisées de bout en bout via HTTPS",
+        "footer_desc_security_2": "Base de données isolée et chiffrée via Supabase",
+        "footer_desc_security_3": "Couche de traitement isolée sur Render",
+        "footer_desc_compliance": "En totale conformité avec la LGPD (Loi générale sur la protection des données) pour le traitement et la collecte exclusive de données commerciales publiques et d'intérêt commercial légitime.",
+        "footer_copyright": "© 2026 GridHunter. Tous droits réservés. Intelligence des données avec sécurité et confidentialité.",
+        "about_us_title": "Qui sommes-nous",
+        "about_us_body_1": "GridHunter est une plateforme avancée d'intelligence géographique et d'automatisation B2B. Notre technologie cartographie les établissements commerciaux avec une forte présence numérique ou des lacunes opérationnelles, permettant aux agences de marketing, de technologie et aux concepteurs d'identifier des opportunités commerciales à fort potentiel de conversion.",
+        "about_us_body_2": "Nos algorithmes effectuent des balayages intelligents et des recoupements de données publiques en temps réel pour fournir des leads hautement qualifiés avec rapidité et précision.",
+        "lp_pricing_title": "Nos Plans",
+        "lp_pricing_subtitle": "Choisissez le plan idéal pour booster la prospection de votre agence ou studio de design.",
+        "lp_starter_features_1": "5 crédits initiaux pour les tests",
+        "lp_starter_features_2": "Accès complet au panneau de recherche",
+        "lp_starter_features_3": "Filtres par secteur et ville",
+        "lp_starter_features_4": "Exporter vers Excel (.xlsx)",
+        "lp_starter_features_5": "Support premium prioritaire",
+        "lp_pro_badge": "Le plus populaire",
+        "plan_starter_name": "Starter",
+        "plan_pro_name": "Pro",
+        "plan_enterprise_name": "Enterprise",
+        "price_currency": "€",
+        "price_period": "/mois",
+        "lp_enterprise_price": "Sur demande",
+        "lp_pro_features_1": "120 crédits récurrents par mois",
+        "lp_pro_features_2": "Accès complet au panneau de recherche",
+        "lp_pro_features_3": "Filtres par secteur et ville",
+        "lp_pro_features_4": "Exporter vers Excel (.xlsx)",
+        "lp_pro_features_5": "Support premium par e-mail",
+        "lp_enterprise_features_1": "Recherches de leads illimitées",
+        "lp_enterprise_features_2": "Accès complet à l'API exclusive",
+        "lp_enterprise_features_3": "Support dédié 24/7",
+        "lp_enterprise_features_4": "Exportation personnalisée et rapports",
+        "lp_enterprise_features_5": "Accord de niveau de service (SLA)",
+        "lp_btn_free": "Démarrer gratuitement",
+        "lp_btn_pro": "S'abonner maintenant",
+        "lp_btn_enterprise": "Contacter le service commercial",
+        "lp_testimonials_title": "Ce que disent nos clients",
+        "lp_faq_title": "Questions fréquemment posées",
+        "toast_password_updated": "Mot de passe mis à jour avec succès !",
+        "toast_recovery_sent": "E-mail de récupération envoyé avec succès !",
+        "toast_password_reset": "Mot de passe réinitialisé avec succès ! Veuillez vous connecter avec votre nouveau mot de passe.",
+        "auth_subtitle": "Panneau de prospection SaaS pour agences et concepteurs",
+        "tab_login": "Se connecter",
+        "tab_signup": "Créer un compte",
+        "auth_email_label": "Adresse e-mail",
+        "auth_email_placeholder": "votre-email@fournisseur.com",
+        "auth_password_label": "Mot de passe",
+        "auth_password_placeholder": "••••••••",
+        "btn_signup_submit": "Créer mon compte gratuit",
+        "btn_processing": "Traitement...",
+        "btn_loading": "...",
+        "toast_login_success": "Connecté avec succès !",
+        "toast_signup_success": "Compte créé avec succès ! Vérifiez vos e-mails.",
+        "toast_test_access": "Accès test accordé !",
+        "toast_demo_signup_success": "Compte de démonstration créé dans le simulateur ! Vous avez gagné 5 crédits gratuits.",
+        "toast_auth_error": "Erreur d'authentification : ",
+        "toast_logout": "Vous vous êtes déconnecté de la plateforme.",
+        "toast_fill_fields": "Veuillez remplir les champs obligatoires !",
+        "toast_no_credits": "Crédits insuffisants ! Rechargez pour continuer la recherche.",
+        "toast_scan_error": "Erreur de balayage : ",
+        "toast_no_data": "Aucune donnée à exporter !",
+        "toast_export_started": "Exportation vers Excel (.xlsx) commencée !",
+        "toast_export_error": "Erreur lors de l'exportation : ",
+        "toast_network_error": "Erreur réseau : ",
+        "error_incorrect_password": "Mot de passe incorrect.",
+        "error_account_not_found": "Compte non trouvé. Veuillez vous inscrire.",
+        "error_register_failed": "Erreur lors de l'enregistrement du profil utilisateur.",
+        "error_register_sim_failed": "Erreur lors de l'enregistrement du compte simulé.",
+        "error_conn_profile_failed": "Erreur de communication avec le serveur lors de la récupération du profil.",
+        "error_conn_sim_failed": "Erreur de communication avec le backend simulé.",
+        "error_change_pwd_failed": "Erreur lors du changement de mot de passe",
+        "error_recovery_failed": "Erreur lors de la demande de récupération",
+        "error_reset_pwd_failed": "Erreur lors de la réinitialisation du mot de passe",
+        "status_connecting": "Connexion à la passerelle de recherche...",
+        "status_validating": "[CONNEXION] Validation des identifiants et des crédits de recherche...",
+        "status_searching": "[PLACES] Requête sur Google Places...",
+        "status_analyzing": "[ANALYSE] Filtrage des établissements sans site officiel...",
+        "status_qualifying": "[QUALIFICATION] Préparation du tableur d'approche commerciale...",
+        "subtitle_generated_by": "Données générées via le backend",
+        "table_empty_message": "Aucun lead qualifié sans site officiel n'a été trouvé dans ce balayage. Essayez un autre secteur ou une autre ville.",
+        "leads_title_prefix": "Leads",
+        "leads_title_in": "dans",
+        "testimonial_text_0": "\"Avec GridHunter, nous avons pu signer 4 nouveaux projets de sites web en seulement 2 semaines. La précision dans la recherche d'entreprises sans site officiel a permis d'économiser des centaines d'heures de prospection manuelle.\"",
+        "testimonial_author_0": "Ricardo Santos",
+        "testimonial_title_0": "Directeur des ventes - Alpha Digital",
+        "testimonial_text_1": "\"Outil fantastique pour les designers indépendants. Se connecter avec des commerces locaux qui génèrent de bons revenus mais qui n'ont pas de site nous a donné une mine d'or de clients potentiels.\"",
+        "testimonial_author_1": "Mariana Costa",
+        "testimonial_title_1": "Designer UI/UX Freelance",
+        "testimonial_text_2": "\"Excellente précision. La conformité avec la loi sur la protection des données et la stabilité des requêtes via Render nous apportent une grande sécurité dans nos opérations quotidiennes.\"",
+        "testimonial_author_2": "Carlos Oliveira",
+        "testimonial_title_2": "Co-fondateur - Agência Vanguarda",
+        "faq_q1": "La collecte de données est-elle légale ? <span class=\"faq-icon\">▲</span>",
+        "faq_a1": "Oui. GridHunter effectue des recherches basées strictement sur les données commerciales publiques fournies volontairement par les entreprises sur Internet (Google Places API). Le traitement est en totale conformité avec la réglementation sur la protection des données (LGPD/RGPD), soutenu par les bases juridiques de l'intérêt commercial légitime et de la publicité des données publiques.",
+        "faq_q2": "Quelle est la rapidité des recherches ? <span class=\"faq-icon\">▲</span>",
+        "faq_a2": "Les recherches prennent entre 15 et 45 secondes selon le secteur et le volume de données de la ville sélectionnée à Bahia. Le traitement est effectué en parallèle et en arrière-plan pour assurer une rapidité maximale.",
+        "faq_q3": "Comment les crédits sont-ils consommés ? <span class=\"faq-icon\">▲</span>",
+        "faq_a3": "Chaque balayage effectué sur une combinaison de Secteur + Ville consomme exactement 1 crédit. Si le balayage ne renvoie aucun lead qualifié sans site, le crédit est retourné ou n'est pas débité.",
+        "auth_password_short": "Le mot de passe doit contenir au moins 3 caractères.",
+        "error_passwords_dont_match": "Les mots de passe ne correspondent pas !",
+        "logout_title": "Se déconnecter du SaaS",
+        "lp_about_title": "Notre histoire et notre but",
+        "lp_about_body_1": "Le <strong>GridHunter</strong> est né en 2026 avec l'objectif clair d'éliminer les frictions commerciales et de démocratiser l'accès à des données de marché géolocalisées de haute précision. Nous avons remarqué que les agences de technologie et de marketing numérique passaient d'innombrables heures à chercher manuellement sur Internet pour trouver des commerces locaux nécessitant une numérisation.",
+        "lp_about_body_2": "En créant une solution automatisée intégrée à des bases de données modernes (Supabase) et des serveurs robustes (Render), nous avons développé un outil d'intelligence géographique qui soutient l'écosystème commercial et stimule la croissance des entreprises locales et des indépendants grâce à des connexions efficaces basées sur des données réelles."
+    },
+    "de": {
+        "settings_title": "Einstellungen",
+        "settings_tab_lang": "Präferenzen",
+        "settings_tab_security": "Passwort ändern",
+        "select_language_label": "Plattform-Sprache",
+        "curr_password_label": "Aktuelles Passwort",
+        "new_password_label": "Neues Passwort",
+        "confirm_password_label": "Neues Passwort bestätigen",
+        "save_password_btn": "Passwort aktualisieren",
+        "forgot_password_link": "Passwort vergessen?",
+        "access_platform_btn": "Einloggen",
+        "forgot_email_label": "E-Mail-Adresse",
+        "send_recovery_link_btn": "Wiederherstellungslink senden",
+        "back_to_login_link": "Zurück zum Login",
+        "reset_pwd_title": "Neues Passwort festlegen",
+        "reset_pwd_btn": "Neues Passwort speichern",
+        "auth_footer_login_text": "Neu auf der Plattform? Wechseln Sie oben zum Tab „Konto erstellen“ und erhalten Sie sofort 5 Demo-Guthaben.",
+        "auth_footer_signup_text": "Bereits registriert? Wechseln Sie oben zum Tab „Einloggen“ und geben Sie Ihre Zugangsdaten ein.",
+        "brand_subtitle": "Hochwirksame Lead-Generierung",
+        "header_credits": "Guthaben",
+        "config_search_title": "Neuen Suchlauf konfigurieren",
+        "config_search_desc": "Wählen Sie die Marktnische und die Stadt in Bahia, um nach Geschäftsbetrieben zu suchen, die gute Umsätze erzielen, aber keine offizielle Website bei Google registriert haben.",
+        "nicho_label": "Geschäftsbereich / Nische",
+        "cidade_label": "Stadt und Bundesland (Bahia-Fokus)",
+        "nicho_placeholder": "Nische auswählen oder eingeben...",
+        "cidade_placeholder": "Stadt in Bahia auswählen oder eingeben...",
+        "start_scan_btn": "Lead-Suchlauf starten (-1 Guthaben)",
+        "metric_analyzed_label": "Analysierte Standorte",
+        "metric_leads_label": "Leads ohne offizielle Website",
+        "metric_conversion_label": "Lokale digitale Präsenz",
+        "tooltip_text": "Diese Metrik berechnet den Prozentsatz der analysierten Unternehmen, die über eine offizielle Website oder einen aktiven digitalen Kanal verfügen. Je niedriger der Prozentsatz, desto größer ist die Chance für Marketing- und Technologieagenturen, Digitalisierungsdienste in dieser Region anzubieten.",
+        "table_qualified_leads": "Qualifizierte Leads",
+        "table_subtitle": "Suche nach lokalen Geschäften ohne Website",
+        "table_col_name": "Name des Geschäfts",
+        "table_col_phone": "Geschäftstelefon",
+        "table_col_wpp": "WhatsApp",
+        "table_col_ig": "Instagram",
+        "table_col_address": "Adresse",
+        "table_col_rating": "Google Places-Bewertung",
+        "table_col_actions": "Schnelle Aktionen",
+        "btn_new_scan": "Neuer Suchlauf",
+        "btn_export_excel": "Nach Excel exportieren (.xlsx)",
+        "footer_title_security": "Sicherheit",
+        "footer_title_compliance": "Compliance",
+        "footer_desc_security_1": "Ende-zu-Ende-Sicherheitsverbindungen über HTTPS",
+        "footer_desc_security_2": "Isolierte und verschlüsselte Datenbank über Supabase",
+        "footer_desc_security_3": "Isolierte Verarbeitungsschicht auf Render",
+        "footer_desc_compliance": "In voller Übereinstimmung mit der LGPD (Allgemeines Datenschutzgesetz) für die ausschließliche Verarbeitung und Erhebung öffentlicher Geschäftsdaten und berechtigter geschäftlicher Interessen.",
+        "footer_copyright": "© 2026 GridHunter. Alle Rechte vorbehalten. Datenintelligenz mit Sicherheit und Datenschutz.",
+        "about_us_title": "Über uns",
+        "about_us_body_1": "GridHunter ist eine fortschrittliche geografische Informations- und B2B-Automatisierungsplattform. Unsere Technologie erfasst gewerbliche Betriebe mit starker digitaler Präsenz oder betrieblichen Lücken, sodass Marketing- und Technologieagenturen sowie Designer vielversprechende Geschäftsmöglichkeiten identifizieren können.",
+        "about_us_body_2": "Unsere Algorithmen führen intelligente Suchläufe und Echtzeit-Abgleiche öffentlicher Daten durch, um schnell und präzise qualifizierte Leads zu liefern.",
+        "lp_pricing_title": "Unsere Pläne",
+        "lp_pricing_subtitle": "Wählen Sie den idealen Tarif, um die Neukundengewinnung Ihrer Agentur oder Ihres Designstudios zu steigern.",
+        "lp_starter_features_1": "5 Startguthaben für Tests",
+        "lp_starter_features_2": "Vollständiger Zugriff auf das Suchfeld",
+        "lp_starter_features_3": "Filter nach Nische und Stadt",
+        "lp_starter_features_4": "Export nach Excel (.xlsx)",
+        "lp_starter_features_5": "Priorisierter Premium-Support",
+        "lp_pro_badge": "Am beliebtesten",
+        "plan_starter_name": "Starter",
+        "plan_pro_name": "Pro",
+        "plan_enterprise_name": "Enterprise",
+        "price_currency": "€",
+        "price_period": "/Monat",
+        "lp_enterprise_price": "Auf Anfrage",
+        "lp_pro_features_1": "120 wiederkehrende Guthaben pro Monat",
+        "lp_pro_features_2": "Vollständiger Zugriff auf das Suchfeld",
+        "lp_pro_features_3": "Filter nach Nische und Stadt",
+        "lp_pro_features_4": "Export nach Excel (.xlsx)",
+        "lp_pro_features_5": "Premium-Support per E-Mail",
+        "lp_enterprise_features_1": "Unbegrenzte Lead-Abfragen",
+        "lp_enterprise_features_2": "Vollständiger Zugriff auf die exklusive API",
+        "lp_enterprise_features_3": "Dedizierter Support rund um die Uhr",
+        "lp_enterprise_features_4": "Benutzerdefinierter Export und Berichte",
+        "lp_enterprise_features_5": "Service-Level-Agreement (SLA)",
+        "lp_btn_free": "Kostenlos starten",
+        "lp_btn_pro": "Jetzt abonnieren",
+        "lp_btn_enterprise": "Vertrieb kontaktieren",
+        "lp_testimonials_title": "Was unsere Kunden sagen",
+        "lp_faq_title": "Häufig gestellte Fragen",
+        "toast_password_updated": "Passwort erfolgreich aktualisiert!",
+        "toast_recovery_sent": "Wiederherstellungs-E-Mail erfolgreich gesendet!",
+        "toast_password_reset": "Passwort erfolgreich zurückgesetzt! Bitte melden Sie sich mit Ihrem neuen Passwort an.",
+        "auth_subtitle": "SaaS-Interessenten-Panel für Agenturen und Designer",
+        "tab_login": "Einloggen",
+        "tab_signup": "Konto erstellen",
+        "auth_email_label": "E-Mail-Adresse",
+        "auth_email_placeholder": "ihre-email@anbieter.com",
+        "auth_password_label": "Passwort",
+        "auth_password_placeholder": "••••••••",
+        "btn_signup_submit": "Mein kostenloses Konto erstellen",
+        "btn_processing": "Verarbeitung...",
+        "btn_loading": "...",
+        "toast_login_success": "Erfolgreich eingeloggt!",
+        "toast_signup_success": "Konto erfolgreich erstellt! Überprüfen Sie Ihre E-Mails.",
+        "toast_test_access": "Testzugriff gewährt!",
+        "toast_demo_signup_success": "Demo-Konto im Simulator erstellt! Sie haben 5 kostenlose Guthaben erhalten.",
+        "toast_auth_error": "Authentifizierungsfehler: ",
+        "toast_logout": "Sie haben sich von der Plattform abgemeldet.",
+        "toast_fill_fields": "Bitte füllen Sie die Pflichtfelder aus!",
+        "toast_no_credits": "Unzureichendes Guthaben! Laden Sie auf, um weiter zu suchen.",
+        "toast_scan_error": "Fehler beim Suchlauf: ",
+        "toast_no_data": "Keine Daten zum Exportieren!",
+        "toast_export_started": "Export nach Excel (.xlsx) gestartet!",
+        "toast_export_error": "Fehler beim Exportieren: ",
+        "toast_network_error": "Netzwerkfehler: ",
+        "error_incorrect_password": "Falsches Passwort.",
+        "error_account_not_found": "Konto nicht gefunden. Bitte registrieren Sie sich.",
+        "error_register_failed": "Fehler bei der Registrierung des Benutzerprofils.",
+        "error_register_sim_failed": "Fehler bei der Registrierung des simulierten Kontos.",
+        "error_conn_profile_failed": "Kommunikationsfehler mit dem Server beim Abrufen des Profils.",
+        "error_conn_sim_failed": "Kommunikationsfehler mit dem simulierten Backend.",
+        "error_change_pwd_failed": "Fehler beim Ändern des Passworts",
+        "error_recovery_failed": "Fehler beim Anfordern der Wiederherstellung",
+        "error_reset_pwd_failed": "Fehler beim Zurücksetzen des Passworts",
+        "status_connecting": "Verbindung zum Such-Gateway wird hergestellt...",
+        "status_validating": "[VERBINDUNG] Anmeldaten und Guthaben werden validiert...",
+        "status_searching": "[PLACES] Abfrage von Google Places...",
+        "status_analyzing": "[ANALYSE] Filterung von Betrieben ohne offizielle Website...",
+        "status_qualifying": "[QUALIFICATION] Vorbereitung der Tabelle zur Kundenansprache...",
+        "subtitle_generated_by": "Vom Backend generierte Daten",
+        "table_empty_message": "Bei diesem Suchlauf wurden keine qualifizierten Leads ohne offizielle Website gefunden. Versuchen Sie eine andere Nische oder Stadt.",
+        "leads_title_prefix": "Leads",
+        "leads_title_in": "in",
+        "testimonial_text_0": "\"Mit GridHunter konnten wir in nur 2 Wochen 4 neue Website-Projekte abschließen. Die Genauigkeit bei der Suche nach Unternehmen ohne offizielle Website hat uns Hunderte von Stunden manueller Recherche erspart.\"",
+        "testimonial_author_0": "Ricardo Santos",
+        "testimonial_title_0": "Vertriebsleiter - Alpha Digital",
+        "testimonial_text_1": "\"Fantastisches Tool für freiberufliche Designer. Die Kontaktaufnahme mit lokalen Geschäften, die gute Umsätze erzielen, aber keine Website haben, hat uns eine Goldgrube an potenziellen Kunden eröffnet.\"",
+        "testimonial_author_1": "Mariana Costa",
+        "testimonial_title_1": "Freiberufliche UI/UX-Designerin",
+        "testimonial_text_2": "\"Hervorragende Genauigkeit. Die Einhaltung der Datenschutzgesetze (LGPD/DSGVO) und die Stabilität der Suchläufe über Render geben uns im Alltag viel Sicherheit.\"",
+        "testimonial_author_2": "Carlos Oliveira",
+        "testimonial_title_2": "Mitbegründer - Agência Vanguarda",
+        "faq_q1": "Ist die Datenerhebung legal? <span class=\"faq-icon\">▲</span>",
+        "faq_a1": "Ja. GridHunter führt Suchläufe durch, die sich ausschließlich auf öffentliche Geschäftsdaten stützen, die von Unternehmen freiwillig im Internet bereitgestellt werden (Google Places API). Die Verarbeitung steht im Einklang mit den Datenschutzgesetzen (LGPD/DSGVO) und basiert auf berechtigtem geschäftlichen Interesse sowie der Offenlegung öffentlicher Daten.",
+        "faq_q2": "Wie schnell sind die Suchläufe? <span class=\"faq-icon\">▲</span>",
+        "faq_a2": "Die Suchläufe dauern zwischen 15 und 45 Sekunden, je nach Nische und Datenvolumen der ausgewählten Stadt in Bahia. Die Verarbeitung erfolgt parallel und im Hintergrund, um maximale Geschwindigkeit zu gewährleisten.",
+        "faq_q3": "Wie werden die Guthaben verbraucht? <span class=\"faq-icon\">▲</span>",
+        "faq_a3": "Jeder ausgeführte Suchlauf für eine Kombination aus Nische und Stadt verbraucht genau 1 Guthaben. Wenn der Suchlauf keine qualifizierten Leads ohne Website liefert, wird das Guthaben zurückerstattet oder nicht abgebucht.",
+        "auth_password_short": "Das Passwort muss mindestens 3 Zeichen lang sein.",
+        "error_passwords_dont_match": "Die Passwörter stimmen nicht überein!",
+        "logout_title": "Vom SaaS abmelden",
+        "lp_about_title": "Unsere Geschichte & Mission",
+        "lp_about_body_1": "<strong>GridHunter</strong> wurde 2026 mit dem klaren Ziel gegründet, Hürden in der Kundenakquise abzubauen und den Zugang zu hochpräzisen geolokalisierten Marktdaten zu demokratisieren. Wir stellten fest, dass Technologie- und Digitalmarketing-Agenturen unzählige Stunden damit verbrachten, das Internet manuell nach lokalen Geschäften zu durchsuchen, die Digitalisierungsdienste benötigten.",
+        "lp_about_body_2": "Durch die Entwicklung einer automatisierten Lösung, die in moderne Datenbanken (Supabase) und robuste Server (Render) integriert ist, haben wir ein Tool zur geografischen Datenanalyse geschaffen, das den Vertrieb unterstützt und das Wachstum lokaler Unternehmen und Freiberufler durch effektive, datenbasierte Kontakte fördert."
+    },
+    "ru": {
+        "settings_title": "Настройки",
+        "settings_tab_lang": "Настройки",
+        "settings_tab_security": "Сменить пароль",
+        "select_language_label": "Язык платформы",
+        "curr_password_label": "Текущий пароль",
+        "new_password_label": "Новый пароль",
+        "confirm_password_label": "Подтвердите новый пароль",
+        "save_password_btn": "Обновить пароль",
+        "forgot_password_link": "Забыли пароль?",
+        "access_platform_btn": "Войти на платформу",
+        "forgot_email_label": "Адрес эл. почты",
+        "send_recovery_link_btn": "Отправить ссылку для восстановления",
+        "back_to_login_link": "Назад к входу",
+        "reset_pwd_title": "Установить новый пароль",
+        "reset_pwd_btn": "Сохранить новый пароль",
+        "auth_footer_login_text": "Впервые на платформе? Перейдите на вкладку «Создать аккаунт» выше и получите 5 демо-кредитов сразу.",
+        "auth_footer_signup_text": "Уже зарегистрированы? Перейдите на вкладку «Войти» выше и введите свои учетные данные.",
+        "brand_subtitle": "Поиск лидов высокого уровня",
+        "header_credits": "кредиты",
+        "config_search_title": "Настройка нового сканирования",
+        "config_search_desc": "Выберите нишу рынка и город в Баии для поиска коммерческих предприятий, которые приносят хороший доход, но не имеют официального сайта, зарегистрированного в Google.",
+        "nicho_label": "Бизнес / Ниша деятельности",
+        "cidade_label": "Город и штат (Баия)",
+        "nicho_placeholder": "Выберите или введите нишу...",
+        "cidade_placeholder": "Выберите или введите город в Баии...",
+        "start_scan_btn": "Начать сканирование лидов (-1 кредит)",
+        "metric_analyzed_label": "Проанализировано мест",
+        "metric_leads_label": "Лиды без официального сайта",
+        "metric_conversion_label": "Локальное цифровое присутствие",
+        "tooltip_text": "Этот показатель рассчитывает процент проанализированных компаний, имеющих официальный сайт или активный цифровой канал. Чем ниже процент, тем больше возможностей у маркетинговых и технологических агентств предложить услуги по цифровизации в этом регионе.",
+        "table_qualified_leads": "Квалифицированные лиды",
+        "table_subtitle": "Поиск местных предприятий без сайта",
+        "table_col_name": "Название заведения",
+        "table_col_phone": "Рабочий телефон",
+        "table_col_wpp": "WhatsApp",
+        "table_col_ig": "Instagram",
+        "table_col_address": "Адрес места",
+        "table_col_rating": "Рейтинг Google Places",
+        "table_col_actions": "Быстрые действия",
+        "btn_new_scan": "Новое сканирование",
+        "btn_export_excel": "Экспорт в Excel (.xlsx)",
+        "footer_title_security": "Безопасность",
+        "footer_title_compliance": "Соответствие требованиям",
+        "footer_desc_security_1": "Безопасные соединения из конца в конец через HTTPS",
+        "footer_desc_security_2": "Изолированная и зашифрованная база данных через Supabase",
+        "footer_desc_security_3": "Изолированный слой обработки на Render",
+        "footer_desc_compliance": "В полном соответствии с LGPD (Общим законом о защите персональных данных) для обработки и исключительного сбора общедоступных коммерческих данных в законных деловых интересах.",
+        "footer_copyright": "© 2026 GridHunter. Все права защищены. Интеллектуальный анализ данных с безопасностью и конфиденциальностью.",
+        "about_us_title": "О нас",
+        "about_us_body_1": "GridHunter — это передовая платформа географического анализа и автоматизации B2B. Наша технология находит коммерческие заведения с сильным цифровым присутствием или операционными пробелами, позволяя маркетинговым, технологическим агентствам и дизайнерам выявлять высокоэффективные коммерческие возможности.",
+        "about_us_body_2": "Наши алгоритмы выполняют интеллектуальное сканирование и сопоставление общедоступных данных в реальном времени, обеспечивая быстрый и точный поиск квалифицированных лидов.",
+        "lp_pricing_title": "Наши тарифы",
+        "lp_pricing_subtitle": "Выберите идеальный тарифный план для увеличения масштабов поиска клиентов вашей агентства или студии дизайна.",
+        "lp_starter_features_1": "5 начальных кредитов для тестирования",
+        "lp_starter_features_2": "Полный доступ к панели поиска",
+        "lp_starter_features_3": "Фильтры по нише и городу",
+        "lp_starter_features_4": "Экспорт в Excel (.xlsx)",
+        "lp_starter_features_5": "Приоритетная премиум-поддержка",
+        "lp_pro_badge": "Самый популярный",
+        "plan_starter_name": "Starter",
+        "plan_pro_name": "Pro",
+        "plan_enterprise_name": "Enterprise",
+        "price_currency": "₽",
+        "price_period": "/мес.",
+        "lp_enterprise_price": "По запросу",
+        "lp_pro_features_1": "120 ежемесячных кредитов",
+        "lp_pro_features_2": "Полный доступ к панели поиска",
+        "lp_pro_features_3": "Фильтры по нише и городу",
+        "lp_pro_features_4": "Экспорт в Excel (.xlsx)",
+        "lp_pro_features_5": "Премиум-поддержка по электронной почте",
+        "lp_enterprise_features_1": "Безлимитный поиск лидов",
+        "lp_enterprise_features_2": "Полный доступ к эксклюзивному API",
+        "lp_enterprise_features_3": "Выделенная поддержка 24/7",
+        "lp_enterprise_features_4": "Настраиваемый экспорт и отчеты",
+        "lp_enterprise_features_5": "Соглашение об уровне обслуживания (SLA)",
+        "lp_btn_free": "Начать бесплатно",
+        "lp_btn_pro": "Подписаться сейчас",
+        "lp_btn_enterprise": "Связаться с отделом продаж",
+        "lp_testimonials_title": "Что говорят наши клиенты",
+        "lp_faq_title": "Часто задаваемые вопросы",
+        "toast_password_updated": "Пароль успешно обновлен!",
+        "toast_recovery_sent": "Электронное письмо для восстановления успешно отправлено!",
+        "toast_password_reset": "Пароль успешно сброшен! Пожалуйста, войдите с новым паролем.",
+        "auth_subtitle": "Панель поиска SaaS для агентств и дизайнеров",
+        "tab_login": "Войти",
+        "tab_signup": "Создать аккаунт",
+        "auth_email_label": "Адрес эл. почты",
+        "auth_email_placeholder": "your-email@provider.com",
+        "auth_password_label": "Пароль",
+        "auth_password_placeholder": "••••••••",
+        "btn_signup_submit": "Создать бесплатный аккаунт",
+        "btn_processing": "Обработка...",
+        "btn_loading": "...",
+        "toast_login_success": "Успешный вход!",
+        "toast_signup_success": "Аккаунт успешно создан! Проверьте электронную почту.",
+        "toast_test_access": "Предоставлен тестовый доступ!",
+        "toast_demo_signup_success": "Демо-аккаунт создан в симуляторе! Вы получили 5 бесплатных кредитов.",
+        "toast_auth_error": "Ошибка аутентификации: ",
+        "toast_logout": "Вы вышли из системы.",
+        "toast_fill_fields": "Пожалуйста, заполните обязательные поля!",
+        "toast_no_credits": "Недостаточно кредитов! Пополните баланс для продолжения.",
+        "toast_scan_error": "Ошибка сканирования: ",
+        "toast_no_data": "Нет данных для экспорта!",
+        "toast_export_started": "Экспорт в Excel (.xlsx) запущен!",
+        "toast_export_error": "Ошибка экспорта: ",
+        "toast_network_error": "Сетевая ошибка: ",
+        "error_incorrect_password": "Неверный пароль.",
+        "error_account_not_found": "Аккаунт не найден. Пожалуйста, зарегистрируйтесь.",
+        "error_register_failed": "Ошибка регистрации профиля пользователя.",
+        "error_register_sim_failed": "Ошибка регистрации симулированного аккаунта.",
+        "error_conn_profile_failed": "Ошибка связи с сервером при получении профиля.",
+        "error_conn_sim_failed": "Ошибка связи с симулированным бэкендом.",
+        "error_change_pwd_failed": "Ошибка при смене пароля",
+        "error_recovery_failed": "Ошибка при запросе восстановления",
+        "error_reset_pwd_failed": "Ошибка при сбросе пароля",
+        "status_connecting": "Подключение к поисковому шлюзу...",
+        "status_validating": "[ПОДКЛЮЧЕНИЕ] Проверка учетных данных и поисковых кредитов...",
+        "status_searching": "[PLACES] Запрос к Google Places...",
+        "status_analyzing": "[АНАЛИЗ] Фильтрация заведений без официального сайта...",
+        "status_qualifying": "[КВАЛИФИКАЦИЯ] Подготовка таблицы коммерческих предложений...",
+        "subtitle_generated_by": "Данные, сгенерированные бэкендом",
+        "table_empty_message": "В ходе сканирования не найдено квалифицированных лидов без официального сайта. Попробуйте другую нишу или город.",
+        "leads_title_prefix": "Лиды",
+        "leads_title_in": "в",
+        "testimonial_text_0": "\"С GridHunter мы смогли закрыть 4 новых проекта сайтов всего за 2 недели. Точность в поиске компаний без официального сайта сэкономила нам сотни часов ручного поиска.\"",
+        "testimonial_author_0": "Рикардо Сантос",
+        "testimonial_title_0": "Директор по продажам - Alpha Digital",
+        "testimonial_text_1": "\"Фантастический инструмент для дизайнеров-фрилансеров. Связь с местными предприятиями, которые имеют хороший оборот, но не имеют сайта, открыла нам золотую жилу потенциальных клиентов.\"",
+        "testimonial_author_1": "Мариана Коста",
+        "testimonial_title_1": "Фриланс UI/UX дизайнер",
+        "testimonial_text_2": "\"Отличная точность. Соответствие требованиям защиты персональных данных (LGPD/GDPR) и стабильность сканирования на Render дают нам полную безопасность в повседневной работе.\"",
+        "testimonial_author_2": "Карлос Оливейра",
+        "testimonial_title_2": "Сооснователь - Agência Vanguarda",
+        "faq_q1": "Законно ли собирать данные? <span class=\"faq-icon\">▲</span>",
+        "faq_a1": "Да. GridHunter выполняет поиск исключительно по общедоступным коммерческим данным, добровольно предоставленным компаниями в Интернете (Google Places API). Обработка полностью соответствует законам о защите данных (LGPD/GDPR), опираясь на законные основания делового интереса и публичность общедоступной информации.",
+        "faq_q2": "Как быстро выполняются поиски? <span class=\"faq-icon\">▲</span>",
+        "faq_a2": "Поиск занимает от 15 до 45 секунд в зависимости от ниши и объема данных выбранного города в штате Баия. Обработка выполняется параллельно и в фоновом режиме для обеспечения максимальной скорости.",
+        "faq_q3": "Как расходуются кредиты? <span class=\"faq-icon\">▲</span>",
+        "faq_a3": "Каждое сканирование комбинации Ниша + Город расходует ровно 1 кредит. Если сканирование не принесло ни одного квалифицированного лида без сайта, кредит возвращается или не списывается.",
+        "auth_password_short": "Пароль должен состоять минимум из 3 символов.",
+        "error_passwords_dont_match": "Пароли не совпадают!",
+        "logout_title": "Выйти из SaaS",
+        "lp_about_title": "Наша история и цель",
+        "lp_about_body_1": "Платформа <strong>GridHunter</strong> была создана в 2026 году с четкой целью — устранить коммерческие барьеры и демократизировать доступ к высокоточным геолокационным рыночным данным. Мы заметили, что технологические и маркетинговые агентства тратили бесчисленные часы на поиск в Интернете вручную местных компаний, нуждающихся в цифровизации.",
+        "lp_about_body_2": "Создав автоматизированное решение, интегрированное с современными базами данных (Supabase) и надежными серверами (Render), мы разработали инструмент географического анализа, который поддерживает коммерческую экосистему и стимулирует рост местных предприятий и фрилансеров посредством эффективных связей на основе реальных данных."
+    },
+    "ja": {
+        "settings_title": "設定",
+        "settings_tab_lang": "環境設定",
+        "settings_tab_security": "パスワード変更",
+        "select_language_label": "プラットフォームの言語",
+        "curr_password_label": "現在のパスワード",
+        "new_password_label": "新しいパスワード",
+        "confirm_password_label": "新しいパスワードの確認",
+        "save_password_btn": "パスワードの更新",
+        "forgot_password_link": "パスワードをお忘れですか？",
+        "access_platform_btn": "プラットフォームに入る",
+        "forgot_email_label": "メールアドレス",
+        "send_recovery_link_btn": "リカバリリンクを送信",
+        "back_to_login_link": "ログインに戻る",
+        "reset_pwd_title": "新しいパスワードの設定",
+        "reset_pwd_btn": "新しいパスワードを保存",
+        "auth_footer_login_text": "プラットフォームは初めてですか？上の「アカウント作成」タブに切り替えて、すぐに5つのデモクレジットを取得してください。",
+        "auth_footer_signup_text": "既に登録されていますか？上の「ログイン」タブに切り替えて、資格情報を入力してください。",
+        "brand_subtitle": "高インパクトなリード開拓",
+        "header_credits": "クレジット",
+        "config_search_title": "新しいスキャンの構成",
+        "config_search_desc": "業種とバイーア州の都市を選択して、売上は良好であるものの、Googleに公式ウェブサイトが登録されていない商業施設を検索します。",
+        "nicho_label": "ビジネス / 業種",
+        "cidade_label": "都市と州（バイーア州中心）",
+        "nicho_placeholder": "業種を選択または入力してください...",
+        "cidade_placeholder": "バイーア州の都市を選択または入力してください...",
+        "start_scan_btn": "リードスキャンの開始（-1 クレジット）",
+        "metric_analyzed_label": "分析済みの場所",
+        "metric_leads_label": "公式サイトなしのリード",
+        "metric_conversion_label": "ローカルデジタルプレゼンス",
+        "tooltip_text": "この指標は、分析対象の企業のうち、公式ウェブサイトまたはアクティブなデジタルチャネルを持っている企業の割合を計算します。割合が低いほど、マーケティングやテクノロジーの代理店がその地域でデジタル化サービスを提供する機会が多くなります。",
+        "table_qualified_leads": "適格リード",
+        "table_subtitle": "ウェブサイトのない地元企業の検索",
+        "table_col_name": "店舗名",
+        "table_col_phone": "電話番号",
+        "table_col_wpp": "WhatsApp",
+        "table_col_ig": "Instagram",
+        "table_col_address": "住所",
+        "table_col_rating": "Google Places 評価",
+        "table_col_actions": "クイックアクション",
+        "btn_new_scan": "新しいスキャン",
+        "btn_export_excel": "Excel にエクスポート (.xlsx)",
+        "footer_title_security": "セキュリティ",
+        "footer_title_compliance": "コンプライアンス",
+        "footer_desc_security_1": "HTTPS経由のエンドツーエンドの安全な接続",
+        "footer_desc_security_2": "Supabase経由の隔離および暗号化されたデータベース",
+        "footer_desc_security_3": "Render上の隔離された処理レイヤー",
+        "footer_desc_compliance": "公共のビジネスデータの処理および収集、ならびに正当なビジネス上の利益のためのLGPD（一般データ保護法）に完全に準拠しています。",
+        "footer_copyright": "© 2026 GridHunter. All rights reserved. セキュリティとプライバシーを兼ね備えたデータインテリジェンス。",
+        "about_us_title": "会社概要",
+        "about_us_body_1": "GridHunterは、高度な地理情報とB2B自動化のプラットフォームです。当社のテクノロジーは、強力なデジタルプレゼンスまたは運用上のギャップを持つ商業施設をマッピングし、マーケティングやテクノロジーの代理店、デザイナーが成約率の高い商業機会を特定できるようにします。",
+        "about_us_body_2": "当社のアルゴリズムは、スマートスキャンと公開データのリアルタイムなクロスリファレンスを実行し、迅速かつ正確に適格なリードを提供します。",
+        "lp_pricing_title": "料金プラン",
+        "lp_pricing_subtitle": "代理店やデザインスタジオ of リード獲得を加速させるための最適なプランを選択してください。",
+        "lp_starter_features_1": "テスト用の5つの初期クレジット",
+        "lp_starter_features_2": "検索パネルへのフルアクセス",
+        "lp_starter_features_3": "業種および都市によるフィルター",
+        "lp_starter_features_4": "Excelへのエクスポート (.xlsx)",
+        "lp_starter_features_5": "優先プレミアムサポート",
+        "lp_pro_badge": "一番人気",
+        "plan_starter_name": "Starter",
+        "plan_pro_name": "Pro",
+        "plan_enterprise_name": "Enterprise",
+        "price_currency": "¥",
+        "price_period": "/月",
+        "lp_enterprise_price": "お問い合わせ",
+        "lp_pro_features_1": "毎月120回の継続クレジット",
+        "lp_pro_features_2": "検索パネルへのフルアクセス",
+        "lp_pro_features_3": "業種および都市によるフィルター",
+        "lp_pro_features_4": "Excelへのエクスポート (.xlsx)",
+        "lp_pro_features_5": "メールによるプレミアムサポート",
+        "lp_enterprise_features_1": "無制限のリード検索",
+        "lp_enterprise_features_2": "専用APIへのフルアクセス",
+        "lp_enterprise_features_3": "24時間365日の専任サポート",
+        "lp_enterprise_features_4": "カスタムエクスポートとレポート",
+        "lp_enterprise_features_5": "サービスレベル合意書 (SLA)",
+        "lp_btn_free": "無料で開始",
+        "lp_btn_pro": "今すぐ購読",
+        "lp_btn_enterprise": "営業担当者に問い合わせる",
+        "lp_testimonials_title": "お客様の声",
+        "lp_faq_title": "よくある質問",
+        "toast_password_updated": "パスワードが正常に更新されました！",
+        "toast_recovery_sent": "リカバリメールが正常に送信されました！",
+        "toast_password_reset": "パスワードが正常にリセットされました！新しいパスワードでログインしてください。",
+        "auth_subtitle": "代理店およびデザイナー向けSaaSリード開拓パネル",
+        "tab_login": "ログイン",
+        "tab_signup": "アカウント作成",
+        "auth_email_label": "メールアドレス",
+        "auth_email_placeholder": "your-email@provider.com",
+        "auth_password_label": "パスワード",
+        "auth_password_placeholder": "••••••••",
+        "btn_signup_submit": "無料アカウント作成",
+        "btn_processing": "処理中...",
+        "btn_loading": "...",
+        "toast_login_success": "正常にログインしました！",
+        "toast_signup_success": "アカウントが正常に作成されました！メールを確認してください。",
+        "toast_test_access": "テストアクセスが許可されました！",
+        "toast_demo_signup_success": "シミュレータにデモアカウントが作成されました！5つの無料クレジットを獲得しました。",
+        "toast_auth_error": "認証エラー: ",
+        "toast_logout": "ログアウトしました。",
+        "toast_fill_fields": "必須項目を入力してください！",
+        "toast_no_credits": "クレジットが不足しています！チャージしてください。",
+        "toast_scan_error": "スキャンエラー: ",
+        "toast_no_data": "エクスポートするデータがありません！",
+        "toast_export_started": "Excelへのエクスポート (.xlsx) が開始されました！",
+        "toast_export_error": "エクスポートエラー: ",
+        "toast_network_error": "ネットワークエラー: ",
+        "error_incorrect_password": "パスワードが違います。",
+        "error_account_not_found": "アカウントが見つかりません。新規登録してください。",
+        "error_register_failed": "プロファイルの登録中にエラーが発生しました。",
+        "error_register_sim_failed": "シミュレートアカウントの登録中にエラーが発生しました。",
+        "error_conn_profile_failed": "プロファイル取得中に通信エラーが発生しました。",
+        "error_conn_sim_failed": "シミュレートされたバックエンドとの通信エラーが発生しました。",
+        "error_change_pwd_failed": "パスワード変更中にエラーが発生しました。",
+        "error_recovery_failed": "リカバリ要求中のエラーが発生しました。",
+        "error_reset_pwd_failed": "パスワードリセット中にエラーが発生しました。",
+        "status_connecting": "検索ゲートウェイに接続中...",
+        "status_validating": "[接続] 資格情報と検索クレジットを検証中...",
+        "status_searching": "[PLACES] Google Placesにクエリを送信中...",
+        "status_analyzing": "[分析] 公式ウェブサイトのない店舗をフィルタリング中...",
+        "status_qualifying": "[適格化] 営業アプローチシートを準備中...",
+        "subtitle_generated_by": "バックエンド経由で生成されたデータ",
+        "table_empty_message": "このスキャンでは、公式ウェブサイトのない適格リードは見つかりませんでした。別の業種または都市を試してください。",
+        "leads_title_prefix": "リード",
+        "leads_title_in": "の",
+        "testimonial_text_0": "「GridHunterのおかげで、わずか2週間で4つの新しいウェブサイト案件を獲得できました。公式サイトのない店舗を特定する正確性により、手動での営業に費やす何百時間もの時間が節約されました。」",
+        "testimonial_author_0": "Ricardo Santos",
+        "testimonial_title_0": "営業部長 - Alpha Digital",
+        "testimonial_text_1": "「フリーランスのデザイナーにとって素晴らしいツールです。売上は良いがホームページがないローカルビジネスとつながることで、潜在顧客の宝庫を手に入れることができました。」",
+        "testimonial_author_1": "Mariana Costa",
+        "testimonial_title_1": "フリーランス UI/UX デザイナー",
+        "testimonial_text_2": "「優れた精度です。LGPD/GDPRコンプライアンス層とRenderによるクエリの安定性により、日々の運用に大きな安心感を得られています。」",
+        "testimonial_author_2": "Carlos Oliveira",
+        "testimonial_title_2": "共同創業者 - Agência Vanguarda",
+        "faq_q1": "データの収集は合法ですか？ <span class=\"faq-icon\">▲</span>",
+        "faq_a1": "はい。GridHunterは、インターネット上で企業が自主的に公開しているパブリックな商業データのみを対象に検索を行います（Google Places API）。処理はデータ保護法（LGPD/GDPR）に完全に準拠しており、正当なビジネス上の利益およびパブリックデータの公開という法的根拠に基づいています。",
+        "faq_q2": "検索の速度はどのくらいですか？ <span class=\"faq-icon\">▲</span>",
+        "faq_a2": "バイーア州の選択された都市における業種やデータ量に応じて、検索には15〜45秒かかります。処理は並行してバックグラウンドで実行され、最大限のスピードが確保されます。",
+        "faq_q3": "クレジットはどのように消費されますか？ <span class=\"faq-icon\">▲</span>",
+        "faq_a3": "業種と都市の組み合わせに対して実行されるスキャンごとに、ちょうど1クレジットが消費されます。公式サイトのない適格なリードが見つからなかった場合、クレジットは返却されるか、デビットされません。",
+        "auth_password_short": "パスワードは3文字以上で入力してください。",
+        "error_passwords_dont_match": "パスワードが一致しません！",
+        "logout_title": "SaaSからログアウト",
+        "lp_about_title": "私たちの歩みと目的",
+        "lp_about_body_1": "<strong>GridHunter</strong>は、営業摩擦を排除し、高精度な位置情報に基づく市場データへのアクセスを民主化するという明確な目的のもと、2026年に誕生しました。テクノロジーやデジタルマーケティングの代理店が、デジタル化サービスを必要としているローカルビジネスを手動で探すために、インターネットの検索に数え切れないほどの時間を費やしていることに気づいたからです。",
+        "lp_about_body_2": "最新のデータベース（Supabase）と堅牢なサーバー（Render）を統合した自動化ソリューションを開発することにより、現実のデータに基づく効果的なつながりを通じて、地域ビジネスやフリーランスの成長をサポートする地理情報ツールを開発しました。"
+    }
+};
 
         function changeLanguage(lang) {
             localStorage.setItem('gridhunter_lang', lang);
             appState.currentLang = lang;
+            document.documentElement.lang = lang === 'pt' ? 'pt-BR' : (lang === 'en' ? 'en-US' : (lang === 'es' ? 'es-ES' : (lang === 'fr' ? 'fr-FR' : (lang === 'de' ? 'de-DE' : (lang === 'ru' ? 'ru-RU' : (lang === 'ja' ? 'ja-JP' : lang))))));
             
             const select = document.getElementById('settings-language-select');
             if (select) select.value = lang;
@@ -4014,6 +4871,8 @@
                 if (t[key]) {
                     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                         el.placeholder = t[key];
+                    } else if (key.startsWith('faq_q') || key.includes('body_') || key.includes('desc_compliance')) {
+                        el.innerHTML = t[key];
                     } else {
                         el.textContent = t[key];
                     }
@@ -4029,11 +4888,10 @@
                 'label[for="cidade-input"]': 'cidade_label',
                 '#nicho-input': 'nicho_placeholder',
                 '#cidade-input': 'cidade_placeholder',
-                '#leads-search-form .btn-submit': 'start_scan_btn',
+                '#leads-search-form .btn-submit span[data-i18n]': 'start_scan_btn',
                 '.metrics-grid .metric-card:nth-child(1) .metric-label': 'metric_analyzed_label',
                 '.metrics-grid .metric-card:nth-child(2) .metric-label': 'metric_leads_label',
                 '.metrics-grid .metric-card:nth-child(3) .metric-label': 'metric_conversion_label',
-                '#results-badge-title': 'table_qualified_leads',
                 '#results-badge-subtitle': 'table_subtitle',
                 '.leads-table th:nth-child(1)': 'table_col_name',
                 '.leads-table th:nth-child(2)': 'table_col_phone',
@@ -4057,27 +4915,6 @@
                 '#about-modal .modal-body p:nth-child(2)': 'about_us_body_2',
                 '.pricing-section .section-title': 'lp_pricing_title',
                 '.pricing-section .section-subtitle': 'lp_pricing_subtitle',
-                '.pricing-card:nth-child(1) .pricing-plan-name': 'settings_tab_lang',
-                '.pricing-card:nth-child(1) .pricing-features li:nth-child(1)': 'lp_starter_features_1',
-                '.pricing-card:nth-child(1) .pricing-features li:nth-child(2)': 'lp_starter_features_2',
-                '.pricing-card:nth-child(1) .pricing-features li:nth-child(3)': 'lp_starter_features_3',
-                '.pricing-card:nth-child(1) .pricing-features li:nth-child(4)': 'lp_starter_features_4',
-                '.pricing-card:nth-child(1) .pricing-features li:nth-child(5)': 'lp_starter_features_5',
-                '.pricing-card:nth-child(1) .pricing-btn': 'lp_btn_free',
-                '.pricing-card.popular .popular-badge': 'lp_pro_badge',
-                '.pricing-card.popular .pricing-features li:nth-child(1)': 'lp_pro_features_1',
-                '.pricing-card.popular .pricing-features li:nth-child(2)': 'lp_pro_features_2',
-                '.pricing-card.popular .pricing-features li:nth-child(3)': 'lp_pro_features_3',
-                '.pricing-card.popular .pricing-features li:nth-child(4)': 'lp_pro_features_4',
-                '.pricing-card.popular .pricing-features li:nth-child(5)': 'lp_pro_features_5',
-                '.pricing-card.popular .pricing-btn': 'lp_btn_pro',
-                '.pricing-card:nth-child(3) .pricing-plan-name': 'settings_title',
-                '.pricing-card:nth-child(3) .pricing-features li:nth-child(1)': 'lp_enterprise_features_1',
-                '.pricing-card:nth-child(3) .pricing-features li:nth-child(2)': 'lp_enterprise_features_2',
-                '.pricing-card:nth-child(3) .pricing-features li:nth-child(3)': 'lp_enterprise_features_3',
-                '.pricing-card:nth-child(3) .pricing-features li:nth-child(4)': 'lp_enterprise_features_4',
-                '.pricing-card:nth-child(3) .pricing-features li:nth-child(5)': 'lp_enterprise_features_5',
-                '.pricing-card:nth-child(3) .pricing-btn': 'lp_btn_enterprise',
                 '.testimonials-section .section-title': 'lp_testimonials_title',
                 '.faq-section .section-title': 'lp_faq_title',
                 '.history-section .section-title': 'lp_about_title',
@@ -4106,6 +4943,40 @@
             const tooltip = document.querySelector('.tooltip-icon');
             if (tooltip && t['tooltip_text']) {
                 tooltip.setAttribute('data-tooltip', t['tooltip_text']);
+            }
+
+            // Traduzir abas de login/cadastro dinamicamente
+            if (typeof appState !== 'undefined' && appState.currentAuthTab) {
+                switchAuthTab(appState.currentAuthTab);
+            }
+
+            // Traduzir cabeçalho dos resultados se exibidos
+            if (typeof appState !== 'undefined' && appState.nichoAtual && appState.cidadeAtual) {
+                const prefix = t['leads_title_prefix'] || 'Leads';
+                const in_word = t['leads_title_in'] || 'em';
+                const titleEl = document.getElementById('results-badge-title');
+                if (titleEl) {
+                    titleEl.textContent = `${prefix}: ${appState.nichoAtual} ${in_word} ${appState.cidadeAtual}`;
+                }
+                const subtitleEl = document.getElementById('results-badge-subtitle');
+                if (subtitleEl) {
+                    if (appState.apiUtilizada) {
+                        const subPrefix = t['subtitle_generated_by'] || 'Dados gerados através do backend';
+                        subtitleEl.textContent = `${subPrefix} (${appState.apiUtilizada})`;
+                    } else {
+                        subtitleEl.textContent = t['table_subtitle'] || 'Busca de comércios locais sem site';
+                    }
+                }
+            }
+
+            // Traduzir títulos dos botões de configurações e logout
+            const btnSettings = document.getElementById('btn-settings');
+            if (btnSettings && t['settings_title']) {
+                btnSettings.setAttribute('title', t['settings_title']);
+            }
+            const btnLogout = document.getElementById('btn-logout');
+            if (btnLogout && t['logout_title']) {
+                btnLogout.setAttribute('title', t['logout_title']);
             }
         }
 
@@ -4164,18 +5035,16 @@
             const newPassword = document.getElementById('change-pwd-new').value;
             const confirmPassword = document.getElementById('change-pwd-confirm').value;
 
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
+
             if (newPassword !== confirmPassword) {
-                createToast(appState.currentLang === 'en' ? 'New passwords do not match!' : 'As novas senhas não coincidem!', 'danger');
+                createToast(t['error_passwords_dont_match'] || 'As senhas não coincidem!', 'danger');
                 return;
             }
 
             if (!validatePassword(newPassword)) {
-                createToast(
-                    appState.currentLang === 'en'
-                    ? 'New password must be at least 3 characters long.'
-                    : 'A nova senha deve conter no mínimo 3 caracteres.',
-                    'danger'
-                );
+                createToast(t['auth_password_short'] || 'A senha deve conter no mínimo 3 caracteres.', 'danger');
                 return;
             }
 
@@ -4205,13 +5074,12 @@
                     closeSettingsModal();
                 } else {
                     const err = await res.json();
-                    createToast(err.detail || 'Erro ao alterar senha', 'danger');
+                    createToast(err.detail || t['error_change_pwd_failed'] || 'Erro ao alterar senha', 'danger');
                 }
             } catch (e) {
-                createToast('Erro de rede: ' + e.message, 'danger');
+                createToast((t['toast_network_error'] || 'Erro de rede: ') + e.message, 'danger');
             } finally {
                 btn.disabled = false;
-                const lang = appState.currentLang || 'pt';
                 btn.textContent = (translations[lang] && translations[lang]['save_password_btn']) || "Atualizar Senha";
             }
         }
@@ -4241,6 +5109,9 @@
             btn.disabled = true;
             btn.textContent = '...';
 
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
+
             try {
                 const res = await fetch(`${API_BASE_URL}/api/esqueci-senha`, {
                     method: 'POST',
@@ -4253,13 +5124,12 @@
                     showLoginPane();
                 } else {
                     const err = await res.json();
-                    createToast(err.detail || err.error || 'Erro ao solicitar recuperação', 'danger');
+                    createToast(err.detail || err.error || t['error_recovery_failed'] || 'Erro ao solicitar recuperação', 'danger');
                 }
             } catch (e) {
-                createToast('Erro de rede: ' + e.message, 'danger');
+                createToast((t['toast_network_error'] || 'Erro de rede: ') + e.message, 'danger');
             } finally {
                 btn.disabled = false;
-                const lang = appState.currentLang || 'pt';
                 btn.textContent = (translations[lang] && translations[lang]['send_recovery_link_btn']) || "Enviar Link de Recuperação";
             }
         }
@@ -4269,19 +5139,16 @@
             const token = document.getElementById('reset-pwd-token').value;
             const newPassword = document.getElementById('reset-pwd-new').value;
             const confirmPassword = document.getElementById('reset-pwd-confirm').value;
+            const lang = appState.currentLang || 'pt';
+            const t = translations[lang] || translations['pt'];
 
             if (newPassword !== confirmPassword) {
-                createToast(appState.currentLang === 'en' ? 'Passwords do not match!' : 'As senhas não coincidem!', 'danger');
+                createToast(t['error_passwords_dont_match'] || 'As senhas não coincidem!', 'danger');
                 return;
             }
 
             if (!validatePassword(newPassword)) {
-                createToast(
-                    appState.currentLang === 'en'
-                    ? 'Password must be at least 3 characters long.'
-                    : 'A senha deve conter no mínimo 3 caracteres.',
-                    'danger'
-                );
+                createToast(t['auth_password_short'] || 'A senha deve conter no mínimo 3 caracteres.', 'danger');
                 return;
             }
 
@@ -4307,13 +5174,12 @@
                     document.querySelector('.auth-subtitle').style.display = 'block';
                 } else {
                     const err = await res.json();
-                    createToast(err.detail || 'Erro ao redefinir senha', 'danger');
+                    createToast(err.detail || t['error_reset_pwd_failed'] || 'Erro ao redefinir senha', 'danger');
                 }
             } catch (e) {
-                createToast('Erro de rede: ' + e.message, 'danger');
+                createToast((t['toast_network_error'] || 'Erro de rede: ') + e.message, 'danger');
             } finally {
                 btn.disabled = false;
-                const lang = appState.currentLang || 'pt';
                 btn.textContent = (translations[lang] && translations[lang]['reset_pwd_btn']) || "Salvar Nova Senha";
             }
         }
