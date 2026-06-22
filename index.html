@@ -1041,11 +1041,20 @@
             }, 120);
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/buscar`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nicho, cidade, lang: 'pt' })
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+                let response;
+                try {
+                    response = await fetch(`${API_BASE_URL}/api/buscar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nicho, cidade, lang: 'pt' }),
+                        signal: controller.signal
+                    });
+                } finally {
+                    clearTimeout(timeoutId);
+                }
 
                 if (!response.ok) {
                     const errData = await response.json();
@@ -1087,7 +1096,9 @@
                 document.getElementById('form-container').style.display = 'flex';
 
                 let msg = err.message;
-                if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+                if (err.name === 'AbortError') {
+                    msg = 'Tempo limite esgotado (30s). O servidor pode estar iniciando — aguarde um momento e tente novamente.';
+                } else if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
                     msg = 'Não foi possível conectar ao servidor. Certifique-se de que a API está rodando.';
                 }
                 createToast('Erro na Varredura: ' + msg, 'danger');
